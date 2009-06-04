@@ -1,0 +1,84 @@
+Readme for Monit with Solaris
+=============================
+
+Written by Christian Hopp <chopp@iei.tu-clausthal.de>  2002/07/15
+Updated by Christian Hopp <chopp@iei.tu-clausthal.de>  2003/06/11
+
+
+Installation of the package: (e.g. for Solaris 7/Sparc)
+-------------------------------------------------------
+
+You need "gzip" for solaris in order to unpack it. You can find it at
+http://www.sunfreeware.com for your platform.
+
+Then do...
+
+gzip -d  monit-4.0-sol7-sparc-local.pkg.gz
+pkgadd -d monit-4.0-sol7-sparc-local.pkg
+
+All the stuff went to /usr/local.  The documentation is located in
+/usr/local/doc/monit.  For the installation and configuration of monit
+please look in the documents located in /usr/local/doc/monit. An
+example of an init script is there, too.
+
+In the case that you are using the 64 bit binary, the path to the ssl
+libraries has to be set. For example adding the path to the Solaris
+bundled ssl libraries:
+
+  crle -64 -l /lib/64:/usr/lib/64:/usr/sfw/lib/64
+
+
+Deinstallation of the package:
+------------------------------
+
+Simply type...
+
+pkgrm GNUmonit
+
+...and the content of the package should be gone then.
+
+
+Generation of a Solaris package:
+--------------------------------
+
+First of all you need:
+        GNU/gzip
+        openssl
+        and all other stuff you need for compilation.
+
+All that you can find at http://www.sunfreeware.com .
+
+Start the "makesolpkg.sh" script.  Beware you have to be in the
+contrib/package/solaris directory to make it work.  The pkginfo and
+the prototype files are generated.  If you wish to use different
+settings like the base directory (aka prefix) or temporary directory
+just change it in the script.
+
+Example for creating the 64-bit monit package with Sun Studio compiler
+and SSL support enabled:
+
+sparc:
+  ./makesolpkg.sh \
+     --with-ssl-incl-dir=/usr/sfw/include \
+     --with-ssl-lib-dir=/usr/sfw/lib/64 \
+     CFLAGS='-xarch=v9' \
+     LDFLAGS='-xarch=v9'
+
+amd64:
+  ./makesolpkg.sh \
+     --with-ssl-incl-dir=/usr/sfw/include \
+     --with-ssl-lib-dir=/usr/sfw/lib/64 \
+     CFLAGS='-xarch=amd64' \
+     LDFLAGS='-xarch=amd64'
+
+Make sure that the path to the GNU/make in the script is right.  The
+generated file is named for Solaris 7/Sparc:
+
+  monit-4.0-sol7-sparc-local.pkg.gz
+
+
+Bye,
+
+C.Hopp
+
+

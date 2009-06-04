@@ -1,0 +1,135 @@
+
+Project standards
+-----------------
+
+   * Bug fixes and small code changes are updated in the CVS and the
+     mailing list is notified later.
+
+   * Adding new Features is the other way around. A proposal for a new
+     Feature is first sent to the mailing list, discussed there (and
+     possible voted on in case of major changes). If accepted, the CVS
+     is updated with the new code.
+
+     Adding new features also include updating the monit.pod file,
+     the CHANGES.txt and other relevant documentation files, like
+     ./monitrc for configuration syntax or semantic changes. It is
+     important that the documentation is *always* aligned with the
+     lates codebase.
+
+   *  Add yourself as an author to any files you have changed
+      substantially. Substantially changes means adding a new method
+      or adding more than a couple of new code lines in a file so the
+      program behavior was changed. The reason is mainly that you get
+      the credit for the work you have done and partly that others
+      will know whom to blame.
+
+
+Decision Making
+---------------
+
+   *  All Contributors are encouraged to participate in decisions, but
+      the decision itself is made by those that have Committer status
+      in the Project. In other words, the Project is a "Minimum
+      Threshold Meritocracy".
+
+   *  Each vote can be made in one of three flavors:
+
+     +1  "Yes," "Agree," or "the action should be performed." On some
+         issues this is only binding if the voter has tested the
+         action on their own system(s).  
+
+      0  "Abstain," "no opinion". An abstention may have detrimental
+         effects if too many people abstain.
+
+     -1  "No." On issues where consensus is required, this vote counts
+         as a veto. All vetos must contain an explanation of why the
+         veto is appropriate. Vetos with no explanation are void. No
+         veto can be overruled. If you disagree with the veto, you
+         should lobby the person who cast the veto. Voters intending
+         to veto an action item should make their opinions known to
+         the group immediately so that the problem can be remedied as
+         early as possible.
+
+
+Programs you will need to build a monit package
+-----------------------------------------------
+
+   * GNU make
+   * pod2html and pod2man
+   * flex
+   * yacc or bison (bison is recommended)
+   * Perl 
+   * GNU tar and GNU gzip
+   * autoconf (v. >= 2.53)
+   * automake (v. >= 1.5)
+   * doxygen (v. >= 1.2.15)
+
+
+
+Setting up the developing environment
+-------------------------------------
+
+   1. Run autogen.sh to create and run configure, or alternatively do:
+	autoheader
+	autoconf
+	./configure
+      Pass any configure arguments on the command line of autogen.sh if
+      you are running autogen.sh.
+
+   2. You will now have a Makefile for building the program. The
+      Makefile will handle any additional source files you add to the
+      project and will link everything to monit.
+
+   3. The man file for the project is monit.pod and a monit.1 man
+      file is created by using perl-pod and pod2man.
+
+   4. To build a new release run the make_dist script. This will
+      create a monit-{release-number}.tar.gz file in the current
+      directory.
+
+
+CVS standards
+-------------
+
+   * ONLY check-in files that will compile without any warnings.
+     (Change the CFLAGS macro in the Makefile to include -Wall;
+     CFLAGS = -Wall .. to compile with all warnings turned on)
+
+   * Regularly do a 'cvs update -d .' to keep your local copy in sync
+     with the master repository.
+
+   * To check out a certain release you can do:
+   
+     export CVS_RSH=ssh
+ cvs -z3 -duname@subversions.gnu.org:/cvsroot/monit/ co -r release-2-4-3 monit
+
+     Where uname is your developer name at Savannah.
+
+   * To check a files current tags, use: 'cvs status -v {filename}' 
+
+
+   For Project Managers:
+
+   * Every file in the project *must* be tagged with a release tag
+     matching the version number in configure.ac before a new release
+     is released. We use the following release tag standard:
+     release-x-y(-z) e.g. release-2-4-2
+
+   * The release numbers explained: 
+ 
+      x is for major feature releases
+      y is for minor feature releases
+      z is for bug fix releases
+
+   * To tag a new relase, use: 'cvs tag release-x-y-z .' This will tag
+     all the files in current directory, and (recursively), files in
+     any subdirectories. You can force a tag if you had to change
+     files after the first tag *BUT* before the release is official:
+     'cvs tag -F release-2-4-2 .'
+
+   * Only the project manager is allowed to create and tag a new
+     release
+
+
+-- 
+hauk@tildeslash.com

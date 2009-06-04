@@ -1,0 +1,81 @@
+#!/bin/sh
+# Get and install the latest monit version from CVS
+#set -vx
+
+help() {
+ cat << ENDTEXT
+Usage: `basename $0` [-h] installdir  
+This script will download and build the latest monit from CVS and install
+monit in 'installdir'. 
+ENDTEXT
+}
+
+merror() {
+   echo $1;
+	cd /tmp && rm -rf $builddir;
+	exit 1;
+}
+
+# Trap for cleanup
+trap 'merror "Aborted";' TERM INT
+
+case $# in
+1) installdir=$1;;
+*) help; exit 1;;
+esac     
+
+while getopts "h" c
+do
+ case $c in
+  h)  help;
+      exit 0;;
+ esac
+done
+
+# Do we have write permissions in installdir?
+if [ ! -d $installdir ]
+then
+	echo "Error, '$installdir' is not a directory"
+	exit 1;
+fi
+if [ ! -w $installdir ]
+then
+	echo "Error, cannot write to $installdir -- no permission"
+	exit 1;
+fi
+
+# Be quiet 
+exec 2>/dev/null
+
+# Build in /tmp
+builddir=$$_monit
+cd /tmp && mkdir $builddir && cd 1>/dev/null $builddir || { echo "Error creating build dir [/tmp/$builddir]"; exit 1; }
+
+# Get cvs version
+echo "Downloading monit from CVS, please wait.."
+export CVS_RSH=ssh
+cvs -Q -z3 -d:ext:anoncvs@savannah.nongnu.org:/cvsroot/monit co monit || merror "Error downloading from CVS" 
+cd 1>/dev/null monit
+echo "Succeded downloading monit"
+
+# Build
+echo "Building monit, please wait.."
+./autogen.sh 1>&2 || merror "Error configuring monit" 
+make 1>&2 || merror "Error building monit"
+echo "Succeeded building monit"
+
+# Install 
+echo "-------------------------------------------------------------------------------"
+VERSION=`perl -ne 'if(/AC_INIT.*\[(\w)([\.\w]+)(\-\w+)?\]/){print"$1$2$3\n";}' configure.ac`
+echo -n "Install monit version $VERSION? [y|n]? [y]"
+read variable <&1 
+if [ "xn" = "x$variable" ]
+then
+		merror "Install aborted"
+fi
+cp monit $installdir || merror "Error installing monit"
+chmod 755 $installdir/monit || merror "Error, cannot set $installdir/monit as executable"
+echo "Succeded installing monit at $installdir/monit"
+
+# Remove build dir
+cd /tmp && rm -rf $builddir;

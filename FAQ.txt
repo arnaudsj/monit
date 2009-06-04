@@ -1,0 +1,501 @@
+Short FAQ:
+----------
+
+   @version \$Id: FAQ.txt,v 1.31 2008/11/18 22:00:11 martinp Exp $
+
+
+1. Q: Monit watches processes by a pid file, so if a program crashes
+      without removing its pid file, then monit won't recognize it,
+      right?
+
+   A: Monit will always check that a pid in a pid file belongs to a
+      *running* process. If a program crashes and dies in a "normal"
+      manner, then the process ID (pid) will not exist and monit will
+      know that the program is not running (and restart it) even if a
+      pid file exist. Some servers *can* crash and leave a zombie
+      process, and appeare to run. Monit does also test for zombie
+      processes and will raise an alert if a process has become a
+      zombie.
+
+
+2. Q: I want to watch the FOO server, unfortunately monit does not
+      support the FOO protocol. And a FOO server won't send you a
+      welcome message which can easily be checked.
+
+   A: Just use the default port connection check. This check is in
+      most cases, more than good enough. You simply use:
+
+       if failed port FOO's-portnumber
+
+      in the monitrc file, monit will open a connection to this port
+      (TCP or UDP) and check that it is possible to send and recieve
+      data from the port (via the select system call or test for an
+      ICMP error in case of udp). If the connection fails or if the
+      port connection does not respond, monit will restart the
+      program. As of monit version 4.1 you can also write your own
+      protocol-tests using send and expect strings (see the manual).
+      Although this requires the server to use a text based protocol.
+
+
+3. Q: I have a program that does not create its own pid file. Since
+      monit requires all programs to have a pid file, what do I do?
+
+   A: Create a wrapper script and have the script create a pid file
+      before it starts the program. Below you will find an example
+      script for starting an imaginary program (a Java program in this
+      case).  Assuming that the script is saved in a file called
+      /bin/xyz, you can call this script from monit by using the
+      following in monitrc:
+
+      check process xyz with pidfile /tmp/xyz.pid
+        start = "/bin/xyz start"
+        stop = "/bin/xyz stop"
+
+
+          --8<--- (cut here)
+
+          #!/bin/bash
+          export JAVA_HOME=/usr/local/java/
+          export DISPLAY=localhost:0.0
+          CLASSPATH=ajarfile.jar:.
+
+          case $1 in
+           start)
+           echo $$ > /tmp/xyz.pid;
+           exec 2>&1 java -cp ${CLASSPATH} org.something.with.main \
+           1>/tmp/xyz.out 
+           ;;
+          stop)  
+           kill `cat /tmp/xyz.pid` ;;
+          *)  
+           echo "usage: xyz {start|stop}" ;;
+          esac
+   
+          --8<---- (cut here)
+
+
+4. Q: Tomcat (The Jakarta Servlet Container) does not create a pid
+      file and will put the server in the background.
+
+   A: Edit The catalina.sh script and find and remove the '&'
+      character which will put the Tomcat server in the
+      background. Then call tomcats startup.sh and shutdown.sh scripts
+      from a wrapper script like the one mentioned above.
+
+      or
+
+      If your catalina.sh contains lines with $CATALINA_PID, you can
+      just set CATALINA_PID=/path/file.pid enviroment variable.
+
+
+5. Q: I have started monit with HTTP support but when I telnet into
+      the monit http port the connection closes.
+
+   A: If you use the host allow statement, monit will promptly close
+      all connections from hosts it does not find in the host allow
+      list. So make sure that you use the official name for your host
+      or its IP address. If you have a firewall running also make sure
+      that it does not block connections on the monit port.
+
+
+6. Q: I'm having trouble getting monit to execute any "start" or
+      "stop" program commands.  The log file says that they're being
+      executed, and I can't find anything wrong when I run monit in
+      verbose mode.
+
+   A: Monit did start the program but for some reason the service dies
+      later. Before we go on and introduce you to the fine art of
+      system debugging, it's worth to note that:
+
+      For security reasons monit purges the environment and only set a
+      spartan PATH variable that contains /bin, /usr/bin, /sbin and
+      /usr/sbin. If your program or script dies, the reason could be
+      that it expects certain environment variables or to find certain
+      programs via the PATH. If this is the case you should set the
+      environment variables you need directly in the start or stop
+      script called by monit.
+
+
+7. Q: How can I run monit from init so it can be respawned in case monit
+      dies unexpectedly?
+
+   A: Use either the 'set init' statement in monits configuration file
+      or use the -I option from the command line. Here's a sample
+      /etc/inittab entry for monit:
+
+       # Run monit in standard runlevels
+       mo:2345:respawn:/usr/local/sbin/monit -Ic /etc/monitrc
+
+      After you have modified inits configuration file, you can run
+      the following command to re-examine the runlevel and start
+      monit:
+
+       telinit q
+
+      If monit is used to monitor services that are also started at
+      boot time (e.g. services started via SYSV init rc scripts or via
+      inittab) then in some situations a special race condition can
+      occur. That is; if a service is slow to start, monit can assume
+      that the service is not running and possibly try to start it and
+      raise an alert, while, in fact the service is already about to
+      start or already in its startup sequence. If you experience this
+      problem, here are a couple of strategies you can use to prevent
+      this type of race condition:
+
+
+      A) Start critical services directly from monit:
+
+        This is the recommended solution - let monit takeover the
+        responsibility for starting services. To use this strategy you
+        must turn off the systems automatic start and stop for all
+        services handled by monit.
+
+        On RedHat, you can for example use:
+
+	  chkconfig myprocess off
+
+        on Debian:
+
+	  update-rc.d -f myprocess remove
+
+        a general example:
+
+          mv /etc/rc2.d/S99myprocess /etc/rc2.d/s99myprocess
+
+        If monit is started from a rc script, then to start and stop
+        the service at systems shutdown, you should add the following
+        lines to monit's rc script:
+
+        on start:
+          /usr/local/bin/monit -c /etc/monitrc start myprocess
+
+        on stop:
+          /usr/local/bin/monit -c /etc/monitrc stop myprocess
+
+        or if monit handles more than one service, simply start/stop all
+        services by using:
+
+        on start:
+          /usr/local/bin/monit -c /etc/monitrc start all
+
+        on stop:
+          /usr/local/bin/monit -c /etc/monitrc stop all
+
+        If monit instead is started from init then, add a second line
+        to inittab to stop the service:
+
+          mo:2345:respawn:/usr/local/bin/monit -Ic /etc/monitrc
+	  mon:2345:wait:/usr/local/bin/monit -Ic /etc/monitrc start myprocess
+	  moff:06:wait:/usr/local/bin/monit -Ic /etc/monitrc stop myprocess
+
+        or to stop all services handled by monit:
+
+          mo:2345:respawn:/usr/local/bin/monit -Ic /etc/monitrc
+	  mon:2345:wait:/usr/local/bin/monit -Ic /etc/monitrc start all
+	  moff:06:wait:/usr/local/bin/monit -Ic /etc/monitrc stop all
+
+        Services handled by monit I<must> have start and stop methods
+        defined so monit can start and stop a service. For instance:
+
+          check process myprocess with pidfile /var/run/myprocess.pid
+	        start program = "/etc/init.d/myprocess start"
+	        stop program = "/etc/init.d/myprocess stop"
+	        alert foo@bar.baz
+
+
+      B) Make init wait for a service to start:
+
+        This solution will make the init process wait for the service
+        to start before it will continue to start other services. If
+        you are running monit from init, you must enter monit's line
+        at the end of /etc/inittab (A short example):
+
+          si::sysinit:/etc/init.d/rcS
+	  ...
+	  l2:2:wait:/etc/init.d/rc 2
+	  ...
+	  mo:2345:respawn:/usr/local/bin/monit -Ic /etc/monitrc
+
+        The rc script for the monitored service must be I<modified>
+        so, that it will not return unless the service was started or
+        start of the service timed out. Creative use of sleep(1) may
+        be sufficient.
+
+        As in the above example, services handled by monit must have
+        start and stop methods defined.
+
+
+      C) Enable the service monitoring manually from monit:
+
+	  check file myprocess.pid with path /var/run/myprocess.pid
+		if timestamp > 5 minutes then
+		   exec "/bin/bash -c '
+			/usr/bin/monit -c /etc/monitrc monitor myprocess;
+			/usr/bin/monit -c /etc/monitrc unmonitor myprocess.pid
+			'"
+	  check process myprocess with pidfile /var/run/myprocess.pid
+		start program = "/etc/init.d/myprocess start"
+		stop program = "/etc/init.d/myprocess stop"
+		alert foo@bar.baz
+		mode manual
+
+        This will cause monit to wait for 5 minutes before it will
+        enable monitoring of the service myprocess.
+
+
+
+8. Q: Why is monit not able to gather process data from a 64bit
+      applications?
+
+   A: Most probably monit was compiled as a 32bit application and
+      32bit applications cannot read /proc data for a 64bit
+      applications. Thus, you must compile monit with 64bit
+      support. Seel PLATFORMS file for platform specifics.
+      
+
+
+9. Q: How to set Monit to run from daemontools?
+
+   A: Use following script:
+
+       --8<--
+       #!/bin/bash
+
+       mkdir -pm 755 /service/monit/log
+
+       cat << EOF > /service/monit/run
+       #!/bin/bash
+       echo Starting Monit
+       exec /usr/bin/monit -Ic /etc/monitrc 2>&1
+       EOF
+
+       # optional if you want monit to log to multilog
+       cat << EOF > /service/monit/log/run
+       #!/bin/bash
+       exec multilog t ./main
+       EOF
+
+       chmod 755 /service/monit/run /service/monit/log/run
+       --8<--
+
+      Monit will be started automaticaly by supervise.
+
+      Above script causes that Monit will log via multilog.
+      This is additional option to traditional syslog and
+      own file logging. You can combine these methods or
+      use them exclusively - it depends on your needs.
+      
+      Note: If you want just log "Starting Monit" message
+      via multilog to know that supervise tried to start Monit
+      and Monit's output is not interesting for you, you can
+      change the Monit run script to not redirect standard
+      error output to standard output:
+
+       #!/bin/bash
+       echo Starting Monit
+       exec /usr/bin/monit -Ic /etc/monitrc
+
+
+10. Q: Is it possible to generate static monit binaries?
+
+    A: Yes, you can call configure like this:
+
+        env LDFLAGS="-static" ./configure
+
+
+11. Q: The monit binary seems quite bloated.  Is it possible to 
+       slim it down?
+
+    A: There are several ways to slim down monit:
+
+       a) If possible link monit against dynamic libraries.  This is 
+          the default behavior on most architectures.
+
+       b) Compile without debug information.  GCC must be started 
+          with out the "-g" option, e.g.:
+             
+             env CFLAGS="" ./configure
+
+       c) Use size optimization switches for the compiler, e.g. use
+          GCC with "-Os" for compiling.  It might look like this,
+
+             env CFLAGS="-Os" ./configure
+
+       d) Strip the binary.  A "strip monit" after compiling does the
+          work.
+
+       e) Compile without SSL support.  Start the configuration process
+          with the "--without-ssl" option.
+
+       Points a)-d) does not reduce the functionality of monit.  By 
+       applying point e) you loose of course any SSL functionality. 
+
+       On Linux it is possible to get some additional reduction by using
+       dietlibc[A] or uClibc[B] instead of GNU-libc.  They might not 
+       directly reduce the size of monit but it is not necessary to have
+       GNU libc installed on order to use monit.  If statically linked
+       binaries are required these libraries reduce the binary size 
+       dramatically.
+
+       It is possible to reduce the monit binary to a size of <320kB 
+       dynamically linked with SSL, <850kB statically linked with
+       SSL and <300kB statically linked without SSL using the plan above.
+
+       [A] http://www.fefe.de/dietlibc/
+       [B] http://www.uclibc.org/
+
+
+12. Q: When running in debug mode (using -v option) there are following error
+       messages (example):
+       --8<--
+       system statistic error -- orphaned process id 5812
+       system statistic error -- orphaned process id 5819
+       ...
+       system statistic error -- orphaned process id 5854
+       system statistic error -- cannot find process id 1 
+       --8<--
+
+    A: You are most probably running monit on system with security
+       restrictions which hides process with PID 1. For example LIDS 
+       and Linux-VServer are optionaly able to do so. Monit can run and 
+       work in this environment, but some system or process resource
+       statistics may be not available (will show zero as value). You can
+       also unhide PID 1 for monit's context and use for example unkillable
+       protection for PID 1 instead to provide access to monit to these
+       statistics.
+
+
+13. Q: Is here any support for external testing scripts available?
+
+    A: We plan to add the support for external scripts in the future (see our
+       TODO list - http://www.tildeslash.com/monit/doc/next.php#33). Until
+       native support will be available, here are some workarounds:
+
+       1.) nice workaround contributed by Pavel Urban is based on timestamp
+       monitoring of file, which is updated by external script, running from
+       cron. When everything is OK, the script will update (touch) the file.
+       When the state is false, the script won't update the timestamp and
+       monit will perform the related action.
+
+       For example script for monitoring the count of files inside /tmp
+       directory:
+       --8<--
+       #!/bin/bash
+       if [ `ls -1 /tmp |wc -l` -lt 100 ]
+       then
+         touch /var/tmp/monit_flag_tmp
+       fi
+       --8<--
+
+       run this script via cron (for example, every 20 minutes):
+       --8<--
+        20 * * * * /root/test_tmp_files > /dev/null 2>&1
+       --8<--
+
+       and do timestamp check on /var/tmp/monit_flag_tmp (or any file you decide)
+       in monit control file:
+       --8<--
+        check file monit_flag_tmp with path /var/tmp/monit_flag_tmp
+          if timestamp > 25 minutes then alert
+       --8<--
+
+       Done :)
+
+       Another Example script: for monitoring the Solaris Volume Manager
+       metadevices:
+       --8<--
+       #!/usr/bin/bash
+       /usr/sbin/metastat | /usr/xpg4/bin/grep -q maintenance
+       if [ $? -ne 0 ]; then
+         touch /var/tmp/monit_flag_svm
+       fi
+       --8<--
+
+       2.) alternatively you can use the monit's file content testing to watch
+       logfiles or status files created similar way as described above.
+
+       Example script:
+       --8<--
+       #!/usr/bin/bash
+       /usr/sbin/metastat > /var/tmp/monit_svm
+       --8<--
+
+       and example monit syntax:
+       --8<--
+       check file svm with path /var/tmp/monit_svm
+         if match "maintenance" then alert
+       --8<--
+
+
+14. Q: How to set Monit to run from upstart?
+
+   A: Use following script (thanks to Michael Hale):
+       --8<--
+       # This is an event.d (upstart) script to keep monit running
+       # To install disable the old way of doing things:
+       #
+       #   /etc/init.d/monit stop && update-rc.d -f monit remove
+       #
+       # then put this script here: /etc/event.d/monit
+       #
+       # You can manually start and stop monit like this:
+       # 
+       # start monit
+       # stop monit
+       #
+       # Michael Hale (http://halethegeek.com)
+
+       start on runlevel 2
+       start on runlevel 3
+       start on runlevel 4
+       start on runlevel 5
+
+       stop on runlevel 0
+       stop on runlevel 6
+
+       exec /usr/sbin/monit -Ic /etc/monit/monitrc
+       respawn
+       --8<--
+
+
+-------------------------------------------------------------------------------
+
+HOW-TO debug monit: 
+
+   a) Start monit
+
+   b) Stop the service you want monit to monitor. Let's say sshd.
+
+   c) Run: strace -f -p $(cat ~/.monit.pid) 2>&1|tee trace.out
+
+   d) Wait for monit to wake up and try to start sshd. (Or wake up
+      the monit daemon in another console by calling monit again)
+
+   e) If you can see a line like this in the trace console with the
+      significant `= 0' at the end, it means that monit did in fact
+      start sshd
+
+   execve("/etc/init.d/sshd", ["/etc/init.d/sshd", "start"], [/* 1 var */]) = 0
+
+   After this statement, monit is (probably) guiltless and you must
+   search for the fault further down in the trace output.  Search for
+   system calls that return -1, error codes like ENOENT or for the
+   Segmentation fault signal, SIGSEGV).
+
+   Here's a `grep' trick you can use to search in the output file from
+   trace.
+          
+     egrep "= -[0-9]*| E[A-Z]*|SIGSEGV" trace.out
+
+   If you have problems understanding and reading the trace file; join
+   the monit mailing list and send us the output from the trace with a
+   description of the bug, the Unix system you are using, the monit
+   version and your monitrc control file.
+
+If you know C, another option is to use the GNU debugger to debug
+monit. Use the -I switch when monit runs inside gdb, this way monit
+does not fork of a daemon process which makes it easier to debug.
+
+
+
+

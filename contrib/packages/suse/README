@@ -1,0 +1,91 @@
+
+    $Id: README,v 1.1 2002/07/12 12:25:26 leppo Exp $
+
+    below you find a mail from monit-general, which describes in short, how
+    to build a SuSE RPM from the sources plus the files you find in here.
+    By times I will rewrite it. (Suggestions and corrections welcome.)
+
+    So far, remember to check the version in monit.spec.
+    Or check for ready packages on http://savannah.gnu.org/download/monit/
+
+    The spec in suse/7.3 should work with 7.2 and 7.1, too.
+
+    Have fun!
+    Leppo.
+
+------------------------------------------------------------------------------
+
+Re: Monit 2.4.3 SuSE 7.3 Spec ++ #2
+Datum: Wed, 10 Jul 2002 12:29:08 +0200
+Von: Thomas Oppel <oppel@kbis.de>  (Kourentis und Brüggemann GbR)
+An: monit-general@mail.freesoftware.fsf.org
+Antwort an: monit-general@mail.freesoftware.fsf.org
+Am Dienstag, 9. Juli 2002 20:21 schrieb Jan-Henrik Haukeland:
+> Thomas Oppel <oppel@kbis.de> writes:
+> > just got ready with that. Thought some might like it:
+> > Appended are a spec for SuSE 7.3 (7.2, 7.1) boxes plus an adjusted init
+> > file (taken from Clinton Works in /contrib) and the notorious
+> > /etc/rc.config.d START_MONIT=[yes|no] option.
+>
+> Thanks. The thing is that I don't know squat about package building. I
+> barley know how to use rpm to install a package :)
+>
+> Is this something I can use to build a monit RPM package?  In that
+> case how do I do it?  and can this be used to build a rpm package for
+> RedHat? Monit is in the new (unstable) Debian release so a Debian
+> package is covered, but it would be nice to have a rpm of monit.
+
+Yep. And it's easy. Guess you have a RPM system, just do:
+
+    cp monit.init /usr/src/packages/SOURCES/
+    cp monit.rc.config /usr/src/packages/SOURCES/
+
+    cp monit-2.4.3.tar.gz /usr/src/packages/SOURCES/
+
+    cp monit.spec /usr/src/packages/SPECS/
+
+(This is what the src.rpm install would do. - Well, the SRPM is about 270K
+big, a bit too large as to be send to a mailing list...)
+
+A   rpm -ba /usr/src/packages/SPECS/monit.spec  then builds
+
+    /usr/src/packages/RPMS/i386/monit-2.4.3-8k.i386.rpm
+    /usr/src/packages/SRPMS/monit-2.4.3-8k.src.rpm
+
+To integrate it into the RPM system, execute (f.e.):
+
+    rpm -Uvh /usr/src/packages/RPMS/i386/monit-2.4.3-8k.i386.rpm
+
+The whole outcome with my spec is a SuSE 7.3 (7.2, 7.1) compliant RPM.
+monit.init will be installed as /etc/init.d/monit (plus runlevel links)
+monit.rc.config goes into /etc/rc.config.d/
+Your monitrc wents in as /etc/monit.conf.
+Edit monit.conf, set START_MONIT to 'yes' in /etc/rc.config.d/monit.rc.config
+and that's it.
+Documentation will be found under /usr/share/doc/packages/monit and in
+/usr/share/man/man1.
+
+Because of the differences in the init process and the system configuration,
+RedHat RPMs mostly won't work on SuSE boxes and vice versa.
+
+As we introduced monit to look for our apache-2.0.39 production server, I will
+rebuild monit by times.
+If you like, I can continue contributing the SuSE 7.x specs and files.
+If you wish to offer RPMs, we have to solve the trust problem (md5sums,
+pgpkeys).
+For the moment I'd rather encourage to put the SuSE spec and files plus this
+mail as 'README.SuSE' together into a special contrib subfolder.
+
+The here apended SuSE spec contains a minor fix to the one posted yesterday,
+as it lists the last entry in '%files' correcctly as '%doc' and not as
+'%dir'.
+(What lacks at the moment to get things fully compliant are merely some
+clean-ups in the init script and corrected 'neededforbuild' and
+'usedforbuild' entries in the spec. But that doesn't matter much to get
+things running.)
+By times I can mangle it to have a SuSE 8.0 compliant spec + rpm, too.
+
+If you like to have me maintaining the SuSE stuff in cvs, okay.
+
+Greetings,
+Thomas Oppel

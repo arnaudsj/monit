@@ -1,0 +1,18 @@
+#!/bin/sh
+# Start/stop the monitoring server
+
+PATH=$PATH:/usr/local/bin # Change to the right path
+CONFFILE=/root/.monitrc # This is default!
+
+case "$1" in
+'start')
+	monit -c $CONFFILE
+	;;
+'stop')
+	monit -c $CONFFILE quit
+	;;
+*)
+	echo "Usage: $0 { start | stop }"
+	;;
+esac
+exit 0

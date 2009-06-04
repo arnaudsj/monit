@@ -1,0 +1,105 @@
+#! /bin/sh
+#
+#   $Id: monit.init,v 1.8 2008/10/04 02:57:18 hauk Exp $
+#
+#   /etc/init.d/monit
+#
+#   Authors:	Clinton Work <work@scripty.com>, 2001
+#		Thomas Oppel <oppel@kbis.de>, 2002
+#
+#   Some commments and structure derive from SuSE 7.3 init files.
+#
+#   monit is a simple daemon process to restart processes if
+#   they die. It can also check tcp and udp ports to make sure
+#   that they are responding. http://mmonit.com/monit/
+#
+#   Copyright (C), 2000-2007 by Contributors to the monit codebase. 		
+#
+#   Licence:	GNU General Public License (GPL), 
+#               http://www.gnu.org/licenses/gpl.html
+#
+# processname: monit
+# pidfile: /var/run/monit.pid
+# config: /etc/monit.conf
+#
+### BEGIN INIT INFO
+# Provides:       monit
+# Required-Start: $network $syslog
+# Required-Stop:  $network $syslog
+# Default-Start:  2 3 5
+# Default-Stop:	  2 3 5
+# Description:    Start monit, the daemon monitoring daemon.
+### END INIT INFO
+
+
+# Source function library.
+#. /etc/rc.d/init.d/functions
+test -s /etc/rc.config.d/monit.rc.config	&& . /etc/rc.config.d/monit.rc.config
+test -s /etc/rc.status				&& . /etc/rc.status
+
+#
+# Determine the base and follow a runlevel link name.
+#
+base=${0##*/}
+link=${base#*[SK][0-9][0-9]}
+
+#
+# Force execution if not called by a runlevel directory.
+#
+test $link = $base && START_MONIT="yes"
+test "$START_MONIT" = yes || exit 0
+
+# 
+# the path to your httpd binary, including options if necessary
+#
+MONIT_BIN=/usr/bin/monit
+test -x $MONIT_BIN		|| exit 5
+rc_reset
+
+MONIT_CONF=/etc/monit.conf
+
+RETVAL=0
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting monit: "
+	startproc $MONIT_BIN -c $MONIT_CONF -l syslog -d 120
+	RETVAL=$?
+	rc_status -v
+	test $RETVAL -eq 0	&& touch /var/lock/subsys/monit
+	;;
+  stop)
+	echo -n "Stopping monit: "
+	killproc $MONIT_BIN
+	RETVAL=$?
+	rc_status -v
+	test $RETVAL -eq 0	&& rm -f /var/lock/subsys/monit
+	;;
+  status)
+        echo -n "Checking for monit: "
+	checkproc $MONIT_BIN
+	rc_status -v
+#	echo "Checking for daemon uptimes:"
+	$MONIT_BIN -c $MONIT_CONF status
+        ;;
+  restart)
+  	$0 stop
+	$0 start
+#	RETVAL=$?
+	rc_status
+	;;
+  reload)
+	killall -HUP monit
+#	RETVAL=$?
+	rc_status -v
+	;;
+  *)	echo "Usage: $0 {start|stop|status|restart|reload}"
+	exit 1
+	;;
+esac
+
+#exit $RETVAL
+
+# Inform the caller not only verbosely and set an exit status.
+rc_exit

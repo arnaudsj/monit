@@ -1,0 +1,68 @@
+
+			  The Monit Project
+
+		   http://mmonit.com/monit/
+
+============================================================================
+
+The monit project group:
+
+    Martin Pala (martinp@tildeslash.com)
+      The Project Manager and overhead projector maintainer
+ 
+    Jan-Henrik Haukeland (hauk@tildeslash.com)
+      Whiteboard and coffee machine operator
+
+Monit Emeritae (old team members now off doing other things):
+
+    Rory Toma (rory@digeo.com)
+      VP of Run Level 9
+
+    Christian Hopp (chopp@iei.tu-clausthal.de)
+      Research exotic stuff and brews interesting tea
+
+    Thomas "Leppo" Oppel (oppel at kbis de)
+
+
+Other major contributors:
+
+    Mark Ferlatte (ferlatte@cryptio.net)
+      Fixed our autoconf system, contributed bugfixes 
+      and many good ideas.
+
+    Igor Homyakov (homyakov@altlinux.ru)
+      Created several protocol tests, contributed bugfixes 
+      and many good ideas.
+
+
+Contributors in alphabetical order:
+
+ Michael Amster
+ Philipp Berndt
+ Olivier Beyssac
+ Marco Bisioli
+ Joe Bryant
+ Will Bryant
+ Dave Cheney
+ Sébastien Debrard
+ Fco.Javier Felix
+ David Fletcher
+ Pierrick Grasland
+ Klaus Heinz
+ Peter Holdaway
+ Mostafa Hosseini
+ Francois Isabelle
+ Oliver Jehle
+ Artyom Khafizov
+ Bret McDanel
+ Kianusch Sayah Karadji
+ Thomas Lohmueller
+ Vlada Macek
+ Michel Marti
+ Wilhelm Meier
+ Arkadiusz Miskiewicz
+ Tatsuya Nonogaki
+ Rick Robino
+ Richard Schwaninger
+ Margarida Sequeira
+

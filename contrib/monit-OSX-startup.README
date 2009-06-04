@@ -1,0 +1,88 @@
+monit Mac OS X Startup Item
+===========================
+
+Author: Rick Robino < rrobino at wavedivision!com >
+
+
+This README describes a procedure to automatically start the
+monit system monitor software upon boot for Mac OS X.
+
+Files:
+------
+Startup Script
+	./monit
+Sample Configuration file
+	./monitrc
+New (10.3+) Startup Plist
+	./monit.plist
+Startup Parameter file
+	./StartupParameters.plist
+
+Instructions:
+-------------
+o  pre OS X v10.3:
+	1.  Create a StartupItems directory called "monit"
+		sudo mkdir -p /Library/StartupItems/monit
+	2.  Move the files in this archive to the startup directory
+		sudo mv -i -- * /Library/StartupItems/monit
+	3.  Add the line "MONIT=-YES-" to /etc/hostconfig
+		sudo echo "MONIT=-YES-" >> /etc/hostconfig
+o  post OS X v10.3:
+	1.  Move the monit.plist file in this archive to the startup directory
+		sudo mv -i -- monit.plist /etc/mach_init.d/
+o  Copy the sample configuration file to /etc/ and edit*
+	sudo cp -i -- /Library/StartupItems/monit/monitrc /etc/
+	sudo vi /etc/monitrc
+o  Ensure permissions are correct for the configuration file
+	sudo chmod 0700 /etc/monitrc
+	sudo chown root:admin /etc/monitrc
+o  Start the monit service manually, or reboot.  Examples:
+	- /usr/local/bin/monit
+	- /usr/libexec/register_mach_bootstrap_servers /etc/mach_init.d/monit.plist
+	- sudo /Library/StartupItems/monit/monit start
+	- sync && reboot
+o  Test the monit service
+	sudo monit status
+
+Notes:
+------
+o  enable and test any mail server specified in the configuration
+o  If using OS X Server, be aware that there is a similar service to monit
+called "WatchDog" - it also uses the Order parameter of Late
+o  try out m/monit if you have monit managing more than one system
+o  if monitoring the checksum property, be sure to verify and update the 
+sums immediately after softwareupdate(8) is run
+o  generate pid files for any monitored service that don't generate one 
+themselves (e.g., sshd), edit the startup wrapper if necessary
+o  short list of pid-files that often exist, under /var/run:
+	automount.pid
+	configd.pid
+	cron.pid
+	diskarbitrationd.pid
+	httpd.pid
+	lockd.pid
+	lookupd.pid
+	mDNSResponder.pid
+	natd.pid
+	named.pid
+	netinfo_local.pid
+	ntpd.pid
+	racoon.pid
+	servermgrd.pid
+	syslog.pid
+	vpnd-L2TP.pid
+	watchdog.pid
+	xinetd.pid
+o  if you are not comfortable editing the firewall configuration by hand
+then carefully consider whether or not you should enable web access at all
+o  fully RTFM by reading the manual, online docs, and mail archives before
+reporting problems or asking for help.  The monit project's lists are _not_
+the place to ask for help with general Mac OS X issues.
+
+References:
+-----------
+*Tildeslash Technology Ltd's official monit manual
+	http://www.tildeslash.com/monit/monit.html
+Apple's Introduction to System Startup
+	http://developer.apple.com/documentation/MacOSX/Conceptual/BPSystemStartup/BPSystemStartup.html
+

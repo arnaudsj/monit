@@ -1,0 +1,39 @@
+Monit Security Advisory [05 April 2004]
+
+Updated version of monit is now available which correct two security
+issues:
+
+
+1. Monit HTTP Interface Buffer Overflow Vulnerability
+=====================================================
+
+Monit implements a simple HTTP interface that supports Basic
+authentication. This interface suffers from a buffer overflow
+vulnerability when handling a client that authenticates with malformed
+credentials. An attacker could send a carefully crafted Authorization
+header to the monit server and cause the server to either crash or
+worse to execute arbitrary code with the privileges of the monit user.
+
+
+2. Off-By-One Overflow in Monit HTTP Interface
+==============================================
+
+This buffer overflow lies in the handling of POST submissions with
+entity bodies. If the request body has the exact length of X bytes,
+monit will write one byte past its designated input buffer. This error
+can cause the monit server to crash.
+
+
+Recommendations
+---------------
+
+Upgrade to monit version 4.2.1. (or turn off http support in previous
+monit versions)
+
+
+Credits
+-------
+
+The monit team would like to thank Matthew Murphy <mattmurphy at kc rr
+com> for discovering and courteously reporting these issues to the
+monit team.

@@ -1,0 +1,89 @@
+
+		Design notes on protocol modules
+	  ---------------------------------------------
+
+
+This is a short note on how to create a new or change an existing
+protocol module. 
+
+The protocol design is based on the Delegation Pattern found shortly
+described in the book "Design Patterns" by Erich Gamma, et
+al. Delegation is a way to extend and reuse the functionality of a
+class by writing a new class with added functionality that the
+original class uses to provide new functionality.
+
+The placeholder for a protocol function (new class) is the myprotocol
+object found in the monitor.h file. The protocol object contains a
+pointer to a function [1], which will be called in the connection
+testing method; validate.c:check_process_connection() (the original
+class). The signature for the abstract function is:
+
+  int (*check)(Socket_T); 
+
+Where the Socket_T parameter is a Socket object opened against a
+server. The socket is guaranteed to be ready for i|o multiplexing
+before the check function is called. The function will use this socket
+to test the protocol in question and return TRUE or FALSE depending on
+success or failure when speaking with the server.
+
+The parser, parsing the users control file, is responsible for
+creating and initializing the protocol object with the relevant
+'concrete' protocol function. The parser use the protocol factory
+module (protocol.c) for this. For example the following statement
+in the control file will create a new protocol object for testing
+the http protocol.
+
+ host localhost port 80 protocol http
+
+In this case the parser (p.y) will instantiate a protocol object
+with the relevant function for checking the HTTP protocol, i.e.:
+check_http.
+
+
+	  ---------------------------------------------
+
+
+An example is called for; Let's say you want to add a new test
+for the (imaginary), xyz protocol. Here's what you have to do:
+
+1) Copy default.c to xyz.c in the protocols directory and change
+   the name of the function from check_default to check_xyz.
+
+2) Add the new function prototype, a factory method prototype
+   and the #define P_XYZ <number> to protocol.h. I.e.:
+     void *create_xyz(); <- factory method
+     int check_xyz(Socket_T); <- protocol method
+   And create the factory method create_xyz() in protocol.c.
+
+3) Add the token xyz to the lexer and parser. (l.l and p.y). Just
+   like, for example, the http token.
+
+4) In the parser (p.y), go to the function, addprotocol() and add
+   create_xyz to the switch statement. Also extend the protocol: 
+   statement in the parser to include the new xyz protocol. I.e.:
+
+     | PROTOCOL XYZ    { portset.protocol= addprotocol(P_XYZ); }
+
+5) Run make to build monit with the new protocol module. You
+   don't have to change the Makefile. The Makefile will find 
+   your new xyz.c file and compile it.
+
+5) Edit your control file to test your new protocol, e.g.
+   (NB! use a real port number to the server that speaks xyz):
+  
+     if failed port 8040 protocol xyz then alert
+
+6) It's time for testing; Run monit from the command line: 
+
+     monit -v validate
+
+   And look for a line in the console saying something like:
+
+   ... succeeded testing protocol [XYZ] at localhost:8040
+
+7) That's it! The last thing to do is to fill in the real logic
+   in the check_xyz function. Have a look at the other modules
+   for inspiration.
+
+
+	  ---------------------------------------------

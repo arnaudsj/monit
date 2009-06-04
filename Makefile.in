@@ -1,0 +1,182 @@
+# Copyright (C) 2009 Tildeslash Ltd. All rights reserved.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 3.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ---------------------------------------------------------------------
+#
+# SYNOPSIS
+#     make {all|install|clean|uninstall|distclean|devclean}
+#
+# AUTHOR: 
+#     Jan-Henrik Haukeland, <hauk@tildeslash.com>
+#
+# CVS INFO
+#     $Id: Makefile.in,v 1.39 2009/05/09 10:18:31 martinp Exp $
+
+
+# Programs (with common options):
+SHELL           = /bin/sh
+RM		= /bin/rm -fr
+MV              = /bin/mv -f
+ETAGS           = etags
+
+# Install modes 
+MODE_PROGS      = 555
+MODE_FILES      = 444
+MODE_CONF       = 600
+MODE_DIRS       = 755
+
+INSTALL         = @INSTALL@ 
+INSTALL_PROG    = $(INSTALL) -m $(MODE_PROGS) -s
+INSTALL_FILE    = $(INSTALL) -m $(MODE_FILES)
+INSTALL_DIR     = $(INSTALL) -m $(MODE_DIRS) -d
+
+DESTDIR         =
+
+# ------------------------------------------------------------------- #
+
+prefix = @prefix@
+exec_prefix = @prefix@
+
+BINDIR 	= @bindir@
+MANDIR 	= @mandir@/man1
+
+# ------------------------------------------------------------------- #
+
+# Name of program to build
+PROG		= monit
+
+INCDIR		= -I. -I./device -I./http -I./process -I./protocols
+LIB 		= @LEXLIB@ @LIBS@
+DEFINES		= -D@ARCH@ -DSYSCONFDIR="\"@sysconfdir@\""
+
+# ------------------------------------------------------------------- #
+
+CC		= @CC@
+LEX 		= @LEX@
+YACC 		= @YACC@
+
+LINKFLAGS	= @LDFLAGS@
+CFLAGS		= $(DEFINES) $(INCDIR) @CFLAGS@ @CPPFLAGS@
+LEXFLAGS	= -i
+YACCFLAGS 	= -dvt -o y.tab.c
+
+# ------------------------------------------------------------------- #
+
+# Grammar files
+GRAMMAR 	:= y.tab.c lex.yy.c
+
+# Filter out platform spesific files
+FILTER          := $(wildcard device/sysdep_*.c process/sysdep_*.c\
+                              external/*.c)
+
+EXTERNALS	:= @EXTERNALS@
+
+# Source files
+SOURCE          := $(filter-out $(GRAMMAR) $(FILTER), \
+                   $(wildcard *.c) $(wildcard */*.c)) \
+                   device/sysdep_@ARCH@.c\
+                   process/sysdep_@ARCH@.c\
+                   $(GRAMMAR) $(EXTERNALS)
+
+# Object files
+OBJECTS 	:= $(SOURCE:.c=.o) 
+
+# Man files
+MAN_OBJS  	:= $(wildcard *.1)
+
+# Header files
+HEADERS 	:= $(wildcard *.h)\
+		   $(wildcard device/*.h)\
+                   $(wildcard http/*.h)\
+                   $(wildcard process/*.h)\
+                   $(wildcard protocols/*.h)
+
+# ------------------------------------------------------------------- #
+
+define check-exit
+|| exit 1
+
+endef
+
+# -----
+# Rules
+# -----
+%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+# -------
+# Targets
+# -------
+.PHONY: all clean install uninstall distclean devclean
+
+all : $(PROG)
+
+$(PROG) : $(GRAMMAR) $(OBJECTS) 
+	$(CC) $(LINKFLAGS) $(OBJECTS) $(LIB) -o $(PROG) 
+
+clean::
+	$(RM) *.orig *~ \#* $(PROG) core $(OBJECTS) $(GRAMMAR) tokens.h
+
+# remove configure files
+distclean:: clean
+	$(RM) config.cache config.log config.status Makefile config.h \
+	autom4te*
+
+devclean:: clean distclean
+	$(RM) configure config.h.in aclocal.m4
+
+install:: $(PROG)
+	$(INSTALL_DIR) $(DESTDIR)$(BINDIR) $(check-exit)
+	$(INSTALL_DIR) $(DESTDIR)$(MANDIR) $(check-exit)
+	$(INSTALL_PROG) $(PROG) $(DESTDIR)$(BINDIR) $(check-exit)
+	$(foreach file, $(MAN_OBJS), \
+		$(INSTALL_FILE) $(file) $(DESTDIR)$(MANDIR)/$(file) \
+	$(check-exit))
+
+uninstall:: 
+	$(RM) $(DESTDIR)$(BINDIR)/$(PROG) $(check-exit)
+	$(foreach file, $(MAN_OBJS), \
+		$(RM) $(DESTDIR)$(MANDIR)/$(file) \
+	$(check-exit))
+
+doc::   
+	doxygen doxygen.cfg
+
+etag:
+	$(ETAGS) $(filter-out $(GRAMMAR), $(FILTER) $(SOURCE)) p.y l.l
+
+
+# ---
+# Dep
+# ---
+$(OBJECTS): $(HEADERS)
+
+# -------------
+# Grammar rules
+# -------------
+
+# Byacc prepends banner where it includes the stdlib.h before the p.y
+# prologue section. When monit is compiled on linux as 32-bit application
+# with largefiles (LFS) support, the _FILE_OFFSET_BITS is not set
+# thus the off_t doesn't match and monit will crash. To workaround
+# this problem we need to include our config.h ahead of byacc banner.
+# Note that bison is not affected and doesn't require this workaround.
+y.tab.c tokens.h: p.y
+	$(YACC) $(YACCFLAGS) $<
+	echo "#include <config.h>" > .y.tab.c
+	cat y.tab.c >> .y.tab.c
+	$(MV) .y.tab.c y.tab.c
+	$(MV) y.tab.h tokens.h
+lex.yy.c: l.l
+	$(LEX) $(LEXFLAGS) $<
+

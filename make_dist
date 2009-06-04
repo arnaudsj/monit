@@ -1,0 +1,87 @@
+#!/bin/sh
+#
+# Build the monit.tar.gz package
+#
+: ${MAKE:=make}
+
+clean_up() 
+{
+ rm -f $CONFIGURE_OBJS
+ rm -f $MAN_OBJS
+ rm -f pod2* 
+ rm -fr ./autom4te*
+ rm -f log
+ rm -f aclocal.m4
+ rm -f monit.spec
+ rm -f valgrind*
+ rm -f y.output
+ find ./ -name ".#*" -exec rm -f {} \;
+ find ./ -name "*orig" -exec rm -f {} \;
+}
+
+# Get version from the configure.ac file
+VERSION=`perl -ne 'if(/AC_INIT.*\[(\w)([\.\w]+)(\-\w+)?\]/){print"$1$2$3\n";}' configure.ac`
+# Get current dir. must be named monit
+WORKDIR=`basename $PWD`
+# The relase string
+RELEASE="${WORKDIR}-${VERSION}"
+# The tar.gz file name
+TARGET=$RELEASE.tar.gz
+
+# Objects created by configure
+CONFIGURE_OBJS="Makefile config.cache config.log config.h config.h.in \
+		confdefs.h config.status configure"
+
+# Man-file objects
+MAN_OBJS="*.1"
+
+# Create the Makefile
+./autogen.sh
+
+# Cleanup before build
+rm -f *.tar.gz
+${MAKE} devclean
+clean_up
+
+# --------------------
+# Create documentation
+# --------------------
+#rm -f doc/api-docs/*
+#perl -pi.bak -e 's/\@VERSION\@/'$VERSION'/' doxygen.cfg
+#${MAKE} doc
+#mv doxygen.cfg.bak doxygen.cfg
+echo "Generating documentation"
+d=`date  '+%B %d. %Y'`
+pod2man -center "User Commands" --release "${d}" \
+                  --date="www.tildeslash.com" --lax monit.pod > monit.1
+pod2html monit.pod > doc/monit.html
+rm -f pod2*
+grep -v "<\?php include" web/doc/examples.php | sed -e 's/<img src="index.gif">//' > doc/examples.html
+chmod 644 doc/examples.html
+
+# Copy the specfile to allow direct rpmbuild -ta
+cp contrib/packages/redhat/monit.spec ./
+perl -pi -e 's/^Version: .*/Version: '$VERSION'/' monit.spec
+
+# -----------------------------
+# Set standard file permissions
+# -----------------------------
+chmod 600 monitrc
+chmod 755 install-sh
+
+# -------------
+# Build package
+# -------------
+./autogen.sh   # configure, config.h.in
+${MAKE} distclean # Keep only the relevant files
+
+# Build the dist file using current version in filename
+cd ..
+mv $WORKDIR $RELEASE # Rename the monit dir to include the version number
+tar zcvfX ${TARGET} $RELEASE/exclude $RELEASE # Create the tar file
+mv $RELEASE $WORKDIR # Rename the work dir. back to monit
+mv $TARGET $WORKDIR # Move the tar.gz package into work dir.
+cd $WORKDIR
+
+# cleanup
+clean_up

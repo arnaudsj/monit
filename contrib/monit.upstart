@@ -1,0 +1,26 @@
+# This is an event.d (upstart) script to keep monit running
+# To install disable the old way of doing things:
+#
+#   /etc/init.d/monit stop && update-rc.d -f monit remove
+#
+# then put this script here: /etc/event.d/monit
+#
+# You can manually start and stop monit like this:
+# 
+# start monit
+# stop monit
+#
+# Michael Hale (http://halethegeek.com)
+
+start on runlevel 2
+start on runlevel 3
+start on runlevel 4
+start on runlevel 5
+
+stop on runlevel 0
+stop on runlevel 6
+
+exec /usr/sbin/monit -Ic /etc/monit/monitrc
+instance
+respawn
+

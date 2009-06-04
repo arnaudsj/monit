@@ -1,0 +1,17 @@
+CVS
+make_dist
+exclude
+man
+*.pod
+web
+man1
+rpm
+Makefile
+test
+bottom
+doxygen.cfg
+TAGS
+autogen.sh
+autom4te*
+packages
+presentation.sxi

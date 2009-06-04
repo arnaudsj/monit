@@ -1,0 +1,208 @@
+			    Platform Notes
+			    --------------
+
+This file describes platform specific notes for monit.  In case you
+are looking for precompiled packages for your platform you might want
+to have a look in the PACKAGES file.
+
+Platforms overview in alphabetical order:
+
+ o Darwin (Mac OS X)
+ o FreeBSD
+ o Linux
+ o NetBSD
+ o OpenBSD
+ o Solaris
+
+Following platforms are not actively maintained because of lack of testing
+machine for these OS's. They may work - its support was added and confirmed
+in particular monit releases by contributors. Possible status reports, bug
+reports, patch contributions or access to such platforms for development is
+welcomed :)
+
+ o AIX
+ o HPUX
+
+
+Platform specific notes:
+========================
+
+
+GNU/Linux
+=========
+
+Monit compiles out of the box on Linux.  Some Linux Distributions
+might have monit as a precompiled package (see PACKAGES).
+
+In order to be able to use resource support you have to have PROCFS
+support enabled in your kernel.  In case your kernel has fortified
+your proc filesystem, e.g. using the openwall patchset, you might need
+to start monit as the root user. 
+
+In case a glibc replacement is used one of the following parts may
+apply.
+
+dietlibc
+--------
+
+Since version 4.0 the use of dietlibc is supported by monit.  For SSL
+support you need to compile the ssl libraries with dietlibc; use the
+"--with-ssl-lib-dir=<path>" option to configure monit.
+
+A configure for dietlibc might look like this:
+
+  env CC="diet gcc" CFLAGS="-Os" \
+      ./configure --with-ssl-lib-dir=/usr/lib/diet/lib-i386/
+
+
+uClibc
+------
+
+The support for uClibc has been integrated in version 4.0.  Like
+dietlibc you need to compile openssl with uClibc for SSL support.  You
+also need to have the openssl include files outside of your "standard"
+include files (e.g. use an "openssl" link in you <uClibc>/include
+tree).  Otherwise your uClibc include files are mixed up with the
+glibc includes. Finally, specify your <uClibc>/ tree in your configure
+run with "--with-ssl-dir=<path>".
+
+A configure for uClibc might look like this:
+
+  env CC="i386-uclibc-gcc" CFLAGS="-Os" \
+      ./configure --with-ssl-dir=/usr/i386-linux-uclibc
+
+
+Solaris
+=======
+
+64-bit monit is required for Solaris support.
+
+You can use either gcc or Sun Studio for compilation.  
+
+Package prerequisites
+
+Solaris 10:
+  SUNWbash
+  SUNWgmake
+  SUNWgcc
+  SUNWopenssl-include
+  SUNWopenssl-libraries
+  SUNWbison
+  SUNWflexlex
+  SUNWflexruntime
+  CSWautoconf           (http://www.blastwave.org))
+  CSWautomake           (http://www.blastwave.org))
+  CSWgm4                (http://www.blastwave.org))
+
+Solaris Nevada:
+  SUNWaconf              NOTE: only if compiling using cvs sources
+  SUNWbash
+  SUNWgmake
+  SUNWgcc
+  SUNWopenssl-include
+  SUNWopenssl-libraries
+  SUNWbison
+  SUNWflexlex
+  SUNWflexruntime        NOTE: see bellow for Solaris Nevada x86 - AMD64
+  CSWgm4                (http://www.blastwave.org))
+
+  NOTE:
+  On AMD64 there was problem with flex library bundled with particular
+  Solaris Express versions (SUNWflexruntime). You can get following
+  error when trying to start monit:
+
+  -bash-3.2# ./monit
+  ld.so.1: monit: fatal: relocation error: R_AMD64_PC32: file
+  /usr/lib/64/libfl.so.1: symbol yylex: value 0x280010e5ad3 does not fit
+  Killed 
+
+  The problem was fixed in SXCE b100 (see http://bugs.opensolaris.org/view_bug.do?bug_id=6752774
+  for more details).
+
+
+Set path to the SFW utilities and libraries, for example:
+
+  PATH=$PATH:/usr/sfw/bin:/opt/csw/bin
+  export PATH
+
+  crle -l /lib:/usr/lib:/usr/sfw/lib               # (32-bit)
+  crle -64 -l /lib/64:/usr/lib/64:/usr/sfw/lib/64  # (64-bit)
+
+Configure monit with 64-bit support (examples):
+
+  gcc [sparc]:
+  ./configure \
+      --with-ssl-incl-dir=/usr/sfw/include \
+      --with-ssl-lib-dir=/usr/sfw/lib/64 \
+      CFLAGS='-m64 -mtune=v9' \
+      LDFLAGS='-m64 -mtune=v9'
+
+  gcc [amd64]:
+  ./configure \
+      --with-ssl-incl-dir=/usr/sfw/include \
+      --with-ssl-lib-dir=/usr/sfw/lib/64 \
+      CFLAGS='-m64 -mtune=opteron' \
+      LDFLAGS='-m64 -mtune=opteron'
+
+  Sun Studio 12 [sparc]:
+  ./configure \
+      --with-ssl-incl-dir=/usr/sfw/include \
+      --with-ssl-lib-dir=/usr/sfw/lib/64 \
+      CFLAGS='-xarch=v9' \
+      LDFLAGS='-xarch=v9' \
+      CC=/opt/SUNWspro/bin/cc
+
+  Sun Studio 12 [amd64]:
+  ./configure \
+      --with-ssl-incl-dir=/usr/sfw/include \
+      --with-ssl-lib-dir=/usr/sfw/lib/64 \
+      CFLAGS='-m64' \
+      LDFLAGS='-m64' \
+      CC=/opt/SUNWspro/bin/cc
+
+Compile monit with:
+
+  gmake
+
+Monit has to be started as root to work with resource support.  
+
+
+FreeBSD + NetBSD + OpenBSD
+==========================
+
+Use GNU make to compile ('gmake')
+
+
+Darwin (Mac OS X)
+=================
+
+Monit compiles out of the box on Mac OS X.
+
+It seems that Apple is phasing out the kvm interface and that
+it is disabled by default on Intel based Mac OS X 10.4.8 and later.
+You can get following error in such case for Monit <= 4.9:
+
+ --8<--
+ kvm_open: : /dev/mem: No such file or directory
+ system statistic error -- cannot initialize kvm interface
+ system statistic error -- cannot initialize the process tree =>
+ process resource monitoring disabled
+ --8<--
+
+You can reenable the kvm interface by adding the kmem to the boot-args
+Open FIrmware variable as root - for example:
+
+ nvram boot-arg="kmem=1"
+
+and reboot the machine.
+
+Monit > 4.9 don't need this workaround.
+
+
+Any other not yet mentioned but posix compatible platform
+=========================================================
+
+Monit might be able to compile using the "UNKNOWN" architecure.  In
+case a wrong platform is detected you can enforce this behavior by
+using the "--without-resource" flag in the configure run.  Generally,
+it is advisable to stick to gcc for compiling.
