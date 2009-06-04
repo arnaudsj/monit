@@ -88,32 +88,31 @@ Setting up the developing environment
       directory.
 
 
-CVS standards
+SVN standards
 -------------
 
    * ONLY check-in files that will compile without any warnings.
      (Change the CFLAGS macro in the Makefile to include -Wall;
      CFLAGS = -Wall .. to compile with all warnings turned on)
 
-   * Regularly do a 'cvs update -d .' to keep your local copy in sync
+   * Regularly do a 'svn update' to keep your local copy in sync
      with the master repository.
 
-   * To check out a certain release you can do:
+   * To check out trunk (development):
    
-     export CVS_RSH=ssh
- cvs -z3 -duname@subversions.gnu.org:/cvsroot/monit/ co -r release-2-4-3 monit
+     svn checkout http://monit.googlecode.com/svn/trunk/ monit
 
-     Where uname is your developer name at Savannah.
+   * To check out full source code including all release tags:
 
-   * To check a files current tags, use: 'cvs status -v {filename}' 
-
+     svn checkout http://monit.googlecode.com/svn/ monit-full
 
    For Project Managers:
 
    * Every file in the project *must* be tagged with a release tag
      matching the version number in configure.ac before a new release
      is released. We use the following release tag standard:
-     release-x-y(-z) e.g. release-2-4-2
+
+     release-x-y-z e.g. release-5-0-3
 
    * The release numbers explained: 
  
@@ -121,11 +120,9 @@ CVS standards
       y is for minor feature releases
       z is for bug fix releases
 
-   * To tag a new relase, use: 'cvs tag release-x-y-z .' This will tag
-     all the files in current directory, and (recursively), files in
-     any subdirectories. You can force a tag if you had to change
-     files after the first tag *BUT* before the release is official:
-     'cvs tag -F release-2-4-2 .'
+   * To tag a new relase use ollowing in full source code copy:
+
+     svn copy trunk release-x-y-z
 
    * Only the project manager is allowed to create and tag a new
      release
