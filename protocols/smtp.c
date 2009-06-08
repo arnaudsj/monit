@@ -100,22 +100,25 @@ static int say(Socket_T s, char *msg) {
 static int expect(Socket_T s, int expect, int log) {
   
   int status;
+  char text[STRLEN];
   char buf[STRLEN];
 
-  if(!socket_readln(s, buf, STRLEN)) {
-    LogError("SMTP: error receiving data -- %s\n", STRERROR);
-    return FALSE;
+  while (TRUE) {
+    if(!socket_readln(s, buf, STRLEN)) {
+      LogError("SMTP: error receiving data -- %s\n", STRERROR);
+      return FALSE;
+    }
+    Util_chomp(buf);
+    if (sscanf(buf, "%d-%256s", &status, &text) != 2) // EHLO send multiple lines
+      break;
   }
-  
-  Util_chomp(buf);
-  
-  sscanf(buf, "%d%*s", &status);
-  if(status != expect) {
+
+  if(sscanf(buf, "%d%*s", &status) != 1 || status != expect) {
     if(log) 
       LogError("SMTP error: %s\n", buf);
     return FALSE;
   }
-  
+
   return TRUE;
   
 }

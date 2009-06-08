@@ -11,7 +11,7 @@ AC_PREREQ([2.53])
 # Note: in  case of beta subversion, use underscore "_" rather then dash "-"
 # since RPM doesn't allow dash in Version
 # Example: 5.0_beta2
-AC_INIT([monit], [5.0.3], [monit-general@nongnu.org])
+AC_INIT([monit], [5.0.4], [monit-general@nongnu.org])
 
 # Package info
 AC_REVISION([$Revision: 1.194 $])

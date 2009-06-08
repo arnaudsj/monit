@@ -1,4 +1,4 @@
-                     CHANGES version 5.0.3
+                     CHANGES version 5.0.4
                                 
            This file summarizes changes made since 3.0
                                 
@@ -7,9 +7,18 @@
           https://savannah.nongnu.org/bugs/?group=monit
 
 
+Version 5.0.4
+
+BUGFIXES:
+
+* Fixed SMTP protocol test which may sometimes incorrectly
+  report ESMTP protocol failure. Thanks to Axel Reinhold for
+  report.
+
+
 Version 5.0.3
 
-NEW FEATURES AND FUNCTIONS:
+BUGFIXES:
 
 * Fixed #26664: crash on service timeout or unmonitor action
   (introduced in 5.0.2). Thanks to Bretislav Kubesa and
