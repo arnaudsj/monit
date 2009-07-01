@@ -15,6 +15,10 @@ BUGFIXES:
   report ESMTP protocol failure. Thanks to Axel Reinhold for
   report.
 
+* Fixed content match check which reported only first
+  match during the same cycle. Thanks to Pavel Shevaev for
+  report.
+
 
 Version 5.0.3
 

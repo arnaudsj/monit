@@ -350,7 +350,7 @@ short Event_check_state(Event_T E, short S) {
   }
 
   /* the internal instance and action events are handled as changed any time since we need to deliver alert whenever it occurs */
-  if (E->id == EVENT_INSTANCE || E->id == EVENT_ACTION || (count >= action->count && S != E->state))
+  if (E->id == EVENT_INSTANCE || E->id == EVENT_ACTION || (count >= action->count && (S != E->state || S == STATE_CHANGED)))
     return TRUE;
   
   return FALSE;
