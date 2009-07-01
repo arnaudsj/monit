@@ -109,7 +109,7 @@ static int expect(Socket_T s, int expect, int log) {
       return FALSE;
     }
     Util_chomp(buf);
-    if (sscanf(buf, "%d-%256s", &status, &text) != 2) // EHLO send multiple lines
+    if (sscanf(buf, "%d-%256s", &status, text) != 2) // EHLO send multiple lines
       break;
   }
 
