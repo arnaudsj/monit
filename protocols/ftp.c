@@ -70,7 +70,7 @@ int check_ftp(Socket_T s) {
   
   sscanf(buf, "%d %*s", &status);
   if(status != 220) {
-    LogError("FTP error: %s\n", buf);
+    LogError("FTP greeting error: %s\n", buf);
     return FALSE;
   }
 
@@ -88,7 +88,7 @@ int check_ftp(Socket_T s) {
 
   sscanf(buf, "%d %*s", &status);
   if(status != 221) {
-    LogError("FTP error: %s\n", buf);
+    LogError("FTP quit error: %s\n", buf);
     return FALSE;
   }
 
