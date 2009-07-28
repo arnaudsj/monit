@@ -61,13 +61,18 @@ int check_ftp(Socket_T s) {
 
   ASSERT(s);
 
-  if(!socket_readln(s, buf, STRLEN)) {
-    LogError("FTP: error receiving data -- %s\n", STRERROR);
-    return FALSE;
+  // process multiline greetings
+  while (TRUE) {
+    if(!socket_readln(s, buf, STRLEN)) {
+      LogError("FTP: error receiving data -- %s\n", STRERROR);
+      return FALSE;
+    }
+    Util_chomp(buf);
+    buf[4] = 0;
+    if (IS(buf, "220 "))
+      break;
   }
 
-  Util_chomp(buf);
-  
   sscanf(buf, "%d %*s", &status);
   if(status != 220) {
     LogError("FTP greeting error: %s\n", buf);

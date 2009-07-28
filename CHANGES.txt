@@ -19,6 +19,9 @@ BUGFIXES:
   match during the same cycle. Thanks to Pavel Shevaev for
   report.
 
+* Added support for multiline greetings to FTP protocol test.
+  Thanks to Giovanni D'Cristina for report.
+
 
 Version 5.0.3
 
