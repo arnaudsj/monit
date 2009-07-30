@@ -61,6 +61,7 @@
 #define P_CLAMAV         22
 #define P_SIP            23
 #define P_LMTP           24
+#define P_GPS            25
 
 void  gc_protocols();
 
@@ -89,6 +90,7 @@ void* create_tns();
 void* create_pgsql();
 void* create_sip();
 void* create_lmtp();
+void* create_gps();
 
 /* "Package" locale Protocol routines */
 int check_apache_status(Socket_T);
@@ -115,6 +117,7 @@ int check_tns(Socket_T);
 int check_pgsql(Socket_T);
 int check_sip(Socket_T);
 int check_lmtp(Socket_T);
+int check_gps(Socket_T);
 
 
 #endif

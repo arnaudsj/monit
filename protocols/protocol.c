@@ -68,6 +68,7 @@ static Protocol_T myrsync= NULL;
 static Protocol_T mytns= NULL;
 static Protocol_T mypgsql= NULL;
 static Protocol_T mysip= NULL;
+static Protocol_T mygps= NULL;
 
 
 /**
@@ -111,6 +112,7 @@ void gc_protocols() {
   FREE(mytns);
   FREE(mypgsql);
   FREE(mysip);
+  FREE(mygps);
 
 }
 
@@ -349,5 +351,15 @@ void *create_pgsql() {
     mypgsql->check= check_pgsql;
   }
   return mypgsql;
+}
+
+
+void *create_gps() {
+  if(mygps == NULL) {
+    NEW(mygps);
+    mygps->name= "GPS";
+    mygps->check= check_gps;
+  }
+  return mygps;
 }
 

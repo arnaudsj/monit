@@ -221,6 +221,7 @@ rsync             { return RSYNC; }
 tns               { return TNS; }
 pgsql             { return PGSQL; }
 sip               { return SIP; } 
+gps               { return GPS; } 
 target            { return TARGET; }
 maxforward        { return MAXFORWARD; }
 mode              { return MODE; }

@@ -278,7 +278,7 @@
 %token ALERT NOALERT MAILFORMAT UNIXSOCKET SIGNATURE
 %token TIMEOUT RESTART CHECKSUM EVERY 
 %token DEFAULT HTTP APACHESTATUS FTP SMTP POP IMAP CLAMAV NNTP NTP3 MYSQL DNS
-%token SSH DWP LDAP2 LDAP3 RDATE RSYNC TNS PGSQL POSTFIXPOLICY SIP LMTP
+%token SSH DWP LDAP2 LDAP3 RDATE RSYNC TNS PGSQL POSTFIXPOLICY SIP LMTP GPS
 %token <string> STRING PATH MAILADDR MAILFROM MAILSUBJECT
 %token <string> MAILBODY SERVICENAME STRINGNAME
 %token <number> NUMBER PERCENT LOGLIMIT CLOSELIMIT DNSLIMIT KEEPALIVELIMIT 
@@ -1027,6 +1027,9 @@ protocol        : /* EMPTY */  {
                   }
                 | PROTOCOL LMTP  {
                     portset.protocol = addprotocol(P_LMTP);
+                  }
+                | PROTOCOL GPS  {
+                    portset.protocol = addprotocol(P_GPS);
                   }
                 | sendexpectlist {
                     portset.protocol = addprotocol(P_GENERIC);
@@ -2494,6 +2497,7 @@ static void *addprotocol(int protocol) {
   case P_PGSQL:         return create_pgsql();
   case P_SIP:           return create_sip();
   case P_LMTP:          return create_lmtp();
+  case P_GPS:          return create_gps();
   }
 
   return create_default();

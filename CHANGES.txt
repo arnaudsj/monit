@@ -1,4 +1,4 @@
-                     CHANGES version 5.0.4
+                     CHANGES version 5.1
                                 
            This file summarizes changes made since 3.0
                                 
@@ -7,7 +7,11 @@
           https://savannah.nongnu.org/bugs/?group=monit
 
 
-Version 5.0.4
+Version 5.1
+
+NEW FEATURES AND FUNCTIONS:
+
+* Added GPS protocol test. Thanks to Sebastien Debrard for patch.
 
 BUGFIXES:
 
