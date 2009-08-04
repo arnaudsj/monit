@@ -22,6 +22,9 @@ BUGFIXES:
 * Fixed content match check which reported only first
   match during the same cycle. Thanks to Pavel Shevaev for
   report.
+  
+* Allow for the use of complete SSL certificate chains. 
+  Thanks to Lawrence Tan for patch.
 
 * Added support for multiline greetings to FTP protocol test.
   Thanks to Giovanni D'Cristina for report.
