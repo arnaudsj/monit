@@ -351,8 +351,7 @@ ssl_server_connection *init_ssl_server(char *pemfile, char *clientpemfile) {
     goto sslerror;
   }
 
-  if(SSL_CTX_use_certificate_file(ssl_server->ctx, pemfile, 
-				   SSL_FILETYPE_PEM) != 1) {
+  if(SSL_CTX_use_certificate_chain_file(ssl_server->ctx, pemfile) != 1) {
     LogError("%s: Cannot initialize SSL server certificate -- %s\n",
              prog, SSLERROR);
     goto sslerror;
@@ -704,8 +703,7 @@ ssl_connection *new_ssl_connection(char *clientpemfile, int sslversion) {
 
   if(ssl->clientpemfile) {
 
-    if(SSL_CTX_use_certificate_file(ssl->ctx, ssl->clientpemfile, 
-				     SSL_FILETYPE_PEM) <= 0) {
+    if(SSL_CTX_use_certificate_chain_file(ssl->ctx, ssl->clientpemfile) <= 0) {
       LogError("%s: Cannot initialize SSL server certificate -- %s\n",
                prog, SSLERROR);
       goto sslerror;
