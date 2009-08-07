@@ -476,9 +476,9 @@ char *socket_readln(Socket_T S, char *s, int size) {
   
   ASSERT(S);
   
-  while(--size && ((c= socket_read_byte(S)) > 0)) {
+  while(--size && ((c= socket_read_byte(S)) > 0)) { // Stop when \0 is read
     *p++= c;
-    if(c == '\n' || c == '\0')
+    if(c == '\n')
       break;
   }
   
