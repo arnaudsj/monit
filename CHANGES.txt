@@ -29,6 +29,10 @@ BUGFIXES:
 * Added support for multiline greetings to FTP protocol test.
   Thanks to Giovanni D'Cristina for report.
 
+* Fix Debian Bug #541139: uses gethostbyname() and thus does
+  not work with "options inet6" in /etc/resolv.conf. Thanks to
+  Michael Stapelberg for patch.
+
 
 Version 5.0.3
 

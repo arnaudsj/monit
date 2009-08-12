@@ -240,24 +240,27 @@ int check_udp_socket(int socket) {
 int create_socket(const char *hostname, int port, int type, int timeout) {
 
   int s;
-  struct hostent *hp;
   struct sockaddr_in sin;
+  struct sockaddr_in *sa;
+  struct addrinfo hints;
+  struct addrinfo *result;
   
   ASSERT(hostname);
 
-  if((hp= gethostbyname(hostname)) == NULL) {
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+  if(getaddrinfo(hostname, NULL, &hints, &result) != 0) {
     return -1;
   }
 
-  endhostent();
-  
   if((s= socket(AF_INET, type, 0)) < 0) {
     return -1;
   }
 
   sin.sin_family= AF_INET;
   sin.sin_port= htons(port);
-  memcpy(&sin.sin_addr, hp->h_addr, hp->h_length);
+  sa = (struct sockaddr_in *)result->ai_addr;
+  memcpy(&sin.sin_addr, &(sa->sin_addr), result->ai_addrlen);
   
   if(! set_noblock(s)) {
     goto error;
@@ -372,17 +375,19 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
   myaddr.sin_port= htons(port);
   
   if(bindAddr) {
-    struct hostent *h= gethostbyname(bindAddr);
-    if(h==NULL) {
-      errno= h_errno;
+    struct sockaddr_in *sa;
+    struct addrinfo hints;
+    struct addrinfo *result;    
+
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;
+    if(getaddrinfo(bindAddr, NULL, &hints, &result) != 0)
       goto error;
-    }
-    myaddr.sin_addr= *(struct in_addr*)h->h_addr_list[0];
+    sa = (struct sockaddr_in *)result->ai_addr;
+    memcpy(&myaddr.sin_addr, &(sa->sin_addr), result->ai_addrlen);
   } else {
     myaddr.sin_addr.s_addr= htonl(INADDR_ANY);
   }
-
-  endhostent();
 
   if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flag, sizeof(flag)) < 0) 
     goto error;
@@ -637,10 +642,11 @@ int udp_write(int socket, void *b, int len, int timeout) {
  * @return response time on succes, -1 on error
  */
 double icmp_echo(const char *hostname, int timeout, int count) {
-
-  struct hostent *hp;
   struct sockaddr_in sin;
   struct sockaddr_in sout;
+  struct sockaddr_in *sa;
+  struct addrinfo hints;
+  struct addrinfo *result;
 #ifdef HAVE_SOL_IP
   struct iphdr *iphdrin;
   struct icmphdr *icmphdrin= NULL;
@@ -660,15 +666,15 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   struct timeval tv;
   struct timeval t1[ICMP_MAX_COUNT];
   struct timeval t2;
-  double response= -1;
+  double response= -1.;
   
   ASSERT(hostname);   
   ASSERT(count <= ICMP_MAX_COUNT);
 
-  if((hp= gethostbyname(hostname)) == NULL)
+  memset(&hints, 0, sizeof(struct addrinfo));
+  hints.ai_family = AF_INET;
+  if(getaddrinfo(hostname, NULL, &hints, &result) != 0)
     return response;
-
-  endhostent();
 
   if((s= socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0)
     return response;
@@ -706,7 +712,8 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 #endif
     sout.sin_family= AF_INET;
     sout.sin_port= 0;
-    memcpy(&sout.sin_addr, hp->h_addr, hp->h_length);
+    sa = (struct sockaddr_in *)result->ai_addr;
+    memcpy(&sout.sin_addr, &(sa->sin_addr), result->ai_addrlen);
 
     /* Get time of particular connection attempt beginning */
     gettimeofday(&t1[i], NULL);
