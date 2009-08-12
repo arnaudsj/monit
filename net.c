@@ -254,6 +254,7 @@ int create_socket(const char *hostname, int port, int type, int timeout) {
   }
 
   if((s= socket(AF_INET, type, 0)) < 0) {
+    freeaddrinfo(result);
     return -1;
   }
 
@@ -261,6 +262,7 @@ int create_socket(const char *hostname, int port, int type, int timeout) {
   sin.sin_port= htons(port);
   sa = (struct sockaddr_in *)result->ai_addr;
   memcpy(&sin.sin_addr, &(sa->sin_addr), result->ai_addrlen);
+  freeaddrinfo(result);
   
   if(! set_noblock(s)) {
     goto error;
@@ -385,6 +387,7 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
       goto error;
     sa = (struct sockaddr_in *)result->ai_addr;
     memcpy(&myaddr.sin_addr, &(sa->sin_addr), result->ai_addrlen);
+    freeaddrinfo(result);
   } else {
     myaddr.sin_addr.s_addr= htonl(INADDR_ANY);
   }
@@ -676,8 +679,10 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   if(getaddrinfo(hostname, NULL, &hints, &result) != 0)
     return response;
 
-  if((s= socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0)
+  if((s= socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
+    freeaddrinfo(result);
     return response;
+  }
 
 #ifdef HAVE_SOL_IP
   sol_ip = SOL_IP;
@@ -689,8 +694,10 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   }
 #endif
 
-  if(setsockopt(s, sol_ip, IP_TTL, (char *)&ttl, sizeof(ttl)) < 0)
+  if(setsockopt(s, sol_ip, IP_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
+    freeaddrinfo(result);
     goto error2;
+  }
 
   tv.tv_sec= timeout;
   tv.tv_usec= 0;
@@ -723,6 +730,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 	      (struct sockaddr *)&sout, sizeof(struct sockaddr));
     } while(n == -1 && errno == EINTR);
   }
+  freeaddrinfo(result);
   
   do {
 
