@@ -51,7 +51,7 @@ Version 5.0.2
 
 BUGFIXES:
 
-* 35 improvements based on code scan with Klockwork
+* 35 improvements based on code scan with Klocwork
   (http://www.klocwork.com/) which we were evaluating.
   Huge thanks to Klocwork for their great product.
 
