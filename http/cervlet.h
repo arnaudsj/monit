@@ -39,7 +39,7 @@
 "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">"\
 "<html>"\
 "<head>"\
-"  <title>monit: service manager</title>"\
+"  <title>Monit: %s</title>"\
 "  <style type=\"text/css\">"\
 "  body {"\
 "	margin: 0;"\
@@ -105,7 +105,7 @@
 
 
 #define HEAD(location, refresh) \
-   out_print(res, HEAD_HTML, refresh, location, location);
+   out_print(res, HEAD_HTML, Run.localhostname, refresh, location, location);
 
 #define FOOT  out_print(res, FOOT_HTML);
 
