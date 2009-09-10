@@ -249,9 +249,6 @@ int create_socket(const char *hostname, int port, int type, int timeout) {
 
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
-  hints.ai_flags = AI_PASSIVE;
-  hints.ai_socktype = SOCK_STREAM;
-  hints.ai_protocol = IPPROTO_TCP;
   if(getaddrinfo(hostname, NULL, &hints, &result) != 0) {
     return -1;
   }
