@@ -470,8 +470,8 @@ static void do_default() {
     
     if(Run.init != TRUE)
       daemonize(); 
- 	else 
-		Util_redirectStdFds();
+    else 
+      Util_redirectStdFds();
     
     if(! File_createPidFile(Run.pidfile)) {
       LogError("%s daemon died\n", prog);

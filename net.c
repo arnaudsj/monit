@@ -249,6 +249,9 @@ int create_socket(const char *hostname, int port, int type, int timeout) {
 
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
+  hints.ai_flags = AI_PASSIVE;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = IPPROTO_TCP;
   if(getaddrinfo(hostname, NULL, &hints, &result) != 0) {
     return -1;
   }
@@ -261,7 +264,7 @@ int create_socket(const char *hostname, int port, int type, int timeout) {
   sin.sin_family= AF_INET;
   sin.sin_port= htons(port);
   sa = (struct sockaddr_in *)result->ai_addr;
-  memcpy(&sin.sin_addr, &(sa->sin_addr), result->ai_addrlen);
+  memcpy(&sin, sa, result->ai_addrlen);
   freeaddrinfo(result);
   
   if(! set_noblock(s)) {
@@ -386,7 +389,7 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
     if(getaddrinfo(bindAddr, NULL, &hints, &result) != 0)
       goto error;
     sa = (struct sockaddr_in *)result->ai_addr;
-    memcpy(&myaddr.sin_addr, &(sa->sin_addr), result->ai_addrlen);
+    memcpy(&myaddr, sa, result->ai_addrlen);
     freeaddrinfo(result);
   } else {
     myaddr.sin_addr.s_addr= htonl(INADDR_ANY);
@@ -720,7 +723,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     sout.sin_family= AF_INET;
     sout.sin_port= 0;
     sa = (struct sockaddr_in *)result->ai_addr;
-    memcpy(&sout.sin_addr, &(sa->sin_addr), result->ai_addrlen);
+    memcpy(&sout, sa, result->ai_addrlen);
 
     /* Get time of particular connection attempt beginning */
     gettimeofday(&t1[i], NULL);
