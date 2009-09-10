@@ -39,7 +39,7 @@
 "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">"\
 "<html>"\
 "<head>"\
-"  <title>Monit: %s</title>"\
+"  <title>%s Monit</title>"\
 "  <style type=\"text/css\">"\
 "  body {"\
 "	margin: 0;"\
