@@ -69,6 +69,7 @@ static Protocol_T mytns= NULL;
 static Protocol_T mypgsql= NULL;
 static Protocol_T mysip= NULL;
 static Protocol_T mygps= NULL;
+static Protocol_T myradius= NULL;
 
 
 /**
@@ -113,6 +114,7 @@ void gc_protocols() {
   FREE(mypgsql);
   FREE(mysip);
   FREE(mygps);
+  FREE(myradius);
 
 }
 
@@ -361,5 +363,14 @@ void *create_gps() {
     mygps->check= check_gps;
   }
   return mygps;
+}
+
+void *create_radius() {
+  if(myradius == NULL) {
+    NEW(myradius);
+    myradius->name= "RADIUS";
+    myradius->check= check_radius;
+  }
+  return myradius;
 }
 

@@ -222,6 +222,7 @@ tns               { return TNS; }
 pgsql             { return PGSQL; }
 sip               { return SIP; } 
 gps               { return GPS; } 
+radius            { return RADIUS; }
 target            { return TARGET; }
 maxforward        { return MAXFORWARD; }
 mode              { return MODE; }
@@ -231,6 +232,7 @@ manual            { return MANUAL; }
 uid               { return UID; }
 gid               { return GID; }
 request           { return REQUEST; }
+secret            { return SECRET; }
 loglimit          { return LOGLIMIT; }
 closelimit        { return CLOSELIMIT; }
 dnslimit          { return DNSLIMIT; }

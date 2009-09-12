@@ -62,6 +62,7 @@
 #define P_SIP            23
 #define P_LMTP           24
 #define P_GPS            25
+#define P_RADIUS         26
 
 void  gc_protocols();
 
@@ -91,6 +92,7 @@ void* create_pgsql();
 void* create_sip();
 void* create_lmtp();
 void* create_gps();
+void* create_radius();
 
 /* "Package" locale Protocol routines */
 int check_apache_status(Socket_T);
@@ -118,6 +120,7 @@ int check_pgsql(Socket_T);
 int check_sip(Socket_T);
 int check_lmtp(Socket_T);
 int check_gps(Socket_T);
+int check_radius(Socket_T);
 
 
 #endif

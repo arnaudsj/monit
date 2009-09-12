@@ -258,10 +258,10 @@ int create_socket(const char *hostname, int port, int type, int timeout) {
     return -1;
   }
 
-  sin.sin_family= AF_INET;
-  sin.sin_port= htons(port);
   sa = (struct sockaddr_in *)result->ai_addr;
   memcpy(&sin, sa, result->ai_addrlen);
+  sin.sin_family= AF_INET;
+  sin.sin_port= htons(port);
   freeaddrinfo(result);
   
   if(! set_noblock(s)) {
@@ -373,8 +373,6 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
   }
 
   memset(&myaddr, 0, sizeof(struct sockaddr_in));
-  myaddr.sin_family= AF_INET;
-  myaddr.sin_port= htons(port);
   
   if(bindAddr) {
     struct sockaddr_in *sa;
@@ -391,6 +389,8 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
   } else {
     myaddr.sin_addr.s_addr= htonl(INADDR_ANY);
   }
+  myaddr.sin_family= AF_INET;
+  myaddr.sin_port= htons(port);
 
   if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flag, sizeof(flag)) < 0) 
     goto error;
@@ -717,10 +717,10 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     icmphdrout[i]->icmp_seq= i;
     icmphdrout[i]->icmp_cksum= checksum_ip((unsigned char *)icmphdrout[i], ICMP_SIZE);
 #endif
-    sout.sin_family= AF_INET;
-    sout.sin_port= 0;
     sa = (struct sockaddr_in *)result->ai_addr;
     memcpy(&sout, sa, result->ai_addrlen);
+    sout.sin_family= AF_INET;
+    sout.sin_port= 0;
 
     /* Get time of particular connection attempt beginning */
     gettimeofday(&t1[i], NULL);

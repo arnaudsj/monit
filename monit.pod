@@ -1926,6 +1926,7 @@ moment Monit knows how to speak:
  I<DNS>
  I<DWP>
  I<FTP>
+ I<GPS>
  I<HTTP>
  I<IMAP>
  I<CLAMAV>
@@ -1937,6 +1938,7 @@ moment Monit knows how to speak:
  I<NTP3>
  I<POP>
  I<POSTFIX-POLICY>
+ I<RADIUS>
  I<RDATE>
  I<RSYNC>
  I<SIP>
@@ -3150,7 +3152,8 @@ I<space>, I<inode>, I<pid>, I<ppid>, I<perm(ission)>, I<icmp>,
 I<process>, I<file>, I<directory>, I<filesystem>, I<size>, I<action>,
 I<unmonitor>, I<rdate>, I<rsync>, I<data>, I<invalid>, I<exec>,
 I<nonexist>, I<policy>, I<reminder>, I<instance>, I<eventqueue>,
-I<basedir>, I<slot(s)>, I<system>, I<idfile> and I<failed>
+I<basedir>, I<slot(s)>, I<system>, I<idfile>, I<gps>, I<rsync>
+and I<failed>
 
 And here is a complete list of B<noise keywords> ignored by
 monit:
@@ -3558,6 +3561,12 @@ Finally an example with all statements:
        then alert
        alert rms@gnu.org with mail-format {
             subject: The gnu server may be hacked again! }
+
+ check process radiusd with pidfile /home/aland/git/2_1_x/raddb/radiusd.pid
+       start program = "/etc/init.d/freeradius start"
+       stop program = "/etc/init.d/freeradius stop"
+       if failed host 127.0.0.1 port 2000 type udp protocol radius secret testing1234 then alert
+       if 5 restarts within 5 cycles then timeout
 
 Note; only the B<check statement> is mandatory, the other
 statements are optional and the order of the optional statements

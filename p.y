@@ -278,7 +278,7 @@
 %token ALERT NOALERT MAILFORMAT UNIXSOCKET SIGNATURE
 %token TIMEOUT RESTART CHECKSUM EVERY 
 %token DEFAULT HTTP APACHESTATUS FTP SMTP POP IMAP CLAMAV NNTP NTP3 MYSQL DNS
-%token SSH DWP LDAP2 LDAP3 RDATE RSYNC TNS PGSQL POSTFIXPOLICY SIP LMTP GPS
+%token SSH DWP LDAP2 LDAP3 RDATE RSYNC TNS PGSQL POSTFIXPOLICY SIP LMTP GPS RADIUS
 %token <string> STRING PATH MAILADDR MAILFROM MAILSUBJECT
 %token <string> MAILBODY SERVICENAME STRINGNAME
 %token <number> NUMBER PERCENT LOGLIMIT CLOSELIMIT DNSLIMIT KEEPALIVELIMIT 
@@ -289,7 +289,7 @@
 %token CHILDREN SYSTEM
 %token RESOURCE MEMORY TOTALMEMORY LOADAVG1 LOADAVG5 LOADAVG15 
 %token MODE ACTIVE PASSIVE MANUAL CPU TOTALCPU CPUUSER CPUSYSTEM CPUWAIT
-%token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE
+%token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE SECRET
 %token UID GID MMONIT INSTANCE USERNAME PASSWORD
 %token TIMESTAMP CHANGED SECOND MINUTE HOUR DAY
 %token SSLAUTO SSLV2 SSLV3 TLSV1 CERTMD5
@@ -1025,11 +1025,14 @@ protocol        : /* EMPTY */  {
                 | PROTOCOL PGSQL {
                     portset.protocol = addprotocol(P_PGSQL);
                   }
-                | PROTOCOL LMTP  {
+                | PROTOCOL LMTP {
                     portset.protocol = addprotocol(P_LMTP);
                   }
-                | PROTOCOL GPS  {
+                | PROTOCOL GPS {
                     portset.protocol = addprotocol(P_GPS);
+                  }
+                | PROTOCOL RADIUS secret {
+                    portset.protocol = addprotocol(P_RADIUS);
                   }
                 | sendexpectlist {
                     portset.protocol = addprotocol(P_GENERIC);
@@ -1070,6 +1073,12 @@ request         : /* EMPTY */
                     portset.request_checksum = $4;
                   }
                 ;
+
+secret          : SECRET STRING { 
+                    portset.request = $2; 
+                  }
+                ;
+
 
 apache_stat_list: apache_stat
                 | apache_stat_list OR apache_stat
@@ -2497,7 +2506,8 @@ static void *addprotocol(int protocol) {
   case P_PGSQL:         return create_pgsql();
   case P_SIP:           return create_sip();
   case P_LMTP:          return create_lmtp();
-  case P_GPS:          return create_gps();
+  case P_GPS:           return create_gps();
+  case P_RADIUS:        return create_radius();
   }
 
   return create_default();
