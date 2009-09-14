@@ -521,7 +521,7 @@ static void do_viewlog(HttpRequest req, HttpResponse res) {
   
   if(is_readonly(req)) {
     send_error(res, SC_FORBIDDEN,
-	       "You do not have sufficent privilegs to access this page");
+	       "You do not have sufficent privileges to access this page");
     return;
   }
   
@@ -601,7 +601,7 @@ static void handle_action(HttpRequest req, HttpResponse res) {
 
     if(is_readonly(req)) {
       send_error(res, SC_FORBIDDEN,
-        "You do not have sufficent privilegs to access this page");
+        "You do not have sufficent privileges to access this page");
       return;
     }
     if((s->doaction = Util_getAction(action)) == ACTION_IGNORE) {
@@ -630,7 +630,7 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
     char *token = NULL;
 
     if(is_readonly(req)) {
-      send_error(res, SC_FORBIDDEN, "You do not have sufficent privilegs to access this page");
+      send_error(res, SC_FORBIDDEN, "You do not have sufficent privileges to access this page");
       return;
     }
     if((doaction = Util_getAction(action)) == ACTION_IGNORE) {
@@ -684,7 +684,7 @@ static void handle_run(HttpRequest req, HttpResponse res) {
   if(action) {
     if(is_readonly(req)) {
       send_error(res, SC_FORBIDDEN,
-        "You do not have sufficent privilegs to access this page");
+        "You do not have sufficent privileges to access this page");
       return;
     }
     if(IS(action, "validate")) {
