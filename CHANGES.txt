@@ -40,6 +40,12 @@ BUGFIXES:
   not work with "options inet6" in /etc/resolv.conf. Thanks to
   Michael Stapelberg for patch.
 
+* If Monit configuration allowed http interface access for read-only
+  user and it was specified as first allow entry, Monit command line
+  commands failed because it used the read-only account so commands
+  like start, stop, etc. were rejected. Monit will now use full access
+  regardless of allow option order. Thanks to Thorsten Kampe for report.
+
 
 Version 5.0.3
 

@@ -1579,7 +1579,7 @@ char *Util_getBasicAuthHeaderMonit() {
 
   /* We find the first cleartext credential for authorization */
   while (c != NULL) {
-    if (c->digesttype == DIGEST_CLEARTEXT)
+    if (c->digesttype == DIGEST_CLEARTEXT && ! c->is_readonly)
       break;
     c = c->next;
   }
