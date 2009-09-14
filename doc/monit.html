@@ -2297,9 +2297,6 @@ interface.</p>
 <strong>after</strong> username:password. In the above example the user <em>hauk</em>
 is defined as a read-only user, while the <em>admin</em> user has all
 access rights.</p>
-<p>NB! a Monit client will use the <em>first</em> username:password pair
-in an allow list and you should <strong>not</strong> define the first user as a
-read-only user. If you do, Monit console commands will not work.</p>
 <p>If you use Basic Authentication it is a good idea to set the
 access permission for the control file (~/.monitrc) to only
 readable and writable for the user running monit, because the
