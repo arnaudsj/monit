@@ -2396,6 +2396,30 @@ the connection type.
 For more examples, see the example section below.
 
 
+=head4 Testing the RADIUS protocol
+
+The SIP test is similar to the other protocol tests, but in
+addition allows extra optional parameters.
+
+=over 4
+
+=item  IF FAILED [host] [port] [type] PROTOCOL radius [SECRET string] THEN action
+       [ELSE IF SUCCEEDED [[<X>] <Y> CYCLES] THEN action]
+
+=back
+
+SECRET:
+you may specify an alternative secret, default is "testing123".
+
+RADIUS example:
+
+ check process radiusd with pidfile /home/aland/git/2_1_x/raddb/radiusd.pid
+       start program = "/etc/init.d/freeradius start"
+       stop program = "/etc/init.d/freeradius stop"
+       if failed host 127.0.0.1 port 2000 type udp protocol radius secret testing1234 then alert
+       if 5 restarts within 5 cycles then timeout
+
+
 =head1 MONIT HTTPD
 
 If specified in the control file, Monit will start a Monit daemon
@@ -3152,8 +3176,8 @@ I<space>, I<inode>, I<pid>, I<ppid>, I<perm(ission)>, I<icmp>,
 I<process>, I<file>, I<directory>, I<filesystem>, I<size>, I<action>,
 I<unmonitor>, I<rdate>, I<rsync>, I<data>, I<invalid>, I<exec>,
 I<nonexist>, I<policy>, I<reminder>, I<instance>, I<eventqueue>,
-I<basedir>, I<slot(s)>, I<system>, I<idfile>, I<gps>, I<rsync>
-and I<failed>
+I<basedir>, I<slot(s)>, I<system>, I<idfile>, I<gps>, I<radius>,
+I<secret>, I<target>, I<maxforward> and I<failed>
 
 And here is a complete list of B<noise keywords> ignored by
 monit:
@@ -3561,12 +3585,6 @@ Finally an example with all statements:
        then alert
        alert rms@gnu.org with mail-format {
             subject: The gnu server may be hacked again! }
-
- check process radiusd with pidfile /home/aland/git/2_1_x/raddb/radiusd.pid
-       start program = "/etc/init.d/freeradius start"
-       stop program = "/etc/init.d/freeradius stop"
-       if failed host 127.0.0.1 port 2000 type udp protocol radius secret testing1234 then alert
-       if 5 restarts within 5 cycles then timeout
 
 Note; only the B<check statement> is mandatory, the other
 statements are optional and the order of the optional statements
