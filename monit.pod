@@ -2413,10 +2413,10 @@ you may specify an alternative secret, default is "testing123".
 
 RADIUS example:
 
- check process radiusd with pidfile /home/aland/git/2_1_x/raddb/radiusd.pid
+ check process radiusd with pidfile /var/run/radiusd.pid
        start program = "/etc/init.d/freeradius start"
        stop program = "/etc/init.d/freeradius stop"
-       if failed host 127.0.0.1 port 2000 type udp protocol radius secret testing1234 then alert
+       if failed host 127.0.0.1 port 1812 type udp protocol radius secret testing123 then alert
        if 5 restarts within 5 cycles then timeout
 
 
