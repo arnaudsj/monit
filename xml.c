@@ -76,6 +76,11 @@ typedef struct mybuffer {
   size_t         bufused;                           /**< Output buffer usage */
 } Buffer_T;
 
+/** Group names cache */
+typedef struct grouplist {
+  char *name;
+  struct grouplist *next;
+} *Grouplist_T;
 
 /* -------------------------------------------------------------- Prototypes */
 
@@ -412,14 +417,43 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 static void status_event(Event_T E, Buffer_T *B) {
 
   Service_T s;
+  Grouplist_T g;
+  Grouplist_T glist = NULL;
   struct timeval *tv;
 
   ASSERT(E);
 
-  if(!(s = Event_get_source(E)))
-    return;
-
   tv = Event_get_collected(E);
+
+  if (Event_get_id(E) == EVENT_INSTANCE) {
+    buf_print(B, "<list>");
+    for (s = servicelist_conf; s && s->name && *s->name; s = s->next_conf) {
+      buf_print(B, "<service>%s</service>", s->name);
+      if (s->group && *s->group) {
+        for (g = glist; g; g = g->next) {
+          if (IS(g->name, s->group))
+            break;
+        }
+        if (! g) {
+          buf_print(B, "<group>%s</group>", s->group);
+          NEW(g);
+          g->name = xstrdup(s->group);
+          g->next = glist;
+          if (! glist)
+            NEW(glist);
+          glist = g;
+        }
+      }
+    }
+    buf_print(B, "</list>");
+    for (g = glist; g; g = glist) {
+      glist = g->next;
+      FREE(g->name);
+      FREE(g);
+    }
+  }
+
+  s = Event_get_source(E);
 
   buf_print(B,
     "<event>"
