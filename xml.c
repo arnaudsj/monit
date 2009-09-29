@@ -136,17 +136,17 @@ char *status_xml(Event_T E, short L) {
 static void document_head(Buffer_T *B) {
 
   buf_print(B,
-   "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\r\n"
-   "<monit>\r\n"
-   "\t<server>\r\n"
-   "\t\t<id>%s</id>\r\n"
-   "\t\t<incarnation>%ld</incarnation>\r\n"
-   "\t\t<version>%s</version>\r\n"
-   "\t\t<uptime>%ld</uptime>\r\n"
-   "\t\t<poll>%d</poll>\r\n"
-   "\t\t<startdelay>%d</startdelay>\r\n"
-   "\t\t<localhostname>%s</localhostname>\r\n"
-   "\t\t<controlfile>%s</controlfile>\r\n",
+   "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
+   "<monit>"
+   "<server>"
+   "<id>%s</id>"
+   "<incarnation>%ld</incarnation>"
+   "<version>%s</version>"
+   "<uptime>%ld</uptime>"
+   "<poll>%d</poll>"
+   "<startdelay>%d</startdelay>"
+   "<localhostname>%s</localhostname>"
+   "<controlfile>%s</controlfile>",
    Run.id,
    Run.incarnation,
    VERSION,
@@ -156,35 +156,34 @@ static void document_head(Buffer_T *B) {
    Run.localhostname ? Run.localhostname : "",
    Run.controlfile ? Run.controlfile : "");
 
-  if(Run.dohttpd)
-  {
+  if(Run.dohttpd) {
     buf_print(B,
-      "\t\t<httpd>\r\n"
-      "\t\t\t<address>%s</address>\r\n"
-      "\t\t\t<port>%d</port>\r\n"
-      "\t\t\t<ssl>%d</ssl>\r\n"
-      "\t\t</httpd>\r\n",
+      "<httpd>"
+      "<address>%s</address>"
+      "<port>%d</port>"
+      "<ssl>%d</ssl>"
+      "</httpd>",
       Run.bind_addr?Run.bind_addr:"",
       Run.httpdport,
       Run.httpdssl);
   }
  
   buf_print(B,
-   "\t</server>\r\n"
-   "\t<platform>\r\n"
-   "\t\t<name>%s</name>\r\n"
-   "\t\t<release>%s</release>\r\n"
-   "\t\t<version>%s</version>\r\n"
-   "\t\t<machine>%s</machine>\r\n"
-   "\t\t<cpu>%d</cpu>\r\n"
-   "\t\t<memory>%lu</memory>\r\n"
-   "\t</platform>\r\n",
-   systeminfo.uname.sysname,
-   systeminfo.uname.release,
-   systeminfo.uname.version,
-   systeminfo.uname.machine,
-   systeminfo.cpus,
-   systeminfo.mem_kbyte_max);
+     "</server>"
+     "<platform>"
+     "<name>%s</name>"
+     "<release>%s</release>"
+     "<version>%s</version>"
+     "<machine>%s</machine>"
+     "<cpu>%d</cpu>"
+     "<memory>%lu</memory>"
+     "</platform>",
+     systeminfo.uname.sysname,
+     systeminfo.uname.release,
+     systeminfo.uname.version,
+     systeminfo.uname.machine,
+     systeminfo.cpus,
+     systeminfo.mem_kbyte_max);
 
 }
 
@@ -195,7 +194,7 @@ static void document_head(Buffer_T *B) {
  */
 static void document_foot(Buffer_T *B) {
 
-  buf_print(B, "</monit>\r\n");
+  buf_print(B, "</monit>");
 
 }
 
@@ -209,16 +208,16 @@ static void document_foot(Buffer_T *B) {
 static void status_service(Service_T S, Buffer_T *B, short L) {
   Event_T E = S->eventlist;
   buf_print(B,
-	    "\t<service type=\"%d\">\r\n"
-	    "\t\t<collected_sec>%ld</collected_sec>\r\n"
-	    "\t\t<collected_usec>%ld</collected_usec>\r\n"
-	    "\t\t<name>%s</name>\r\n"
-	    "\t\t<status>%llu</status>\r\n"
-	    "\t\t<status_hint>%llu</status_hint>\r\n"
-	    "\t\t<monitor>%d</monitor>\r\n"
-	    "\t\t<monitormode>%d</monitormode>\r\n"
-	    "\t\t<pendingaction>%d</pendingaction>\r\n"
-	    "\t\t<group>%s</group>\r\n",
+	    "<service type=\"%d\">"
+	    "<collected_sec>%ld</collected_sec>"
+	    "<collected_usec>%ld</collected_usec>"
+	    "<name>%s</name>"
+	    "<status>%llu</status>"
+	    "<status_hint>%llu</status_hint>"
+	    "<monitor>%d</monitor>"
+	    "<monitormode>%d</monitormode>"
+	    "<pendingaction>%d</pendingaction>"
+	    "<group>%s</group>",
 	    S->type,
 	    S->collected.tv_sec,
 	    S->collected.tv_usec,
@@ -232,7 +231,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
   /* if the service is in error state, display first active error message to provide more details */
   while (E) {
     if ((E->state == STATE_FAILED || E->state == STATE_CHANGED) && (S->error & E->id) && E->message) {
-       buf_print(B, "\t\t<status_message>%s</status_message>\r\n", E->message);
+       buf_print(B, "<status_message>%s</status_message>", E->message);
        break;
     }
     E = E->next;
@@ -245,9 +244,9 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
          S->type == TYPE_FIFO ||
          S->type == TYPE_FILESYSTEM) {
         buf_print(B,
-  		"\t\t<mode>%o</mode>\r\n"
-  		"\t\t<uid>%d</uid>\r\n"
-  		"\t\t<gid>%d</gid>\r\n",
+  		"<mode>%o</mode>"
+  		"<uid>%d</uid>"
+  		"<gid>%d</gid>",
   		S->inf->st_mode & 07777,
   		(int)S->inf->st_uid,
   		(int)S->inf->st_gid);
@@ -256,38 +255,38 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
          S->type == TYPE_FIFO ||
          S->type == TYPE_DIRECTORY)  {
         buf_print(B,
-  		"\t\t<timestamp>%ld</timestamp>\r\n",
+  		"<timestamp>%ld</timestamp>",
   		(long)S->inf->timestamp);
       }
       if(S->type == TYPE_FILE) {
         buf_print(B,
-  		"\t\t<size>%llu</size>\r\n",
+  		"<size>%llu</size>",
   		(unsigned long long) S->inf->st_size);
         if(S->checksum) {
           buf_print(B,
-  		  "\t\t<checksum type=\"%s\">%s</checksum>\r\n",
+  		  "<checksum type=\"%s\">%s</checksum>",
   		  checksumnames[S->checksum->type], S->inf->cs_sum);
         }
       }
       if(S->type == TYPE_FILESYSTEM) {
         buf_print(B,
-  		"\t\t<flags>%ld</flags>\r\n"
-  		"\t\t<block>\r\n"
-  		"\t\t\t<percent>%.1f</percent>\r\n"
-  		"\t\t\t<usage>%.1f MB</usage>\r\n"
-                "\t\t\t<total>%.1f MB</total>\r\n"
-  		"\t\t</block>\r\n",
+  		"<flags>%ld</flags>"
+  		"<block>"
+  		"<percent>%.1f</percent>"
+  		"<usage>%.1f MB</usage>"
+                "<total>%.1f MB</total>"
+  		"</block>",
   		S->inf->flags,
   		S->inf->space_percent/10.,
   		(float)S->inf->space_total / (float)1048576 * (float)S->inf->f_bsize,
                 (float)S->inf->f_blocks / (float)1048576 * (float)S->inf->f_bsize);
         if(S->inf->f_files > 0) {
           buf_print(B,
-  		  "\t\t<inode>\r\n"
-                  "\t\t\t<percent>%.1f</percent>\r\n"
-                  "\t\t\t<usage>%ld</usage>\r\n"
-                  "\t\t\t<total>%ld</total>\r\n"
-		  "\t\t</inode>\r\n",
+  		  "<inode>"
+                  "<percent>%.1f</percent>"
+                  "<usage>%ld</usage>"
+                  "<total>%ld</total>"
+		  "</inode>",
 		  S->inf->inode_percent/10.,
 		  S->inf->inode_total,
                   S->inf->f_files);
@@ -295,25 +294,25 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
       }
       if(S->type == TYPE_PROCESS) {
         buf_print(B,
-  		"\t\t<pid>%d</pid>\r\n"
-  		"\t\t<ppid>%d</ppid>\r\n"
-  		"\t\t<uptime>%ld</uptime>\r\n",
+  		"<pid>%d</pid>"
+  		"<ppid>%d</ppid>"
+  		"<uptime>%ld</uptime>",
   		S->inf->pid,
   		S->inf->ppid,
   		(long)S->inf->uptime);
         if(Run.doprocess) {
           buf_print(B,
-  		  "\t\t<children>%d</children>\r\n"
-  		  "\t\t<memory>\r\n"
-  		  "\t\t\t<percent>%.1f</percent>\r\n"
-  		  "\t\t\t<percenttotal>%.1f</percenttotal>\r\n"
-  		  "\t\t\t<kilobyte>%ld</kilobyte>\r\n"
-  		  "\t\t\t<kilobytetotal>%ld</kilobytetotal>\r\n"
-  		  "\t\t</memory>\r\n"
-  		  "\t\t<cpu>\r\n"
-		  "\t\t\t<percent>%.1f</percent>\r\n"
-		  "\t\t\t<percenttotal>%.1f</percenttotal>\r\n"
-		  "\t\t</cpu>\r\n",
+  		  "<children>%d</children>"
+  		  "<memory>"
+  		  "<percent>%.1f</percent>"
+  		  "<percenttotal>%.1f</percenttotal>"
+  		  "<kilobyte>%ld</kilobyte>"
+  		  "<kilobytetotal>%ld</kilobytetotal>"
+  		  "</memory>"
+  		  "<cpu>"
+		  "<percent>%.1f</percent>"
+		  "<percenttotal>%.1f</percenttotal>"
+		  "</cpu>",
 		  S->inf->children,
 		  S->inf->mem_percent/10.0,
 	  	  S->inf->total_mem_percent/10.0,
@@ -327,10 +326,10 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
         Icmp_T i;
         for(i= S->icmplist; i; i= i->next) {
           buf_print(B,
-  		  "\t\t<icmp>\r\n"
-  		  "\t\t\t<type>%s</type>\r\n"
-  		  "\t\t\t<responsetime>%.3f</responsetime>\r\n"
-  		  "\t\t</icmp>\r\n",
+  		  "<icmp>"
+  		  "<type>%s</type>"
+  		  "<responsetime>%.3f</responsetime>"
+  		  "</icmp>",
   		  icmpnames[i->type],
   		  i->is_available?i->response:-1.);
         }
@@ -340,14 +339,14 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
         for(p= S->portlist; p; p= p->next) {
           if(p->family == AF_INET) {
             buf_print(B,
-  		    "\t\t<port>\r\n"
-  		    "\t\t\t<hostname>%s</hostname>\r\n"
-  		    "\t\t\t<portnumber>%d</portnumber>\r\n"
-  		    "\t\t\t<request>%s</request>\r\n"
-  		    "\t\t\t<protocol>%s</protocol>\r\n"
-  		    "\t\t\t<type>%s</type>\r\n"
-  		    "\t\t\t<responsetime>%.3f</responsetime>\r\n"
-  		    "\t\t</port>\r\n",
+  		    "<port>"
+  		    "<hostname>%s</hostname>"
+  		    "<portnumber>%d</portnumber>"
+  		    "<request>%s</request>"
+  		    "<protocol>%s</protocol>"
+  		    "<type>%s</type>"
+  		    "<responsetime>%.3f</responsetime>"
+  		    "</port>",
   		    p->hostname?p->hostname:"",
   		    p->port,
   		    p->request?p->request:"",
@@ -357,11 +356,11 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
   	  
           } else if(p->family == AF_UNIX) {
             buf_print(B,
-  		    "\t\t<unix>\r\n"
-		    "\t\t\t<path>%s</path>\r\n"
-		    "\t\t\t<protocol>%s</protocol>\r\n"
-		    "\t\t\t<responsetime>%.3f</responsetime>\r\n"
-		    "\t\t</unix>\r\n",
+  		    "<unix>"
+		    "<path>%s</path>"
+		    "<protocol>%s</protocol>"
+		    "<responsetime>%.3f</responsetime>"
+		    "</unix>",
 		    p->pathname?p->pathname:"",
 		    p->protocol->name?p->protocol->name:"",
 		    p->is_available?p->response:-1.);
@@ -370,24 +369,24 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
       }
       if(S->type == TYPE_SYSTEM && Run.doprocess) {
 				buf_print(B,
-					"\t\t<system>\r\n"
-					"\t\t\t<load>\r\n"
-					"\t\t\t\t<avg01>%.2f</avg01>\r\n"
-					"\t\t\t\t<avg05>%.2f</avg05>\r\n"
-					"\t\t\t\t<avg15>%.2f</avg15>\r\n"
-					"\t\t\t</load>\r\n"
-					"\t\t\t<cpu>\r\n"
-					"\t\t\t\t<user>%.1f</user>\r\n"
-					"\t\t\t\t<system>%.1f</system>\r\n"
+					"<system>"
+					"<load>"
+					"<avg01>%.2f</avg01>"
+					"<avg05>%.2f</avg05>"
+					"<avg15>%.2f</avg15>"
+					"</load>"
+					"<cpu>"
+					"<user>%.1f</user>"
+					"<system>%.1f</system>"
 #ifdef HAVE_CPU_WAIT
-				        "\t\t\t\t<wait>%.1f</wait>\r\n"
+				        "<wait>%.1f</wait>"
 #endif
-					"\t\t\t</cpu>\r\n"
-					"\t\t\t<memory>\r\n"
-					"\t\t\t\t<percent>%.1f</percent>\r\n"
-					"\t\t\t\t<kilobyte>%ld</kilobyte>\r\n"
-					"\t\t\t</memory>\r\n"
-					"\t\t</system>\r\n",
+					"</cpu>"
+					"<memory>"
+					"<percent>%.1f</percent>"
+					"<kilobyte>%ld</kilobyte>"
+					"</memory>"
+					"</system>",
 					systeminfo.loadavg[0],
 					systeminfo.loadavg[1],
 					systeminfo.loadavg[2],
@@ -401,7 +400,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
       }
     }
   }
-  buf_print(B, "\t</service>\r\n");
+  buf_print(B, "</service>");
 }
 
 
@@ -423,16 +422,16 @@ static void status_event(Event_T E, Buffer_T *B) {
   tv = Event_get_collected(E);
 
   buf_print(B,
-    "\t<event>\r\n"
-    "\t\t<collected_sec>%ld</collected_sec>\r\n"
-    "\t\t<collected_usec>%ld</collected_usec>\r\n"
-    "\t\t<service>%s</service>\r\n"
-    "\t\t<type>%d</type>\r\n"
-    "\t\t<group>%s</group>\r\n"
-    "\t\t<id>%d</id>\r\n"
-    "\t\t<state>%d</state>\r\n"
-    "\t\t<action>%d</action>\r\n"
-    "\t\t<message>%s</message>\r\n",
+    "<event>"
+    "<collected_sec>%ld</collected_sec>"
+    "<collected_usec>%ld</collected_usec>"
+    "<service>%s</service>"
+    "<type>%d</type>"
+    "<group>%s</group>"
+    "<id>%d</id>"
+    "<state>%d</state>"
+    "<action>%d</action>"
+    "<message>%s</message>",
     tv->tv_sec,
     tv->tv_usec,
     Event_get_id(E) == EVENT_INSTANCE ? "Monit" : Event_get_source_name(E),
@@ -444,11 +443,11 @@ static void status_event(Event_T E, Buffer_T *B) {
     Event_get_message(E));
   if (s->token) {
     buf_print(B,
-      "\t\t<token>%s</token>\r\n",
+      "<token>%s</token>",
       s->token);
   }
   buf_print(B,
-    "\t</event>\r\n");
+    "</event>");
 }
 
 
