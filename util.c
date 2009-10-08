@@ -673,8 +673,8 @@ void Util_printRunList() {
   }
 
   if(Run.mailservers) {
-    printf(" %-18s = ", "Mail server(s)");
     MailServer_T mta= Run.mailservers;
+    printf(" %-18s = ", "Mail server(s)");
     for(mta= Run.mailservers; mta; mta= mta->next)
 	printf("%s:%d%s%s",
           mta->host,
