@@ -449,6 +449,7 @@ typedef struct myport {
   int  port;                                                 /**< Portnumber */
   char *request;                              /**< Specific protocol request */
   char *request_checksum;     /**< The optional checksum for a req. document */
+  char *request_hostheader;            /**< The optional Host: header to use */
   int  request_hashtype;  /**< The optional type of hash for a req. document */
   char *pathname;                   /**< Pathname, in case of an UNIX socket */
   char *address;               /**< Human readable destination of the socket */

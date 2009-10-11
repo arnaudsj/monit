@@ -383,6 +383,7 @@ static void _gcppl(Port_T *p) {
   FREE((*p)->pathname);
   FREE((*p)->SSL.certmd5);
   FREE((*p)->request_checksum);
+  FREE((*p)->request_hostheader);
   FREE(*p);
 }
 

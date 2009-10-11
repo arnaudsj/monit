@@ -289,7 +289,7 @@
 %token CHILDREN SYSTEM
 %token RESOURCE MEMORY TOTALMEMORY LOADAVG1 LOADAVG5 LOADAVG15 
 %token MODE ACTIVE PASSIVE MANUAL CPU TOTALCPU CPUUSER CPUSYSTEM CPUWAIT
-%token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE SECRET
+%token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE SECRET HOSTHEADER
 %token UID GID MMONIT INSTANCE USERNAME PASSWORD
 %token TIMESTAMP CHANGED SECOND MINUTE HOUR DAY
 %token SSLAUTO SSLV2 SSLV3 TLSV1 CERTMD5
@@ -1063,14 +1063,20 @@ maxforward      : /* EMPTY */
                 ;
 
 request         : /* EMPTY */
-                | REQUEST PATH { 
+                | REQUEST PATH hostheader { 
                     portset.request = Util_urlEncode($2); 
                     FREE($2); 
                   }
-                | REQUEST PATH CHECKSUM STRING {
+                | REQUEST PATH CHECKSUM STRING hostheader {
                     portset.request = Util_urlEncode($2);
                     FREE($2);
                     portset.request_checksum = $4;
+                  }
+                ;
+
+hostheader      : /* EMPTY */
+                | hostheader STRING {
+                    portset.request_hostheader = $2;
                   }
                 ;
 
@@ -1078,7 +1084,6 @@ secret          : SECRET STRING {
                     portset.request = $2; 
                   }
                 ;
-
 
 apache_stat_list: apache_stat
                 | apache_stat_list OR apache_stat
@@ -2014,19 +2019,20 @@ static void addport(Port_T port) {
   ASSERT(port);
 
   NEW(p);
-  p->port             = port->port;
-  p->type             = port->type;
-  p->socket           = port->socket;
-  p->family           = port->family;
-  p->action           = port->action;
-  p->timeout          = port->timeout;
-  p->request          = port->request;
-  p->generic          = port->generic;
-  p->protocol         = port->protocol;
-  p->pathname         = port->pathname;
-  p->hostname         = port->hostname;
-  p->url_request      = port->url_request;
-  p->request_checksum = port->request_checksum;
+  p->port               = port->port;
+  p->type               = port->type;
+  p->socket             = port->socket;
+  p->family             = port->family;
+  p->action             = port->action;
+  p->timeout            = port->timeout;
+  p->request            = port->request;
+  p->generic            = port->generic;
+  p->protocol           = port->protocol;
+  p->pathname           = port->pathname;
+  p->hostname           = port->hostname;
+  p->url_request        = port->url_request;
+  p->request_checksum   = port->request_checksum;
+  p->request_hostheader = port->request_hostheader;
   memcpy(&p->ApacheStatus, &port->ApacheStatus, sizeof(struct apache_status));
 
   if (p->request_checksum) {

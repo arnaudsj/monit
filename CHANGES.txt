@@ -20,6 +20,12 @@ NEW FEATURES AND FUNCTIONS:
        if failed host 127.0.0.1 port 2000 type udp protocol radius secret testing1234 then alert
        if 5 restarts within 5 cycles then timeout
 
+* The HTTP protocol test now supports hostheader option which allows to
+  override Host header in HTTP request. It can be used for example
+  if for testing farm of HTTP servers by IP addresses and set specific
+  Host header. Thanks to Brady Catherman for patch. Example:
+    if failed host 192.168.1.100 protocol http hostheader "example.com" then alert
+
 BUGFIXES:
 
 * Fixed SMTP protocol test which may sometimes incorrectly

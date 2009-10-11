@@ -112,6 +112,7 @@ int check_http(Socket_T s) {
   char host[STRLEN];
   char auth[STRLEN]= {0};
   const char *request= NULL;
+  const char *hostheader= NULL;
   
   ASSERT(s);
 
@@ -120,6 +121,9 @@ int check_http(Socket_T s) {
   ASSERT(P);
   
   request= P->request?P->request:"/";
+
+  Util_getHTTPHostHeader(s, host, STRLEN);
+  hostheader= P->request_hostheader?P->request_hostheader:host;
  
   if(socket_print(s, 
 		  "GET %s HTTP/1.1\r\n"
@@ -128,8 +132,8 @@ int check_http(Socket_T s) {
 		  "Connection: close\r\n"
 		  "User-Agent: %s/%s\r\n"
 		  "%s\r\n",
-		  request, Util_getHTTPHostHeader(s, host, STRLEN), 
-		  prog, VERSION, get_auth_header(P, auth, STRLEN)) < 0) {
+		  request, hostheader, prog, VERSION,
+                  get_auth_header(P, auth, STRLEN)) < 0) {
     LogError("HTTP: error sending data -- %s\n", STRERROR);
     return FALSE;
   }

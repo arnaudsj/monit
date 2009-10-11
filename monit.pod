@@ -1964,11 +1964,24 @@ deduce if the server behind the port is up or not.
 
 The protocol statement is:
 
- [PROTO(COL) {name} [REQUEST {"/path"} [with CHECKSUM checksum]]
+ PROTO(COL) {name}
 
-As you can see, you may specify a request after the protocol, at
-the moment only the HTTP protocol supports the request option.
-See also below for an example.
+HTTP protocol supports additional options:
+ o REQUEST
+ o HOSTHEADER
+ o CHECKSUM
+
+ PROTO(COL) HTTP [REQUEST {"/path"} [with HOSTHEADER "string"] [with CHECKSUM checksum]
+
+When the Host header option is not specified, for HTTP protocol, by default
+the content of host option which specifies the target host to connect to is used.
+The Host header can be used when you need to test 
+
+Examples:
+
+  if failed host 192.168.1.100 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
+  if failed host 192.168.1.101 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
+  if failed host 192.168.1.102 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
 
 In addition to the standard protocols, the I<APACHE-STATUS>
 protocol is a test of a specific server type, rather than a
@@ -2256,6 +2269,12 @@ the http server. The string will be URL encoded by Monit before
 it sends the request to the http server, so it's okay to use URL
 unsafe characters in the request. If the request statement isn't
 specified, the default web server page will be requested.
+
+You can override default Host header in HTTP request:
+
+ if failed host 192.168.1.100 port 80 protocol http 
+    hostheader "example.com"
+ then alert
 
 You can also test the checksum for documents returned by a http
 server.  You can use either MD5 sums:
@@ -3173,7 +3192,7 @@ I<process>, I<file>, I<directory>, I<filesystem>, I<size>, I<action>,
 I<unmonitor>, I<rdate>, I<rsync>, I<data>, I<invalid>, I<exec>,
 I<nonexist>, I<policy>, I<reminder>, I<instance>, I<eventqueue>,
 I<basedir>, I<slot(s)>, I<system>, I<idfile>, I<gps>, I<radius>,
-I<secret>, I<target>, I<maxforward> and I<failed>
+I<secret>, I<target>, I<maxforward>, I<hostheader> and I<failed>
 
 And here is a complete list of B<noise keywords> ignored by
 monit:

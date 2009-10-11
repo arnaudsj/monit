@@ -197,6 +197,7 @@ checksum          { return CHECKSUM; }
 mailserver        { return MAILSERVER; }
 every             { return EVERY; }
 host              { return HOST; }
+hostheader        { return HOSTHEADER; }
 system            { return SYSTEM; }
 default           { return DEFAULT; }
 http              { return HTTP; }
