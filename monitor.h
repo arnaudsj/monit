@@ -831,12 +831,11 @@ struct myrun {
 
 /* -------------------------------------------------------- Global variables */
 
-char   *prog;                                  /**< The Name of this Program */
-struct myrun Run;                      /**< Struct holding runtime constants */
-Service_T servicelist;                /**< The service list (created in p.y) */
-Service_T servicelist_conf;   /**< The service list in conf file (c. in p.y) */
-SystemInfo_T systeminfo;                              /**< System infomation */
-
+extern char          *prog;
+extern struct myrun   Run;
+extern Service_T      servicelist;
+extern Service_T      servicelist_conf;
+extern SystemInfo_T   systeminfo;
 extern ProcessTree_T *ptree;     
 extern int            ptreesize;    
 extern ProcessTree_T *oldptree;  

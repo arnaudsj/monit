@@ -115,6 +115,16 @@ static RETSIGTYPE do_destroy(int);   /* Signalhandler for monit finalization */
 static RETSIGTYPE do_wakeup(int);  /* Signalhandler for a daemon wakeup call */
 
 
+/* ------------------------------------------------------------------ Global */
+
+
+char   *prog;                                  /**< The Name of this Program */
+struct myrun Run;                      /**< Struct holding runtime constants */
+Service_T servicelist;                /**< The service list (created in p.y) */
+Service_T servicelist_conf;   /**< The service list in conf file (c. in p.y) */
+SystemInfo_T systeminfo;                              /**< System infomation */
+
+
 /* ------------------------------------------------------------------ Public */
 
 
