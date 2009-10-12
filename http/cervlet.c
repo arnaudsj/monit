@@ -401,8 +401,8 @@ static void do_runtime(HttpRequest req, HttpResponse res) {
   }
 
   if(Run.mailservers) {
-    out_print(res, "<tr><td>Mail server(s)</td><td>");
     MailServer_T mta= Run.mailservers;
+    out_print(res, "<tr><td>Mail server(s)</td><td>");
     for(mta= Run.mailservers; mta; mta= mta->next)
 	out_print(res, "%s:%d%s&nbsp;",
           mta->host, mta->port, mta->ssl.use_ssl?"(ssl)":"");
