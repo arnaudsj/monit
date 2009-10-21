@@ -52,6 +52,9 @@ BUGFIXES:
   like start, stop, etc. were rejected. Monit will now use full access
   regardless of allow option order. Thanks to Thorsten Kampe for report.
 
+* Do not require SSL version type when setting SSL check and setting mmonit
+  (SSL version is set to auto).
+
 
 Version 5.0.3
 
