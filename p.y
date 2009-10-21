@@ -2671,7 +2671,7 @@ static void addmmonit(URL_T url, int timeout, int sslversion, char *certmd5) {
       yyerror("ssl check cannot be activated. SSL is not supported");
     } else {
       c->ssl.use_ssl = TRUE;
-      c->ssl.version = sslversion;
+      c->ssl.version = (sslversion == SSL_VERSION_NONE) ? SSL_VERSION_AUTO : sslversion;
       if (certmd5) {
 	c->ssl.certmd5 = certmd5;
 	cleanup_hash_string(c->ssl.certmd5);
