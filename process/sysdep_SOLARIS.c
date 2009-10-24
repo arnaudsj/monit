@@ -138,7 +138,7 @@ int init_process_info_sysdep(void) {
 
   systeminfo.mem_kbyte_max=pagetok(sysconf(_SC_PHYS_PAGES));
 
-  return (getuid()==0);
+  return (TRUE);
 
 }
 
@@ -158,7 +158,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
 
   char buf[4096];
   psinfo_t  * psinfo=  (psinfo_t *)&buf;
-  pstatus_t * pstatus= (pstatus_t *)&buf;
+  pstatus_t pstatus;
   int      pid;
   int      i;
   int      treesize;
@@ -224,14 +224,11 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     pt[i].mem_kbyte = psinfo->pr_rssize;
     
     if (!read_proc_file(buf,4096, "status", pt[i].pid)) {
-      
       pt[i].cputime=0;
       pt[i].cpu_percent = 0;
-      
     } else {
-      
-      pt[i].cputime= ( timestruc_to_tseconds(pstatus->pr_utime) +
-                       timestruc_to_tseconds(pstatus->pr_stime) );
+      memcpy(&pstatus, buf, sizeof(pstatus_t));
+      pt[i].cputime = (timestruc_to_tseconds(pstatus.pr_utime) + timestruc_to_tseconds(pstatus.pr_stime));
       pt[i].cpu_percent = 0;
     }
     

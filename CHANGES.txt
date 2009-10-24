@@ -60,6 +60,10 @@ BUGFIXES:
 * Fixed #27784: wait_start/wait_stop can advance too quickly.
   Thanks for report to Randy Puro.
 
+* Allow to monitor process' cpu and memory usage on Solaris even
+  when Monit is not running as root and fix when compiled with
+  optimizations enabled.
+
 
 Version 5.0.3
 
