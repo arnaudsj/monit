@@ -55,6 +55,8 @@ BUGFIXES:
 * Do not require SSL version type when setting SSL check and setting mmonit
   (SSL version is set to auto).
 
+* Passive monitoring mode fixed. Thanks to Nelson Vale for report.
+
 
 Version 5.0.3
 

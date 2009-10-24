@@ -252,35 +252,24 @@ static FILE *open_state(const char *mode) {
 
 
 static void close_state(FILE *S) {
-
-  if(fclose(S) != 0) {
-    LogCritical("%s: Cannot close the monit state file '%s' -- %s\n",
-	prog, Run.statefile, STRERROR);
-    
-  }
-
+  if(fclose(S) != 0)
+    LogCritical("%s: Cannot close the monit state file '%s' -- %s\n", prog, Run.statefile, STRERROR);
 }
 
 
 static void clone_state(Service_T service, State_T *state) {
-  
   memset(state, 0, sizeof(State_T));
   
   strncpy(state->name, service->name, sizeof(state->name) - 1);
   state->name[sizeof(state->name) - 1] = 0;
-  state->mode= service->mode;
   state->nstart= service->nstart;
   state->ncycle= service->ncycle;
   state->monitor= service->monitor;
-
 }
 
 
 static void update_service_state(Service_T service, State_T *state) {
-
-  service->mode= state->mode;
   service->nstart= state->nstart;
   service->ncycle= state->ncycle;
   service->monitor= state->monitor;
-  
 }
