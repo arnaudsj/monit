@@ -480,7 +480,7 @@ static void do_default() {
     
     if(Run.init != TRUE)
       daemonize(); 
-    else 
+    else if (! Run.debug)
       Util_redirectStdFds();
     
     if(! File_createPidFile(Run.pidfile)) {
