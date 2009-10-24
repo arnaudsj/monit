@@ -57,6 +57,9 @@ BUGFIXES:
 
 * Passive monitoring mode fixed. Thanks to Nelson Vale for report.
 
+* Fixed #27784: wait_start/wait_stop can advance too quickly.
+  Thanks for report to Randy Puro.
+
 
 Version 5.0.3
 

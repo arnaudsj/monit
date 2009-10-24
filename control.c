@@ -454,11 +454,11 @@ static void do_depend(Service_T s, int action) {
  * @param service A Service to wait for
  */
 static void wait_start(Service_T s) {
-  int max_tries= s->start->timeout;
+  time_t timeout = time(NULL) + s->start->timeout;
   
   ASSERT(s);
 
-  while(max_tries-- && !Run.stopped) {
+  while((time(NULL) < timeout) && !Run.stopped) {
     if(Util_isProcessRunning(s))
       break;
     sleep(1);
@@ -483,12 +483,11 @@ static void wait_start(Service_T s) {
  * @return TRUE if the service was stopped otherwise FALSE
  */
 static int wait_stop(Service_T s) {
-
-  int max_tries= s->stop->timeout;
+  time_t timeout = time(NULL) + s->stop->timeout;
   
   ASSERT(s);
 
-  while(max_tries-- && !Run.stopped) {
+  while((time(NULL) < timeout) && !Run.stopped) {
     if(!Util_isProcessRunning(s))
       break;
     sleep(1);
