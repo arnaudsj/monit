@@ -64,6 +64,9 @@ BUGFIXES:
   when Monit is not running as root and fix when compiled with
   optimizations enabled.
 
+* Fix #26752: inside Solaris Zone Monit fails to detect children
+  and gets host memory wrong
+
 
 Version 5.0.3
 

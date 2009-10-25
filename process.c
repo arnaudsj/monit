@@ -132,59 +132,48 @@ int init_process_info(void) {
  * @param pid The process id
  * @return TRUE if succeeded otherwise FALSE.
  */
-int update_process_data(Service_T s, ProcessTree_T *pt, int treesize,
-                        pid_t pid) {
-
+int update_process_data(Service_T s, ProcessTree_T *pt, int treesize, pid_t pid) {
   ProcessTree_T *leaf;
 
   ASSERT(s);
   ASSERT(systeminfo.mem_kbyte_max > 0);
 
   /* save the previous pid and set actual one */
-  s->inf->_pid= s->inf->pid;
-  s->inf->pid = pid;
+  s->inf->_pid = s->inf->pid;
+  s->inf->pid  = pid;
 
-  if ((leaf = findprocess(pid, pt, treesize)) != NULL ) {
+  if ((leaf = findprocess(pid, pt, treesize)) != NULL) {
  
     /* save the previous ppid and set actual one */
-    s->inf->_ppid= s->inf->ppid;
-    s->inf->ppid= leaf->ppid;
-    s->inf->children=leaf->children_sum;
-    s->inf->mem_kbyte=leaf->mem_kbyte;
-    s->inf->status_flag=leaf->status_flag;
-    s->inf->total_mem_kbyte=leaf->mem_kbyte_sum;
-    s->inf->cpu_percent=leaf->cpu_percent;
-    s->inf->total_cpu_percent=leaf->cpu_percent_sum;
+    s->inf->_ppid             = s->inf->ppid;
+    s->inf->ppid              = leaf->ppid;
+    s->inf->children          = leaf->children_sum;
+    s->inf->mem_kbyte         = leaf->mem_kbyte;
+    s->inf->status_flag       = leaf->status_flag;
+    s->inf->total_mem_kbyte   = leaf->mem_kbyte_sum;
+    s->inf->cpu_percent       = leaf->cpu_percent;
+    s->inf->total_cpu_percent = leaf->cpu_percent_sum;
 
-    if ( systeminfo.mem_kbyte_max == 0 ) {
-      
-      s->inf->total_mem_percent=0;
-      s->inf->mem_percent = 0;
-      
+    if (systeminfo.mem_kbyte_max == 0) {
+      s->inf->total_mem_percent = 0;
+      s->inf->mem_percent       = 0;
     } else {
-      
-      s->inf->total_mem_percent=
-        (int)((double)leaf->mem_kbyte_sum * 1000.0 / systeminfo.mem_kbyte_max);
-      s->inf->mem_percent =
-        (int)((double)leaf->mem_kbyte * 1000.0 / systeminfo.mem_kbyte_max);
-      
+      s->inf->total_mem_percent = (int)((double)leaf->mem_kbyte_sum * 1000.0 / systeminfo.mem_kbyte_max);
+      s->inf->mem_percent       = (int)((double)leaf->mem_kbyte * 1000.0 / systeminfo.mem_kbyte_max);
     }
 
   } else {
-
-    s->inf->ppid=0;
-    s->inf->children=0;
-    s->inf->total_mem_kbyte=0;
-    s->inf->total_mem_percent=0;
-    s->inf->mem_kbyte=0;
-    s->inf->mem_percent=0;
-    s->inf->cpu_percent=0;
-    s->inf->total_cpu_percent=0;
-
+    s->inf->ppid              = 0;
+    s->inf->children          = 0;
+    s->inf->total_mem_kbyte   = 0;
+    s->inf->total_mem_percent = 0;
+    s->inf->mem_kbyte         = 0;
+    s->inf->mem_percent       = 0;
+    s->inf->cpu_percent       = 0;
+    s->inf->total_cpu_percent = 0;
   }
   
   return TRUE;
-
 }
 
 
@@ -194,74 +183,44 @@ int update_process_data(Service_T s, ProcessTree_T *pt, int treesize,
  */
 int update_system_load(ProcessTree_T *pt, int treesize) {
 
-  if(Run.doprocess)
-  {
-    ProcessTree_T *leaf;
-  
+  if (Run.doprocess) {
+
     ASSERT(systeminfo.mem_kbyte_max > 0);
 
     /** Get load average triplet */
-    if(-1 == getloadavg_sysdep(systeminfo.loadavg, 3))
-    {
-      LogError("'%s' statistic error -- load average gathering failed\n",
-        Run.system->name);
+    if (-1 == getloadavg_sysdep(systeminfo.loadavg, 3)) {
+      LogError("'%s' statistic error -- load average gathering failed\n", Run.system->name);
       goto error1;
     }
 
     /** Get real memory usage statistic */
-    if(!used_system_memory_sysdep(&systeminfo))
-    {
-      DEBUG("'%s' statistic -- memory usage gathering method fallback\n",
-        Run.system->name);
-      /* Update the total real memory usage by monitoring process with PID 1 */
-      if((leaf = findprocess(1, pt, treesize)) && leaf->mem_kbyte_sum > 0)
-      {
-        systeminfo.total_mem_kbyte = leaf->mem_kbyte_sum;
-      }
-      else
-      {
-        LogError("'%s' statistic error -- memory usage gathering failed\n",
-          Run.system->name);
-        goto error2;
-      }
+    if (! used_system_memory_sysdep(&systeminfo)) {
+      LogError("'%s' statistic error -- memory usage gathering failed\n", Run.system->name);
+      goto error2;
     }
-    systeminfo.total_mem_percent = (int)(1000 *
-      (double)systeminfo.total_mem_kbyte / (double)systeminfo.mem_kbyte_max);
+    systeminfo.total_mem_percent = (int)(1000 * (double)systeminfo.total_mem_kbyte / (double)systeminfo.mem_kbyte_max);
 
     /** Get CPU usage statistic */
-    if(!used_system_cpu_sysdep(&systeminfo))
-    {
-      DEBUG("'%s' statistic -- cpu usage gathering method fallback\n",
-        Run.system->name);
-      /* Update the total CPU load by monitoring process with PID 1 */
-      if((leaf = findprocess(1, pt, treesize)))
-      {
-        systeminfo.total_cpu_user_percent = leaf->cpu_percent_sum;
-        systeminfo.total_cpu_syst_percent = 0;  
-        systeminfo.total_cpu_wait_percent = 0;  
-      }
-      else
-      {
-        LogError("'%s' statistic error -- cpu usage gathering failed\n",
-          Run.system->name);
-        goto error3;
-      }
+    if (! used_system_cpu_sysdep(&systeminfo)) {
+      LogError("'%s' statistic error -- cpu usage gathering failed\n", Run.system->name);
+      goto error3;
     }
 
     return TRUE;
   }
 
-  error1:
+error1:
   systeminfo.loadavg[0] = 0;
   systeminfo.loadavg[1] = 0;
   systeminfo.loadavg[2] = 0;
-  error2:
-  systeminfo.total_mem_kbyte = 0;
+error2:
+  systeminfo.total_mem_kbyte   = 0;
   systeminfo.total_mem_percent = 0;
-  error3:
+error3:
   systeminfo.total_cpu_user_percent = 0;
   systeminfo.total_cpu_syst_percent = 0;  
   systeminfo.total_cpu_wait_percent = 0;  
+
   return FALSE;
 }
 
@@ -270,25 +229,20 @@ int update_system_load(ProcessTree_T *pt, int treesize) {
  * Initialize the process tree 
  * @return treesize>=0 if succeeded otherwise <0.
  */
-int initprocesstree(ProcessTree_T **pt_r,     int *size_r,
-                    ProcessTree_T **oldpt_r, int *oldsize_r) {
-  
+int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, int *oldsize_r) {
   int i;
   ProcessTree_T *oldentry;
   ProcessTree_T *pt;
   ProcessTree_T *oldpt;
-  ProcessTree_T *root;
+  ProcessTree_T *root = NULL;
 
-  if(*pt_r != NULL)
-  {  
+  if (*pt_r != NULL) {  
     *oldpt_r   = *pt_r; 
     *oldsize_r = *size_r; 
   }
   
-  if((*size_r = initprocesstree_sysdep(pt_r)) <= 0)
-  {
-    DEBUG("system statistic error -- cannot initialize the process tree => "
-          "process resource monitoring disabled\n");
+  if ((*size_r = initprocesstree_sysdep(pt_r)) <= 0) {
+    DEBUG("system statistic error -- cannot initialize the process tree => process resource monitoring disabled\n");
     Run.doprocess = FALSE;
     return -1;
   }
@@ -296,75 +250,56 @@ int initprocesstree(ProcessTree_T **pt_r,     int *size_r,
   pt    = *pt_r;
   oldpt = *oldpt_r;
 
-  if ( pt == NULL ) {
+  if (pt == NULL)
     return 0;
-  }
 
-  for(i = 0; i < *size_r; i ++)
-  {
-    if(oldpt && (oldentry= findprocess(pt[i].pid, oldpt, *oldsize_r)))
-    {
+  for (i = 0; i < *size_r; i ++) {
+    if (oldpt && (oldentry = findprocess(pt[i].pid, oldpt, *oldsize_r))) {
       pt[i].cputime_prev = oldentry->cputime;
       pt[i].time_prev    = oldentry->time;
  
       /* The cpu_percent may be set already (for example by HPUX module) */
-      if(pt[i].cpu_percent  == 0 &&
-         pt[i].cputime_prev != 0 &&
-         pt[i].cputime      != 0 &&
-         pt[i].cputime      > pt[i].cputime_prev)
-      {
-        pt[i].cpu_percent = (int)(
-          (
-            1000 *
-            (double)(pt[i].cputime - pt[i].cputime_prev) /
-            (pt[i].time - pt[i].time_prev)
-          ) / systeminfo.cpus
-        );
-
-        /* Just for paranoia! */
-        if(pt[i].cpu_percent > 1000 / systeminfo.cpus)
+      if (pt[i].cpu_percent  == 0 && pt[i].cputime_prev != 0 && pt[i].cputime != 0 && pt[i].cputime > pt[i].cputime_prev) {
+        pt[i].cpu_percent = (int)((1000 * (double)(pt[i].cputime - pt[i].cputime_prev) / (pt[i].time - pt[i].time_prev)) / systeminfo.cpus);
+        if (pt[i].cpu_percent > 1000 / systeminfo.cpus)
           pt[i].cpu_percent = 1000 / systeminfo.cpus;
       }
-    }
-    else
-    {
+    } else {
       pt[i].cputime_prev = 0;
       pt[i].time_prev    = 0.0;
       pt[i].cpu_percent  = 0;
     }
         
     if(pt[i].ppid == 0)
-    {
       continue;
-    }
 
-    if(NULL == (pt[i].parent= findprocess(pt[i].ppid, pt, *size_r)))
-    {
-      /* Inconsitency found, process orphaned most probably by a race
-         condition. we might lack accuracy but we remain stable! */
+    if (NULL == (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r))) {
+      /* Inconsitency found, process orphaned most probably by a race condition. we might lack accuracy but we remain stable! */
       DEBUG("system statistic error -- orphaned process id %d\n", pt[i].pid);
       pt[i].pid = 0;
       continue;
     }
     
-    if(! connectchild(pt[i].parent, &pt[i]))
-    {
-      /* connection to parent process has failed, this is
-	 usually caused in the part above */
-      DEBUG(
-        "system statistic error -- "
-        "cannot connect process id %d to its parent %d\n",
-        pt[i].pid, pt[i].ppid);
+    if (! connectchild(pt[i].parent, &pt[i])) {
+      /* connection to parent process has failed, this is usually caused in the part above */
+      DEBUG("system statistic error -- cannot connect process id %d to its parent %d\n", pt[i].pid, pt[i].ppid);
       pt[i].pid=0;
       continue;
     }
 
   }
 
-  if(! (root = findprocess(1, pt, *size_r)))
-  {
-    DEBUG("system statistic error -- cannot find process id 1\n",
-      pt[i].pid, pt[i].ppid);
+  /* The main process in Solaris zones, BSD jails doesn't have pid 1, so try to find process which is parent of itself */
+  for (i = 0; i < *size_r; i++) {
+    if (pt[i].pid == pt[i].ppid) {
+      root = &pt[i];
+      break;
+    }
+  }
+
+  /* Linux's init process with pid 1 has parent pid 0, which is hidden however, so above search will fail */
+  if (! root && findprocess(1, pt, *size_r)) {
+    DEBUG("system statistic error -- cannot find root process id\n");
     return -1;
   }
 
@@ -382,23 +317,16 @@ int initprocesstree(ProcessTree_T **pt_r,     int *size_r,
  * @return pointer of the process if succeeded otherwise NULL.
  */
 ProcessTree_T *findprocess(int pid, ProcessTree_T *pt, int size) {
-
   int i;
 
   ASSERT(pt);
 
-  if(( pid == 0  ) || ( size <= 0 ))
+  if ((pid == 0) || (size <= 0))
     return NULL;
 
-  for( i = 0; i < size; i ++ ) {
-
-    if( pid == pt[i].pid ) {
-      
+  for (i = 0; i < size; i++)
+    if (pid == pt[i].pid)
       return &pt[i];
-
-    }
-
-  }
 
   return NULL;
 
@@ -408,30 +336,25 @@ ProcessTree_T *findprocess(int pid, ProcessTree_T *pt, int size) {
  * Delete the process tree 
  */
 void delprocesstree(ProcessTree_T ** reference, int size) {
-
   int i;
   ProcessTree_T * pt;
 
-  pt= * reference;
+  pt = * reference;
 
-  if( pt == NULL || size <= 0 )
+  if (pt == NULL || size <= 0)
       return;
 
-  for( i = 0; i < size; i ++ ) {
-
-    if( pt[i].children!=NULL ) {
-
+  for (i = 0; i < size; i++) {
+    if (pt[i].children != NULL) {
       FREE(pt[i].children);
-      pt[i].children=NULL;
-
+      pt[i].children = NULL;
     }
-    
   }
 
   FREE(pt);
 
-  *reference=NULL;
+  *reference = NULL;
 
   return;
-
 }
+

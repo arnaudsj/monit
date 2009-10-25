@@ -90,7 +90,6 @@
  * @return TRUE if succeeded otherwise FALSE.
  */
 int read_proc_file(char *buf, int buf_size, char * name, int pid) {
-
   int fd;
   char filename[STRLEN];
   int bytes;
@@ -98,32 +97,20 @@ int read_proc_file(char *buf, int buf_size, char * name, int pid) {
   ASSERT(buf);
   ASSERT(name);
 
-  if ( pid < 0 ) {
-
+  if ( pid < 0 )
     snprintf(filename, STRLEN, "/proc/%s", name);
-
-  } else {
-
+  else
     snprintf(filename, STRLEN, "/proc/%d/%s", pid, name);
-
-  }
     
-  if ( (fd = open(filename, O_RDONLY)) < 0 ) {
-
+  if ((fd = open(filename, O_RDONLY)) < 0) {
     DEBUG("cannot open file %s -- %s\n", filename, STRERROR);
-
     return FALSE;
-
   }
 
-  if ( (bytes = read(fd, buf, buf_size-1)) < 0 ) {
-
+  if ((bytes = read(fd, buf, buf_size-1)) < 0) {
     close(fd);
-
     DEBUG("cannot read file %s -- %s\n", filename, STRERROR);
-
     return FALSE;
-
   }
        
   /* In case it is a string we have to 0 terminate it our self */
@@ -132,7 +119,6 @@ int read_proc_file(char *buf, int buf_size, char * name, int pid) {
   close(fd);
 
   return TRUE;
-  
 }
 
 /**
@@ -140,12 +126,10 @@ int read_proc_file(char *buf, int buf_size, char * name, int pid) {
  * @return time in seconds
  */
 double get_float_time(void) {    
-
   struct timeval t;
 
   gettimeofday(&t, NULL);
   return (double) t.tv_sec * 10 + (double) t.tv_usec / 100000.0;
-
 }
 
 
@@ -156,28 +140,21 @@ double get_float_time(void) {
  * @return TRUE if succeeded otherwise FALSE.
  */
 int connectchild(ProcessTree_T * parent, ProcessTree_T * child) {
-
   ProcessTree_T ** tmp;
 
   ASSERT(child);
   ASSERT(parent);
 
-  if ( parent->pid == 0 || child->pid == 0 ) {
-
+  if (parent->pid == 0 || child->pid == 0)
     return FALSE;
-    
-  }
 
   parent->children_num++;
 
   tmp = xcalloc(sizeof(ProcessTree_T *), parent->children_num);
 
-  if ( parent->children != NULL ) {
-
-    memcpy(tmp, parent->children,
-	   sizeof(ProcessTree_T *) * (parent->children_num - 1));
+  if (parent->children != NULL) {
+    memcpy(tmp, parent->children, sizeof(ProcessTree_T *) * (parent->children_num - 1));
     FREE(parent->children);
-
   }
 
   parent->children = tmp;
@@ -194,39 +171,28 @@ int connectchild(ProcessTree_T * parent, ProcessTree_T * child) {
  * @return TRUE if succeeded otherwise FALSE.
  */
 void fillprocesstree(ProcessTree_T * pt) {
-
-  int i;
-  ProcessTree_T  *parent_pt;
+  int            i;
+  ProcessTree_T *parent_pt;
 
   ASSERT(pt);
 
-  if (( pt->pid==0 ) || ( pt->visited == 1 )) {
-    
+  if ((pt->pid==0) || (pt->visited == 1))
     return;
-    
-  }
 
-  pt->visited= 1;
-  pt->children_sum= pt->children_num;
-  pt->mem_kbyte_sum= pt->mem_kbyte;
-  pt->cpu_percent_sum= pt->cpu_percent;
+  pt->visited         = 1;
+  pt->children_sum    = pt->children_num;
+  pt->mem_kbyte_sum   = pt->mem_kbyte;
+  pt->cpu_percent_sum = pt->cpu_percent;
 
-  for( i = 0; i < pt->children_num; i++) {
-
+  for(i = 0; i < pt->children_num; i++)
     fillprocesstree(pt->children[i]);
 
-  }
-
-  if ( pt->parent != NULL ) {
-    
-    parent_pt=pt->parent;
-    parent_pt->children_sum+=pt->children_sum;
-    parent_pt->mem_kbyte_sum+=pt->mem_kbyte_sum;
-    parent_pt->cpu_percent_sum+=pt->cpu_percent_sum;
-    /* Numerical inaccuracy force us to limit the cpu load to 100%*/
-    parent_pt->cpu_percent_sum=(pt->cpu_percent_sum>1000?1000:
-                                parent_pt->cpu_percent_sum);
-    
+  if (pt->parent != NULL) {
+    parent_pt                   = pt->parent;
+    parent_pt->children_sum    += pt->children_sum;
+    parent_pt->mem_kbyte_sum   += pt->mem_kbyte_sum;
+    parent_pt->cpu_percent_sum += pt->cpu_percent_sum;
+    parent_pt->cpu_percent_sum  = (pt->cpu_percent_sum > 1000) ? 1000 : parent_pt->cpu_percent_sum;
   } 
 }
 

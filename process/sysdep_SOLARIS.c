@@ -155,93 +155,70 @@ double timestruc_to_tseconds(timestruc_t t) {
  * @return treesize>=0 if succeeded otherwise <0.
  */
 int initprocesstree_sysdep(ProcessTree_T ** reference) {
-
-  char buf[4096];
-  psinfo_t  * psinfo=  (psinfo_t *)&buf;
-  pstatus_t pstatus;
-  int      pid;
-  int      i;
-  int      treesize;
-
-  ProcessTree_T *  pt;
-
-  glob_t   globbuf;
+  int            i;
+  int            pid;
+  int            treesize;
+  char           buf[4096];
+  glob_t         globbuf;
+  pstatus_t      pstatus;
+  psinfo_t      *psinfo = (psinfo_t *)&buf;
+  ProcessTree_T *pt;
 
   ASSERT(reference);
 
   /* Find all processes in the /proc directory */
-
-  if (glob("/proc/[0-9]*", 0, NULL, &globbuf) != 0 ) {
-
+  if (glob("/proc/[0-9]*", 0, NULL, &globbuf) != 0)
     return 0;
-
-  } 
 
   treesize = globbuf.gl_pathc;
 
   /* Allocate the tree */
-
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
   /* Insert data from /proc directory */
-
-  for ( i = 0; i < treesize; i ++ ) {
-
-    pid=atoi(globbuf.gl_pathv[i]+strlen("/proc/"));
-    pt[i].pid=pid;
+  for (i = 0; i < treesize; i++) {
+    pid = atoi(globbuf.gl_pathv[i] + strlen("/proc/"));
+    pt[i].pid = pid;
 
     /* get the actual time */
     pt[i].time = get_float_time();
 
-    if (!read_proc_file(buf,4096, "psinfo", pt[i].pid)) {
-      
-      pt[i].cputime = 0;
+    if (! read_proc_file(buf,4096, "psinfo", pt[i].pid)) {
+      pt[i].cputime     = 0;
       pt[i].cpu_percent = 0;
-      pt[i].mem_kbyte= 0;
+      pt[i].mem_kbyte   = 0;
       continue;
-
     } 
 
     pt[i].ppid = psinfo->pr_ppid;
         
-    /* If we don't have any light-weight processes (LWP) then we
-       are definitely a zombie */
-
-    if ( psinfo->pr_nlwp == 0 ) {
-
+    /* If we don't have any light-weight processes (LWP) then we are definitely a zombie */
+    if (psinfo->pr_nlwp == 0) {
       pt[i].status_flag = PROCESS_ZOMBIE;
-    
-      /* We can't access /proc/$pid/status of a zombie */
-      /* and does it anyway matter? */
-      
-      pt[i].cputime = 0;
+      pt[i].cputime     = 0;
       pt[i].cpu_percent = 0;
-      pt[i].mem_kbyte= 0;
+      pt[i].mem_kbyte   = 0;
       continue;
-      
     } 
     
     pt[i].mem_kbyte = psinfo->pr_rssize;
     
-    if (!read_proc_file(buf,4096, "status", pt[i].pid)) {
-      pt[i].cputime=0;
+    if (! read_proc_file(buf,4096, "status", pt[i].pid)) {
+      pt[i].cputime     = 0;
       pt[i].cpu_percent = 0;
     } else {
       memcpy(&pstatus, buf, sizeof(pstatus_t));
-      pt[i].cputime = (timestruc_to_tseconds(pstatus.pr_utime) + timestruc_to_tseconds(pstatus.pr_stime));
+      pt[i].cputime     = (timestruc_to_tseconds(pstatus.pr_utime) + timestruc_to_tseconds(pstatus.pr_stime));
       pt[i].cpu_percent = 0;
     }
-    
   }
   
-  * reference = pt;
+  *reference = pt;
 
   /* Free globbing buffer */
-
   globfree(&globbuf);
 
   return treesize;
-
 }
 
 /**
