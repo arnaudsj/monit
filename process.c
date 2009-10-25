@@ -298,7 +298,7 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
   }
 
   /* Linux's init process with pid 1 has parent pid 0, which is hidden however, so above search will fail */
-  if (! root && findprocess(1, pt, *size_r)) {
+  if (! root && ! (root = findprocess(1, pt, *size_r))) {
     DEBUG("system statistic error -- cannot find root process id\n");
     return -1;
   }
