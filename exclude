@@ -1,4 +1,6 @@
 CVS
+.svn
+valgrind*
 make_dist
 exclude
 man

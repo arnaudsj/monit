@@ -270,10 +270,10 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
       pt[i].cpu_percent  = 0;
     }
         
-    if(pt[i].ppid == 0)
+    if (pt[i].pid == pt[i].ppid)
       continue;
 
-    if (NULL == (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r))) {
+    if (! (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r))) {
       /* Inconsitency found, process orphaned most probably by a race condition. we might lack accuracy but we remain stable! */
       DEBUG("system statistic error -- orphaned process id %d\n", pt[i].pid);
       pt[i].pid = 0;
@@ -283,7 +283,7 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
     if (! connectchild(pt[i].parent, &pt[i])) {
       /* connection to parent process has failed, this is usually caused in the part above */
       DEBUG("system statistic error -- cannot connect process id %d to its parent %d\n", pt[i].pid, pt[i].ppid);
-      pt[i].pid=0;
+      pt[i].pid = 0;
       continue;
     }
 
@@ -321,7 +321,7 @@ ProcessTree_T *findprocess(int pid, ProcessTree_T *pt, int size) {
 
   ASSERT(pt);
 
-  if ((pid == 0) || (size <= 0))
+  if (size <= 0)
     return NULL;
 
   for (i = 0; i < size; i++)
@@ -329,7 +329,6 @@ ProcessTree_T *findprocess(int pid, ProcessTree_T *pt, int size) {
       return &pt[i];
 
   return NULL;
-
 }
 
 /**

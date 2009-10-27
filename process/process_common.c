@@ -145,7 +145,7 @@ int connectchild(ProcessTree_T * parent, ProcessTree_T * child) {
   ASSERT(child);
   ASSERT(parent);
 
-  if (parent->pid == 0 || child->pid == 0)
+  if (parent->pid == child->pid)
     return FALSE;
 
   parent->children_num++;
@@ -176,7 +176,7 @@ void fillprocesstree(ProcessTree_T * pt) {
 
   ASSERT(pt);
 
-  if ((pt->pid==0) || (pt->visited == 1))
+  if (pt->visited == 1)
     return;
 
   pt->visited         = 1;

@@ -196,9 +196,7 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].kp_eproc.e_vm.vm_rssize * pagesize_kbyte);
     if(pinfo[i].kp_proc.p_stat == SZOMB)
    #endif
-    {
-      pt[i].status_flag |= PROCESS_ZOMBIE;
-    }
+    pt[i].status_flag |= PROCESS_ZOMBIE;
     pt[i].cpu_percent = 0;
     pt[i].time = get_float_time();
   }

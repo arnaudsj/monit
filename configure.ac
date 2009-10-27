@@ -54,6 +54,10 @@ AC_CHECK_LIB([pthread],
 AC_CHECK_LIB([c_r],
 	     [pthread_create],
 	     [pthread_libs="-pthread"])
+if test `uname` = "FreeBSD" -a `uname -r | cut -c1` = "6"
+then
+	pthread_libs="-lthr"
+fi
 if test "$pthread_libs"
 then
 	LIBS="$pthread_libs $LIBS"
