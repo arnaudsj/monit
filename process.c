@@ -273,12 +273,8 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
     if (pt[i].pid == pt[i].ppid)
       continue;
 
-    if (! (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r))) {
-      /* Inconsitency found, process orphaned most probably by a race condition. we might lack accuracy but we remain stable! */
-      DEBUG("system statistic error -- orphaned process id %d\n", pt[i].pid);
-      pt[i].pid = 0;
+    if (! (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r)))
       continue;
-    }
     
     if (! connectchild(pt[i].parent, &pt[i])) {
       /* connection to parent process has failed, this is usually caused in the part above */
