@@ -587,8 +587,7 @@ static void do_viewlog(HttpRequest req, HttpResponse res) {
 
 
 static void handle_action(HttpRequest req, HttpResponse res) {
-
-  char *name= req->url;
+  char *name = req->url;
   const char *action;
   Service_T s;
   
@@ -600,8 +599,7 @@ static void handle_action(HttpRequest req, HttpResponse res) {
     const char *token = NULL;
 
     if(is_readonly(req)) {
-      send_error(res, SC_FORBIDDEN,
-        "You do not have sufficent privileges to access this page");
+      send_error(res, SC_FORBIDDEN, "You do not have sufficent privileges to access this page");
       return;
     }
     if((s->doaction = Util_getAction(action)) == ACTION_IGNORE) {
@@ -609,18 +607,16 @@ static void handle_action(HttpRequest req, HttpResponse res) {
       return;
     }
     token = get_parameter(req, "token");
-    s->token = token?xstrdup(token):NULL;
+    s->token = token ? xstrdup(token) : NULL;
     LogDebug("%s service '%s' on user request\n", action, s->name);
     Run.doaction = TRUE; /* set the global flag */
     do_wakeupcall();
   }
   do_service(req, res, s);
-
 }
 
 
 static void handle_do_action(HttpRequest req, HttpResponse res) {
-
   Service_T s;
   int doaction = ACTION_IGNORE;
   const char *action = get_parameter(req, "action");
@@ -673,7 +669,6 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
     Run.doaction = TRUE; 
     do_wakeupcall();
   }
-
 }
 
 

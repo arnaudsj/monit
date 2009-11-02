@@ -28,6 +28,11 @@ NEW FEATURES AND FUNCTIONS:
 
 BUGFIXES:
 
+* When error occurred during monit command-line execution, report error
+  and exit with 1, so it is possible to react when monit is used in script.
+  On success 0 is returned as usual. Formerly command-line monit exited
+  always 0 even if error occurred.
+
 * Fixed SMTP protocol test which may sometimes incorrectly
   report ESMTP protocol failure. Thanks to Axel Reinhold for
   report.

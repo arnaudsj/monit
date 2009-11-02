@@ -101,7 +101,6 @@
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: validate.c,v 1.200 2009/05/04 21:07:34 martinp Exp $
  *  @file
  */
 
@@ -144,8 +143,8 @@ int            oldptreesize=0;
  *  validate function check services in the service list to see if
  *  they will pass all defined tests.
  */
-void validate() {
-
+int validate() {
+  int errors = 0;
   Service_T s;
 
   Run.handler_flag = HANDLER_SUCCEEDED;
@@ -172,7 +171,8 @@ void validate() {
   for(s= servicelist; s && !Run.stopped; s= s->next) {
     LOCK(s->mutex)
       if(!do_scheduled_action(s) && s->monitor && !check_skip(s) && !check_timeout(s)) {
-        s->check(s);
+        if (! s->check(s))
+          errors++;
         /* The monitoring may be disabled by some matching rule in s->check
          * so we have to check again before setting to MONITOR_YES */
         if(s->monitor != MONITOR_NOT)
@@ -189,6 +189,7 @@ void validate() {
 
   handle_mmonit(NULL);
 
+  return errors;
 }
 
 
@@ -467,7 +468,6 @@ int check_fifo(Service_T s) {
 int check_status(Service_T s) {
   // TODO Call external script and validate return value
   return TRUE;
-
 }
 
 
@@ -1318,13 +1318,13 @@ static int check_skip(Service_T s) {
  * Returns TRUE if scheduled action was performed
  */
 static int do_scheduled_action(Service_T s) {
+  int rv = FALSE;
   if (s->doaction != ACTION_IGNORE) {
-    control_service(s->name, s->doaction);
+    rv = control_service(s->name, s->doaction);
     Event_post(s, EVENT_ACTION, STATE_CHANGED, s->action_ACTION, "%s action done", actionnames[s->doaction]);
     s->doaction = ACTION_IGNORE;
     FREE(s->token);
-    return TRUE;
   }
-  return FALSE;
+  return rv;
 }
 

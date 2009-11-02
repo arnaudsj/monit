@@ -849,14 +849,14 @@ extern int            oldptreesize;
 /* FIXME: move remaining prototypes into seperate header-files */
 
 int   parse(char *);
-void  control_service(const char *, int);
-void  control_service_string(const char *, const char *);
-void  control_service_daemon(const char *, const char *);
+int   control_service(const char *, int);
+int   control_service_string(const char *, const char *);
+int   control_service_daemon(const char *, const char *);
 void  setup_dependants();
 void  reset_depend();
 void  spawn(Service_T, Command_T, const char *);
 int   status(char *);
-int   log_init() ;
+int   log_init();
 void  LogEmergency(const char *, ...);
 void  LogAlert(const char *, ...);
 void  LogCritical(const char *, ...);
@@ -871,8 +871,8 @@ void  log_close();
 void vsyslog (int, const char *, va_list);
 #endif /* HAVE_SYSLOG */
 #endif /* HAVE_VSYSLOG */
-void  validate() ;
-void  daemonize() ;
+int   validate();
+void  daemonize();
 void  gc();
 void  gc_mail_list(Mail_T *);
 void  gccmd(Command_T *);
