@@ -46,6 +46,10 @@
 #include <kvm.h>
 #endif
 
+#ifdef HAVE_PATHS_H
+#include <paths.h>
+#endif
+
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
@@ -165,7 +169,7 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     return FALSE;
   }
 
-  if(!(kvm_handle = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL)))
+  if(!(kvm_handle = kvm_open(NULL, _PATH_DEVNULL, NULL, O_RDONLY, prog)))
   {
     LogError("system statistic error -- cannot initialize kvm interface\n");
     return FALSE;

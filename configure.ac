@@ -89,6 +89,7 @@ AC_CHECK_HEADERS([ \
 	glob.h \
 	grp.h \
 	kvm.h \
+	paths.h \
 	kstat.h \
 	libperfstat.h \
 	limits.h \

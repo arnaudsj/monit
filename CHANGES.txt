@@ -28,6 +28,12 @@ NEW FEATURES AND FUNCTIONS:
 
 BUGFIXES:
 
+* Support resource monitoring (cpu usage, etc.) when Monit is running
+  inside FreeBSD jail.
+
+* Fix #26752: inside Solaris Zone Monit fails to detect children
+  and gets host memory wrong
+
 * When error occurred during monit command-line execution, report error
   and exit with 1, so it is possible to react when monit is used in script.
   On success 0 is returned as usual. Formerly command-line monit exited
@@ -68,9 +74,6 @@ BUGFIXES:
 * Allow to monitor process' cpu and memory usage on Solaris even
   when Monit is not running as root and fix when compiled with
   optimizations enabled.
-
-* Fix #26752: inside Solaris Zone Monit fails to detect children
-  and gets host memory wrong
 
 
 Version 5.0.3
