@@ -42,10 +42,6 @@
 #include <fcntl.h>
 #endif
 
-#ifdef HAVE_KVM_H
-#include <kvm.h>
-#endif
-
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
@@ -77,9 +73,7 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *  @author Rory Toma <rory@digeo.com>
- *  @author Martin Pala<martinp@tildeslash.com>
- *
- *  @version \$Id: sysdep_OPENBSD.c,v 1.36 2009/02/13 09:18:18 hauk Exp $
+ *  @author Martin Pala <martinp@tildeslash.com>
  *
  *  @file
  */
@@ -88,11 +82,13 @@
 /* ----------------------------------------------------------------- Private */
 
 
-static int  hz;
-static int  pagesize_kbyte;
-static long total_old    = 0;
-static long cpu_user_old = 0;
-static long cpu_syst_old = 0;
+static int      hz;
+static int      pagesize_kbyte;
+static long     total_old    = 0;
+static long     cpu_user_old = 0;
+static long     cpu_syst_old = 0;
+static unsigned maxslp;
+
 
 
 /* ------------------------------------------------------------------ Public */
@@ -106,27 +102,23 @@ int init_process_info_sysdep(void) {
   mib[0] = CTL_KERN;
   mib[1] = KERN_CLOCKRATE;
   len    = sizeof(clock);
-  if(sysctl(mib, 2, &clock, &len, NULL, 0) == -1)
-  {
+  if (sysctl(mib, 2, &clock, &len, NULL, 0) == -1) {
     DEBUG("system statistic error -- cannot get clock rate: %s\n", STRERROR);
     return FALSE;
   }
   hz     = clock.hz;
 
   mib[0] = CTL_HW;
-
   mib[1] = HW_NCPU;
   len    = sizeof(systeminfo.cpus);
-  if(sysctl(mib, 2, &systeminfo.cpus, &len, NULL, 0) == -1)
-  {
+  if (sysctl(mib, 2, &systeminfo.cpus, &len, NULL, 0) == -1) {
     DEBUG("system statistic error -- cannot get cpu count: %s\n", STRERROR);
     return FALSE;
   }
 
   mib[1] = HW_PHYSMEM;
   len    = sizeof(systeminfo.mem_kbyte_max);
-  if(sysctl(mib, 2, &systeminfo.mem_kbyte_max, &len, NULL, 0) == -1)
-  {
+  if (sysctl(mib, 2, &systeminfo.mem_kbyte_max, &len, NULL, 0) == -1) {
     DEBUG("system statistic error -- cannot get real memory amount: %s\n", STRERROR);
     return FALSE;
   }
@@ -134,8 +126,7 @@ int init_process_info_sysdep(void) {
 
   mib[1] = HW_PAGESIZE;
   len    = sizeof(pagesize_kbyte);
-  if(sysctl(mib, 2, &pagesize_kbyte, &len, NULL, 0) == -1)
-  {
+  if (sysctl(mib, 2, &pagesize_kbyte, &len, NULL, 0) == -1) {
     DEBUG("system statistic error -- cannot get memory page size: %s\n", STRERROR);
     return FALSE;
   }
@@ -148,54 +139,51 @@ int init_process_info_sysdep(void) {
 /**
  * Read all processes to initialize the information tree.
  * @param reference  reference of ProcessTree
- * @return treesize>0 if succeeded otherwise =0.
+ * @return treesize > 0 if succeeded otherwise = 0.
  */
-int initprocesstree_sysdep(ProcessTree_T ** reference) {
-  int                i;
-  int                treesize;
-  static kvm_t      *kvm_handle;
-  ProcessTree_T     *pt;
-  struct kinfo_proc *pinfo;
+int initprocesstree_sysdep(ProcessTree_T **reference) {
+  int                        i;
+  int                        treesize;
+  size_t                     size = sizeof(maxslp);
+  int                        mib_proc2[6] = {CTL_KERN, KERN_PROC2, KERN_PROC_KTHREAD, 0, sizeof(struct kinfo_proc2), 0};
+  static int                 mib_maxslp[] = {CTL_VM, VM_MAXSLP};
+  ProcessTree_T             *pt;
+  static struct kinfo_proc2 *pinfo;
 
-  if(getuid()!=0) {
-    LogError("system statistic error -- permission denied\n");
+  if (sysctl(mib_maxslp, 2, &maxslp, &size, NULL, 0) < 0) {
+    LogError("system statistic error -- vm.maxslp failed");
     return FALSE;
   }
 
-  if(!(kvm_handle = kvm_open(NULL, NULL, NULL, O_RDONLY, NULL)))
-  {
-    LogError("system statistic error -- cannot initialize kvm interface\n");
+  if (sysctl(mib_proc2, 6, NULL, &size, NULL, 0) == -1) {
+    LogError("system statistic error -- kern.proc2 #1 failed");
     return FALSE;
   }
 
-  pinfo = kvm_getprocs(kvm_handle, KERN_PROC_ALL, 0, &treesize);
-  if(!pinfo || (treesize < 1))
-  {
-    LogError("system statistic error -- cannot get process tree\n");
-    kvm_close(kvm_handle);
+  size *= 2; // Add reserve for new processes which were created between calls of sysctl
+  pinfo = xcalloc(1, size);
+  mib_proc2[5] = (int)(size / sizeof(struct kinfo_proc2));
+  if (sysctl(mib_proc2, 6, pinfo, &size, NULL, 0) == -1) {
+    LogError("system statistic error -- kern.proc2 #2 failed");
     return FALSE;
   }
+
+  treesize = (int)(size / sizeof(struct kinfo_proc2));
 
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
-  for(i = 0; i < treesize; i++)
-  {
-    pt[i].pid       = pinfo[i].kp_proc.p_pid;
-    pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
-    pt[i].cputime   = (long)((pinfo[i].kp_proc.p_rtime.tv_sec * 10) +
-                             (pinfo[i].kp_proc.p_rtime.tv_usec / 100000)
-                            );
+  for (i = 0; i < treesize; i++) {
+    pt[i].pid         = pinfo[i].p_pid;
+    pt[i].ppid        = pinfo[i].p_ppid;
+    pt[i].cputime     = (long)((pinfo[i].p_rtime_sec * 10) + (pinfo[i].p_rtime_usec / 100000));
     pt[i].cpu_percent = 0;
-    pt[i].mem_kbyte = (unsigned long)(pinfo[i].kp_eproc.e_vm.vm_rssize * pagesize_kbyte);
-    if(pinfo[i].kp_proc.p_stat == SZOMB)
-    {
+    pt[i].mem_kbyte   = (unsigned long)(pinfo[i].p_vm_rssize * pagesize_kbyte);
+    if (pinfo[i].p_stat == SZOMB)
       pt[i].status_flag |= PROCESS_ZOMBIE;
-    }
     pt[i].time = get_float_time();
   }
 
   *reference = pt;
-  kvm_close(kvm_handle);
 
   return treesize;
 }
@@ -222,10 +210,8 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   size_t         len   = sizeof(struct vmtotal);
   struct vmtotal vm;
 
-  if(sysctl(mib, 2, &vm, &len, NULL, 0) == -1)
-  {
-    LogError("system statistic error -- cannot get real memory usage: %s\n",
-      STRERROR);
+  if (sysctl(mib, 2, &vm, &len, NULL, 0) == -1) {
+    LogError("system statistic error -- cannot get real memory usage: %s\n", STRERROR);
     return FALSE;
   }
 
@@ -247,25 +233,19 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
   size_t len;
 
   len = sizeof(cp_time);
-  if(sysctl(mib, 2, &cp_time, &len, NULL, 0) == -1)
-  {
+  if (sysctl(mib, 2, &cp_time, &len, NULL, 0) == -1) {
     LogError("system statistic error -- cannot get cpu time: %s\n", STRERROR);
     return FALSE;
   }
 
-  for(i = 0; i < CPUSTATES; i++)
-  {
+  for (i = 0; i < CPUSTATES; i++)
     total_new += cp_time[i];
-  }
   total     = total_new - total_old;
   total_old = total_new;
 
-  si->total_cpu_user_percent =
-    (total > 0)?(int)(1000 * (double)(cp_time[CP_USER] - cpu_user_old) / total):-10;
-  si->total_cpu_syst_percent =
-    (total > 0)?(int)(1000 * (double)(cp_time[CP_SYS] - cpu_syst_old) / total):-10;
-  si->total_cpu_wait_percent =
-    0; /* there is no wait statistic available */
+  si->total_cpu_user_percent = (total > 0)?(int)(1000 * (double)(cp_time[CP_USER] - cpu_user_old) / total):-10;
+  si->total_cpu_syst_percent = (total > 0)?(int)(1000 * (double)(cp_time[CP_SYS] - cpu_syst_old) / total):-10;
+  si->total_cpu_wait_percent = 0; /* there is no wait statistic available */
 
   cpu_user_old = cp_time[CP_USER];
   cpu_syst_old = cp_time[CP_SYS];

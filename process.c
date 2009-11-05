@@ -227,7 +227,7 @@ error3:
 
 /**
  * Initialize the process tree 
- * @return treesize>=0 if succeeded otherwise <0.
+ * @return treesize >= 0 if succeeded otherwise < 0
  */
 int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, int *oldsize_r) {
   int i;
@@ -253,7 +253,7 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
   if (pt == NULL)
     return 0;
 
-  for (i = 0; i < *size_r; i ++) {
+  for (i = 0; i < (volatile int)*size_r; i ++) {
     if (oldpt && (oldentry = findprocess(pt[i].pid, oldpt, *oldsize_r))) {
       pt[i].cputime_prev = oldentry->cputime;
       pt[i].time_prev    = oldentry->time;
@@ -273,8 +273,15 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
     if (pt[i].pid == pt[i].ppid)
       continue;
 
-    if (! (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r)))
-      continue;
+    if (! (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r))) {
+      /* Parent process wasn't found - on Linux this is normal: main process with PID 0 is not listed, similarly in FreeBSD jail.
+       * We create virtual process entry for missing parent so we can have full tree-like structure with root. */
+      int j = (*size_r)++;
+
+      pt = *pt_r = xresize(*pt_r, *size_r * sizeof(ProcessTree_T));
+      pt[j].ppid = pt[j].pid  = pt[i].ppid;
+      pt[i].parent = &pt[j];
+    }
     
     if (! connectchild(pt[i].parent, &pt[i])) {
       /* connection to parent process has failed, this is usually caused in the part above */
@@ -282,10 +289,9 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
       pt[i].pid = 0;
       continue;
     }
-
   }
 
-  /* The main process in Solaris zones, BSD jails doesn't have pid 1, so try to find process which is parent of itself */
+  /* The main process in Solaris zones and FreeBSD host doesn't have pid 1, so try to find process which is parent of itself */
   for (i = 0; i < *size_r; i++) {
     if (pt[i].pid == pt[i].ppid) {
       root = &pt[i];
@@ -293,8 +299,7 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
     }
   }
 
-  /* Linux's init process with pid 1 has parent pid 0, which is hidden however, so above search will fail */
-  if (! root && ! (root = findprocess(1, pt, *size_r))) {
+  if (! root) {
     DEBUG("system statistic error -- cannot find root process id\n");
     return -1;
   }

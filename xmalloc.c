@@ -58,8 +58,6 @@
  *  @author Eric S. Raymond <esr@snark.thyrsus.com>
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: xmalloc.c,v 1.21 2009/02/13 09:18:11 hauk Exp $
- *
  *  @file
  */
 

@@ -34,9 +34,12 @@ BUGFIXES:
 * Fix #26752: inside Solaris Zone Monit fails to detect children
   and gets host memory wrong
 
-* When error occurred during monit command-line execution, report error
-  and exit with 1, so it is possible to react when monit is used in script.
-  On success 0 is returned as usual. Formerly command-line monit exited
+* On Solaris, FreeBSD and OpenBSD Monit no longer needs to run as root user
+  in order to be able to watch process resource usage (cpu and memory).
+
+* When error occurred during Monit command-line execution, report error
+  and exit with 1, so it is possible to react when Monit is used in script.
+  On success 0 is returned as usual. Formerly command-line Monit exited
   always 0 even if error occurred.
 
 * Fixed SMTP protocol test which may sometimes incorrectly
@@ -63,7 +66,7 @@ BUGFIXES:
   like start, stop, etc. were rejected. Monit will now use full access
   regardless of allow option order. Thanks to Thorsten Kampe for report.
 
-* Do not require SSL version type when setting SSL check and setting mmonit
+* Do not require SSL version type when setting SSL check and setting M/Monit
   (SSL version is set to auto).
 
 * Passive monitoring mode fixed. Thanks to Nelson Vale for report.
@@ -71,9 +74,7 @@ BUGFIXES:
 * Fixed #27784: wait_start/wait_stop can advance too quickly.
   Thanks for report to Randy Puro.
 
-* Allow to monitor process' cpu and memory usage on Solaris even
-  when Monit is not running as root and fix when compiled with
-  optimizations enabled.
+* Solaris resource usage fix when Monit was compiled with optimizations enabled.
 
 
 Version 5.0.3

@@ -32,8 +32,7 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
- *
- *  @version \$Id: process_common.c,v 1.12 2009/02/13 09:18:15 hauk Exp $
+ *  @author Martin Pala <martinp@tildeslash.com>
  *
  *  @file
  */
@@ -134,34 +133,23 @@ double get_float_time(void) {
 
 
 /**
- * Connects child and parent in a process treee
+ * Connects child and parent in a process tree
  * @param parent pointer to parents process tree entry
  * @param child pointer to childs process tree entry
  * @return TRUE if succeeded otherwise FALSE.
  */
 int connectchild(ProcessTree_T * parent, ProcessTree_T * child) {
-  ProcessTree_T ** tmp;
-
   ASSERT(child);
   ASSERT(parent);
 
   if (parent->pid == child->pid)
     return FALSE;
 
+  parent->children = xresize(parent->children, sizeof(ProcessTree_T *) * (parent->children_num + 1));
+  parent->children[parent->children_num] = child;
   parent->children_num++;
 
-  tmp = xcalloc(sizeof(ProcessTree_T *), parent->children_num);
-
-  if (parent->children != NULL) {
-    memcpy(tmp, parent->children, sizeof(ProcessTree_T *) * (parent->children_num - 1));
-    FREE(parent->children);
-  }
-
-  parent->children = tmp;
-  parent->children[parent->children_num - 1] = child;
-
   return TRUE;
-
 }
 
 
@@ -184,7 +172,7 @@ void fillprocesstree(ProcessTree_T * pt) {
   pt->mem_kbyte_sum   = pt->mem_kbyte;
   pt->cpu_percent_sum = pt->cpu_percent;
 
-  for(i = 0; i < pt->children_num; i++)
+  for (i = 0; i < pt->children_num; i++)
     fillprocesstree(pt->children[i]);
 
   if (pt->parent != NULL) {
