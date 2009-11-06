@@ -131,37 +131,32 @@ int init_process_info_sysdep(void) {
   long  page_size;
   int   page_shift;  
 
-  if(!read_proc_file(buf, 1024, "meminfo", -1)) 
-  {
+  if (! read_proc_file(buf, 1024, "meminfo", -1)) 
     return FALSE;
-  }
-  if(!(ptr= strstr(buf, MEMTOTAL)))
-  {
+  if (! (ptr = strstr(buf, MEMTOTAL))) {
     DEBUG("system statistic error -- cannot get real memory amount\n");
     return FALSE;
   }
-  if(sscanf(ptr+strlen(MEMTOTAL), "%ld", &systeminfo.mem_kbyte_max) != 1)
-  {
+  if (sscanf(ptr+strlen(MEMTOTAL), "%ld", &systeminfo.mem_kbyte_max) != 1) {
     DEBUG("system statistic error -- cannot get real memory amount\n");
     return FALSE;
   }
 
-  if((systeminfo.cpus = sysconf(_SC_NPROCESSORS_CONF)) < 0)
-  {
+  if ((systeminfo.cpus = sysconf(_SC_NPROCESSORS_CONF)) < 0) {
     DEBUG("system statistic error -- cannot get cpu count: %s\n", STRERROR);
     return FALSE;
-  } else if(systeminfo.cpus == 0) {
+  } else if (systeminfo.cpus == 0) {
     DEBUG("system reports cpu count 0, setting dummy cpu count 1\n");
     systeminfo.cpus = 1;
   }
 
-  if((page_size = sysconf(_SC_PAGESIZE)) <= 0) {
+  if ((page_size = sysconf(_SC_PAGESIZE)) <= 0) {
     DEBUG("system statistic error -- cannot get page size: %s\n", STRERROR);
     return FALSE;
   }
 
-  for(page_shift=0; page_size!=1; page_size>>=1, page_shift++);
-  page_shift_to_kb=page_shift-10;
+  for (page_shift = 0; page_size != 1; page_size >>= 1, page_shift++);
+  page_shift_to_kb = page_shift - 10;
 
   return TRUE;
 }
@@ -192,8 +187,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   ASSERT(reference);
 
   /* Find all processes in the /proc directory */
-  if(glob("/proc/[0-9]*", GLOB_ONLYDIR, NULL, &globbuf))
-  {
+  if (glob("/proc/[0-9]*", GLOB_ONLYDIR, NULL, &globbuf)) {
     LogError("system statistic error -- glob failed\n");
     return FALSE;
   } 
@@ -203,26 +197,19 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
   /* Insert data from /proc directory */
-  for(i = 0; i < treesize; i++)
-  {
+  for (i = 0; i < treesize; i++) {
     pt[i].pid = atoi(globbuf.gl_pathv[i] + strlen("/proc/"));
     
-    if(!read_proc_file(buf, 4096, "stat", pt[i].pid))
-    {
-      DEBUG(
-        "system statistic error -- cannot read /proc/%d/stat\n",
-        pt[i].pid);
+    if (!read_proc_file(buf, 4096, "stat", pt[i].pid)) {
+      DEBUG("system statistic error -- cannot read /proc/%d/stat\n", pt[i].pid);
       continue;
     }
 
     pt[i].time = get_float_time();
 
     /* Move along the buffer to get past the process name */
-    if(!(tmp = strrchr(buf, ')')))
-    {
-      DEBUG(
-        "system statistic error -- file /proc/%d/stat parse error\n",
-        pt[i].pid);
+    if (!(tmp = strrchr(buf, ')'))) {
+      DEBUG("system statistic error -- file /proc/%d/stat parse error\n", pt[i].pid);
       continue;
     }
 
@@ -230,7 +217,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
 
     /* This implementation is done by using fs/procfs/array.c as a basis
      * it is also worth looking into the source of the procps utils */
-    if(sscanf(tmp,
+    if (sscanf(tmp,
          "%c %d %*d %*d %*d %*d %*u %*u"
          "%*u %*u %*u %lu %lu %ld %ld %*d %*d %*d "
          "%*d %*u %*u %ld %*u %*u %*u %*u %*u "
@@ -241,11 +228,8 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
          &stat_item_stime,
          &stat_item_cutime,
          &stat_item_cstime,
-         &stat_item_rss) != 7)
-    {
-      DEBUG(
-        "system statistic error -- file /proc/%d/stat parse error\n",
-        pt[i].pid);
+         &stat_item_rss) != 7) {
+      DEBUG("system statistic error -- file /proc/%d/stat parse error\n", pt[i].pid);
       continue;
     }
     
@@ -256,24 +240,17 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     /* jiffies -> seconds = 1 / HZ
      * HZ is defined in "asm/param.h"  and it is usually 1/100s but on
      * alpha system it is 1/1024s */
-    pt[i].cputime =
-        ((float)(stat_item_utime + stat_item_stime) * 10.0) / HZ;
+    pt[i].cputime     = ((float)(stat_item_utime + stat_item_stime) * 10.0) / HZ;
     pt[i].cpu_percent = 0;
 
     /* State is Zombie -> then we are a Zombie ... clear or? (-: */
-    if(stat_item_state == 'Z')
-    {
+    if (stat_item_state == 'Z')
       pt[i].status_flag |= PROCESS_ZOMBIE;
-    }
 
-    if(page_shift_to_kb < 0)
-    {
+    if (page_shift_to_kb < 0)
       pt[i].mem_kbyte = (stat_item_rss >> abs(page_shift_to_kb));
-    }
     else
-    {
       pt[i].mem_kbyte = (stat_item_rss << abs(page_shift_to_kb));
-    }
   }
   
   *reference = pt;
@@ -306,43 +283,35 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   unsigned long  buffers;
   unsigned long  cached;
   
-  if(!read_proc_file(buf, 1024, "meminfo", -1))
-  {
+  if (! read_proc_file(buf, 1024, "meminfo", -1)) {
     LogError("system statistic error -- cannot get real memory free amount\n");
     goto error;
   }
 
-  if(!(ptr= strstr(buf, MEMFREE)))
-  {
+  if (! (ptr = strstr(buf, MEMFREE))) {
     LogError("system statistic error -- cannot get real memory free amount\n");
     goto error;
   }
-  if(sscanf(ptr + strlen(MEMFREE), "%ld", &mem_free) != 1)
-  {
+  if (sscanf(ptr + strlen(MEMFREE), "%ld", &mem_free) != 1) {
     LogError("system statistic error -- cannot get real memory free amount\n");
     goto error;
   }
 
-  if(!(ptr= strstr(buf, MEMBUF)))
-  {
+  if (! (ptr = strstr(buf, MEMBUF))) {
     LogError("system statistic error -- cannot get real memory buffers "
       "amount\n");
     goto error;
   }
-  if(sscanf(ptr + strlen(MEMBUF), "%ld", &buffers) != 1)
-  {
-    LogError("system statistic error -- cannot get real memory buffers "
-      "amount\n");
+  if (sscanf(ptr + strlen(MEMBUF), "%ld", &buffers) != 1) {
+    LogError("system statistic error -- cannot get real memory buffers amount\n");
     goto error;
   }
 
-  if(!(ptr= strstr(buf, MEMCACHE)))
-  {
+  if (! (ptr = strstr(buf, MEMCACHE))) {
     LogError("system statistic error -- cannot get real memory cache amount\n");
     goto error;
   }
-  if(sscanf(ptr + strlen(MEMCACHE), "%ld", &cached) != 1)
-  {
+  if (sscanf(ptr + strlen(MEMCACHE), "%ld", &cached) != 1) {
     LogError("system statistic error -- cannot get real memory cache free "
       "amount\n");
     goto error;
@@ -373,10 +342,9 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
   unsigned long long cpu_wait;
   unsigned long long cpu_irq;
   unsigned long long cpu_softirq;
-  char   buf[1024];
+  char               buf[1024];
 
-  if(!read_proc_file(buf, 1024, "stat", -1))
-  {
+  if (!read_proc_file(buf, 1024, "stat", -1)) {
     LogError("system statistic error -- cannot read /proc/stat\n");
     goto error;
   }
@@ -389,44 +357,35 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
          &cpu_wait,
          &cpu_irq,
          &cpu_softirq);
-  if(rv < 4)
-  {
+  if (rv < 4) {
     LogError("system statistic error -- cannot read cpu usage\n");
     goto error;
-  }
-  else if(rv == 4)
-  {
+  } else if (rv == 4) {
     /* linux 2.4.x doesn't support these values */
-    cpu_wait = 0;
-    cpu_irq = 0;
+    cpu_wait    = 0;
+    cpu_irq     = 0;
     cpu_softirq = 0;
   }
 
-  cpu_total= cpu_user + cpu_nice + cpu_syst + cpu_idle + cpu_wait + cpu_irq + cpu_softirq;
-  cpu_user = cpu_user + cpu_nice;
+  cpu_total = cpu_user + cpu_nice + cpu_syst + cpu_idle + cpu_wait + cpu_irq + cpu_softirq;
+  cpu_user  = cpu_user + cpu_nice;
 
-  if(old_cpu_total == 0)
-  {
+  if (old_cpu_total == 0) {
     si->total_cpu_user_percent = -10;
     si->total_cpu_syst_percent = -10;
     si->total_cpu_wait_percent = -10;
-  }
-  else
-  {
+  } else {
     unsigned long long delta = cpu_total - old_cpu_total;
   
-    si->total_cpu_user_percent =
-      (int)(1000 * (double)(cpu_user - old_cpu_user) / delta);
-    si->total_cpu_syst_percent =
-      (int)(1000 * (double)(cpu_syst - old_cpu_syst) / delta);
-    si->total_cpu_wait_percent =
-      (int)(1000 * (double)(cpu_wait - old_cpu_wait) / delta);
+    si->total_cpu_user_percent = (int)(1000 * (double)(cpu_user - old_cpu_user) / delta);
+    si->total_cpu_syst_percent = (int)(1000 * (double)(cpu_syst - old_cpu_syst) / delta);
+    si->total_cpu_wait_percent = (int)(1000 * (double)(cpu_wait - old_cpu_wait) / delta);
   }
 
-  old_cpu_user = cpu_user;
-  old_cpu_syst = cpu_syst;
-  old_cpu_wait = cpu_wait;
-  old_cpu_total= cpu_total;
+  old_cpu_user  = cpu_user;
+  old_cpu_syst  = cpu_syst;
+  old_cpu_wait  = cpu_wait;
+  old_cpu_total = cpu_total;
   return TRUE;
 
   error:

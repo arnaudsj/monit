@@ -174,8 +174,8 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
   pinfo = (struct kinfo_proc *)xcalloc(1, bufSize);
 
   if(sysctl(mib, 4, pinfo, &bufSize, NULL, 0)) {
+    FREE(pinfo);
     LogError("system statistic error -- sysctl failed\n");
-    free(pinfo);
     return FALSE;
   }
 
@@ -230,9 +230,9 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
       mach_port_deallocate(mytask, task); 	
     }
   }
+  FREE(pinfo);
 
   *reference = pt;
-  free(pinfo);
 
   return treesize;
 }

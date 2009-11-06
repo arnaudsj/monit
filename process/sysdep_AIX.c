@@ -217,13 +217,14 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   /* Read process info */
   firstproc = 0;
   if ((treesize = getprocs64(procs, sizeof(struct procentry64), NULL, 0, &firstproc, treesize)) < 0) {
+    FREE(procs);
     LogError("system statistic error -- getprocs64 failed: %s\n", STRERROR);
     return FALSE;
   }
 
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
-  for (i=0; i<treesize; i++) {
+  for (i = 0; i < treesize; i++) {
 
     pt[i].cputime     = 0;
     pt[i].cpu_percent = 0;
@@ -235,8 +236,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
       pt[i].status_flag |= PROCESS_ZOMBIE;
     } else if (getuser(&(procs[i]), sizeof(struct procinfo), &user, sizeof(struct userinfo)) != -1) {
       pt[i].mem_kbyte = (user.ui_drss + user.ui_trss) * (page_size / 1024);
-      pt[i].cputime   = (user.ui_ru.ru_utime.tv_sec + user.ui_ru.ru_utime.tv_usec * 1.0e-6 +
-                         user.ui_ru.ru_stime.tv_sec + user.ui_ru.ru_stime.tv_usec * 1.0e-6) * 10;
+      pt[i].cputime   = (user.ui_ru.ru_utime.tv_sec + user.ui_ru.ru_utime.tv_usec * 1.0e-6 + user.ui_ru.ru_stime.tv_sec + user.ui_ru.ru_stime.tv_usec * 1.0e-6) * 10;
     }
 
   }

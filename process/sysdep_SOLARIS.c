@@ -99,8 +99,7 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
- *
- *  @version \$Id: sysdep_SOLARIS.c,v 1.29 2009/05/01 16:10:11 martinp Exp $
+ *  @author Martin Pala <martinp@tildeslash.com>
  *
  *  @file
  */
@@ -108,7 +107,6 @@
 #define pagetok(size) ((size) << pageshift)
 
 static int    pageshift=0;
-
 static long   old_cpu_user=0;
 static long   old_cpu_syst=0;
 static long   old_cpu_wait=0;
@@ -119,27 +117,23 @@ static long   old_total=0;
 #endif
 
 int init_process_info_sysdep(void) {
-
   register int pagesize;
 
-  systeminfo.cpus= sysconf( _SC_NPROCESSORS_ONLN);
+  systeminfo.cpus = sysconf( _SC_NPROCESSORS_ONLN);
 
-  pagesize = sysconf(_SC_PAGESIZE);
+  pagesize  = sysconf(_SC_PAGESIZE);
   pageshift = 0;
   while (pagesize > 1) {
-
     pageshift++;
     pagesize >>= 1;
-
   }
 
   /* we only need the amount of log(2)1024 for our conversion */
   pageshift -= LOG1024;
 
-  systeminfo.mem_kbyte_max=pagetok(sysconf(_SC_PHYS_PAGES));
+  systeminfo.mem_kbyte_max = pagetok(sysconf(_SC_PHYS_PAGES));
 
   return (TRUE);
-
 }
 
 double timestruc_to_tseconds(timestruc_t t) {
@@ -229,9 +223,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
  * @return: 0 if successful, -1 if failed (and all load averages are 0).
  */
 int getloadavg_sysdep (double *loadv, int nelem) {
-
   return getloadavg(loadv, nelem);
-
 }
 
 
@@ -240,15 +232,12 @@ int getloadavg_sysdep (double *loadv, int nelem) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-
   kstat_ctl_t   *kctl;  
   kstat_named_t *knamed;
   kstat_t       *kstat;
 
-  kctl = kstat_open();
-  
+  kctl  = kstat_open();
   kstat = kstat_lookup(kctl, "unix", 0, "system_pages");
-
   if (kstat_read(kctl, kstat, 0) == -1) {
     LogError("system statistic error -- memory usage gathering failed\n");
     kstat_close(kctl);
@@ -256,10 +245,8 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   }
   
   knamed = kstat_data_lookup(kstat, "freemem");
-  
-  if (knamed) {
+  if (knamed)
     si->total_mem_kbyte = systeminfo.mem_kbyte_max-pagetok(knamed->value.ul);
-  }
   
   kstat_close(kctl);
 
@@ -272,105 +259,70 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_cpu_sysdep(SystemInfo_T *si) {
-  kstat_ctl_t   *kctl;  
-  kstat_named_t *knamed;
-  kstat_t       *kstat;
-
-  kstat_t **cpu_ks;
-  cpu_stat_t *cpu_stat;
-
-  int i, ncpu=0, ncpus;
-  long cpu_user=0, cpu_syst=0, cpu_wait=0;
-  long total=0;
+  int             i, ncpu = 0, ncpus;
+  long            cpu_user = 0, cpu_syst = 0, cpu_wait = 0;
+  long            total = 0;
+  kstat_ctl_t    *kctl;  
+  kstat_named_t  *knamed;
+  kstat_t        *kstat;
+  kstat_t       **cpu_ks;
+  cpu_stat_t     *cpu_stat;
   
-  si->total_cpu_user_percent=0;
-  si->total_cpu_syst_percent=0;
-  si->total_cpu_wait_percent=0;
+  si->total_cpu_user_percent = 0;
+  si->total_cpu_syst_percent = 0;
+  si->total_cpu_wait_percent = 0;
 
-  kctl = kstat_open();
-
+  kctl  = kstat_open();
   kstat = kstat_lookup(kctl, "unix", 0, "system_misc");
-
-  if (kstat_read(kctl, kstat, 0) == -1) {
-
+  if (kstat_read(kctl, kstat, 0) == -1)
     goto error;
-    
-  }
   
-  if (NULL == (knamed = kstat_data_lookup(kstat, "ncpus"))) {
-    
+  if (NULL == (knamed = kstat_data_lookup(kstat, "ncpus")))
     goto error;
-    
-  }
   
   ncpus = knamed->value.ui32;
 
-  cpu_ks = (kstat_t **) xmalloc(ncpus * sizeof (kstat_t *));
-  cpu_stat = (cpu_stat_t *) xmalloc (ncpus * sizeof (cpu_stat_t));
+  cpu_ks   = (kstat_t **)xmalloc(ncpus * sizeof(kstat_t *));
+  cpu_stat = (cpu_stat_t *)xmalloc(ncpus * sizeof(cpu_stat_t));
 
-  for (kstat = kctl->kc_chain; kstat;
-       kstat = kstat->ks_next)
-  {
-    if (strncmp(kstat->ks_name, "cpu_stat", 8) == 0)
-    {
-      if (-1 == kstat_read(kctl, kstat, NULL)) {
+  for (kstat = kctl->kc_chain; kstat; kstat = kstat->ks_next) {
+    if (strncmp(kstat->ks_name, "cpu_stat", 8) == 0) {
 
+      if (-1 == kstat_read(kctl, kstat, NULL))
         goto error2;
-        
-      }
 
       cpu_ks[ncpu] = kstat;
-      ncpu++;
-      if (ncpu > ncpus) {
-        
+      if (++ncpu > ncpus)
         goto error2;
-        
-      }
     }
   }
+  
+  for (i = 0; i < ncpu; i++) {
 
-  
-  
-  for (i = 0; i < ncpu; i++)
-  {
-    if ( -1 == kstat_read(kctl, cpu_ks[i], &cpu_stat[i])) {
-      
+    if (-1 == kstat_read(kctl, cpu_ks[i], &cpu_stat[i]))
       goto error2;
-      
-    }
     
-    cpu_user+=cpu_stat[i].cpu_sysinfo.cpu[CPU_USER];
-    cpu_syst+=cpu_stat[i].cpu_sysinfo.cpu[CPU_KERNEL];
-    cpu_wait+=cpu_stat[i].cpu_sysinfo.cpu[CPU_WAIT];
-
-    total += ( cpu_stat[i].cpu_sysinfo.cpu[0]+
-               cpu_stat[i].cpu_sysinfo.cpu[1]+
-               cpu_stat[i].cpu_sysinfo.cpu[2]+
-               cpu_stat[i].cpu_sysinfo.cpu[3]);
-    
+    cpu_user += cpu_stat[i].cpu_sysinfo.cpu[CPU_USER];
+    cpu_syst += cpu_stat[i].cpu_sysinfo.cpu[CPU_KERNEL];
+    cpu_wait += cpu_stat[i].cpu_sysinfo.cpu[CPU_WAIT];
+    total    += (cpu_stat[i].cpu_sysinfo.cpu[0]+ cpu_stat[i].cpu_sysinfo.cpu[1]+ cpu_stat[i].cpu_sysinfo.cpu[2]+ cpu_stat[i].cpu_sysinfo.cpu[3]);
   }
 
-  if ( old_total == 0.0 ) {
-
-    si->total_cpu_user_percent=-10;
-    si->total_cpu_syst_percent=-10;
-    si->total_cpu_wait_percent=-10;
-    
+  if (old_total == 0.0 ) {
+    si->total_cpu_user_percent = -10;
+    si->total_cpu_syst_percent = -10;
+    si->total_cpu_wait_percent = -10;
   } else {
-
-    si->total_cpu_user_percent=(int)((1000*(cpu_user-old_cpu_user))/
-                                     (total-old_total));
-    si->total_cpu_syst_percent=(int)((1000*(cpu_syst-old_cpu_syst))/
-                                     (total-old_total));
-    si->total_cpu_wait_percent=(int)((1000*(cpu_wait-old_cpu_wait))/
-                                     (total-old_total));
+    si->total_cpu_user_percent = (int)((1000 * (cpu_user - old_cpu_user)) / (total - old_total));
+    si->total_cpu_syst_percent = (int)((1000 * (cpu_syst - old_cpu_syst)) / (total - old_total));
+    si->total_cpu_wait_percent = (int)((1000 * (cpu_wait - old_cpu_wait)) / (total - old_total));
   }
 
   
-  old_cpu_user=cpu_user;
-  old_cpu_syst=cpu_syst;
-  old_cpu_wait=cpu_wait;
-  old_total=total;
+  old_cpu_user = cpu_user;
+  old_cpu_syst = cpu_syst;
+  old_cpu_wait = cpu_wait;
+  old_total    = total;
   
   FREE(cpu_ks);
   FREE(cpu_stat);
@@ -385,5 +337,5 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
   error:
   kstat_close(kctl);
   return FALSE;
-  
 }
+

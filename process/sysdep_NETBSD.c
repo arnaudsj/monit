@@ -164,6 +164,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   pinfo = xcalloc(1, size);
   mib_proc2[5] = (int)(size / sizeof(struct kinfo_proc2));
   if (sysctl(mib_proc2, 6, pinfo, &size, NULL, 0) == -1) {
+    FREE(pinfo);
     LogError("system statistic error -- kern.proc2 #2 failed");
     return FALSE;
   }
@@ -182,6 +183,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
       pt[i].status_flag |= PROCESS_ZOMBIE;
     pt[i].time = get_float_time();
   }
+  FREE(pinfo);
 
   *reference = pt;
 
