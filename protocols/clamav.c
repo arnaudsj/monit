@@ -53,8 +53,6 @@
  *
  *  @author Debrard Sébastien <sebastien.debrard@strange-garden.com>
  *
- *  @version \$Id: clamav.c,v 1.7 2009/02/13 09:18:19 hauk Exp $
- *
  *  @file
  */
 int check_clamav(Socket_T s) {

@@ -73,7 +73,6 @@
  *
  * @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  * @author Martin Pala <martinp@tildeslash.com>
- * @version \$Id: event.c,v 1.99 2009/05/28 21:35:29 martinp Exp $
  * @file
  */
 

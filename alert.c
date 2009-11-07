@@ -66,7 +66,6 @@
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: alert.c,v 1.65 2009/03/24 19:49:05 martinp Exp $
  *  @file
  */
 

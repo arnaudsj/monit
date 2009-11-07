@@ -53,8 +53,6 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: imap.c,v 1.26 2009/02/13 09:18:20 hauk Exp $
- *
  *  @file
  */
 int check_imap(Socket_T s) {

@@ -111,8 +111,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: processor.c,v 1.73 2009/05/09 15:11:39 martinp Exp $
- *
  *  @file
  */
 

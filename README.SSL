@@ -4,7 +4,6 @@ How to use monit with ssl
 File information:
  
    @author Christian Hopp, <chopp@iei.tu-clausthal.de>
-   @version \$Id: README.SSL,v 1.7 2003/08/07 17:38:00 hauk Exp $
 
 Where to get openssl:
 ---------------------

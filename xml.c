@@ -60,8 +60,6 @@
  *
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: xml.c,v 1.56 2009/04/21 21:32:10 martinp Exp $
- *
  *  @file
  */
 

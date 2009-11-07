@@ -40,8 +40,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: sysdep_UNKNOWN.c,v 1.17 2009/02/13 09:18:18 hauk Exp $
- *
  *  @file
  */
 

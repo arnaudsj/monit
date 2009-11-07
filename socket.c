@@ -69,7 +69,6 @@
  * Implementation of the socket interface.
  * 
  * @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
- * @version \$Id: socket.c,v 1.72 2009/02/13 09:18:10 hauk Exp $
  * @file
  */
 

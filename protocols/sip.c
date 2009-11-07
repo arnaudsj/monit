@@ -89,7 +89,6 @@
  *
  *  @author Pierrick Grasland <pierrick.grasland@nexcom.fr>
  *  @author Bret McDanel, <trixter AT 0xdecafbad.com>
- *  @version \$Id: sip.c,v 1.10 2009/02/13 09:18:22 hauk Exp $
  *
  *  @file
  */

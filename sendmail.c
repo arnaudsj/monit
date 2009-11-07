@@ -77,8 +77,6 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: sendmail.c,v 1.67 2009/03/24 19:49:06 martinp Exp $
- *
  *  @file
  */
 

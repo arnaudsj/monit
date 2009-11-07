@@ -155,8 +155,6 @@ static pthread_mutex_t *ssl_mutex_table;
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: ssl.c,v 1.69 2009/05/03 21:29:42 martinp Exp $
- *
  *  @file
  */
 

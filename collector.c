@@ -56,7 +56,6 @@
  *
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: collector.c,v 1.30 2009/04/17 16:20:00 martinp Exp $
  *
  *  @file
  */

@@ -53,8 +53,6 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: pop.c,v 1.26 2009/02/13 09:18:21 hauk Exp $
- *
  *  @file
  */
 int check_pop(Socket_T s) {

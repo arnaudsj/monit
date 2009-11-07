@@ -29,7 +29,6 @@
 //
 //  Requires PHP, and a working webserver!
 //  @author Author David Fletcher, <david@megapico.co.uk>
-//  @version \$Id: monit.php,v 1.3 2007/07/25 12:54:30 hauk Exp $
 
 
 //Configuration - set this to match the information in /etc/monitrc

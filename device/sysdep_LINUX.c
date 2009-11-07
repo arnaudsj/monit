@@ -33,8 +33,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: sysdep_LINUX.c,v 1.24 2009/05/04 19:37:15 martinp Exp $
- *
  *  @file
  */
 

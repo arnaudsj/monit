@@ -40,7 +40,6 @@
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *  @author Rory Toma <rory@digeo.com>
- *  @version \$Id: p.y,v 1.300 2009/05/04 21:25:21 martinp Exp $
  */
 
 #include <config.h>

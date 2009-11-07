@@ -90,8 +90,6 @@
   *
   *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
   *
-  *  @version \$Id: log.c,v 1.43 2009/05/03 07:48:20 martinp Exp $
-  *
   *  @file
  */
 

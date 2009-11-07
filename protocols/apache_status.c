@@ -71,7 +71,6 @@ static int check_apache_stat(Socket_T s);
  * even with ExtendedStatus Off on Apache config file.
  *
  * @author David Fletcher, <david@megapico.co.uk>
- * @version \$Id: apache_status.c,v 1.14 2009/05/02 15:01:13 martinp Exp $
  * @file
  */
 int check_apache_status(Socket_T s) {

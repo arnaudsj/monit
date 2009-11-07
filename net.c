@@ -144,8 +144,6 @@
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: net.c,v 1.83 2009/05/04 19:53:48 martinp Exp $
- *
  *  @file
  */
 

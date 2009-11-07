@@ -59,8 +59,6 @@
  *
  *  @author Francois Isabelle <Francois.Isabelle@ca.kontron.com>
  *
- *  @version \$Id: rdate.c,v 1.15 2009/02/13 09:18:21 hauk Exp $
- *
  *  @file
  */
 int check_rdate(Socket_T s) {

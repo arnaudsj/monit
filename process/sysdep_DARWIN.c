@@ -80,8 +80,6 @@
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Dave Cheney <dcheney@redbubble.com> (Updated for Tiger)
  *
- *  @version \$Id: sysdep_DARWIN.c,v 1.44 2009/02/13 09:18:16 hauk Exp $
- *
  *  @file
  */
 

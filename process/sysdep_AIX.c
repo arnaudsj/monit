@@ -122,8 +122,6 @@
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *  @author Martin Pala <martinp@tildeslash.com>
  *
- *  @version \$Id: sysdep_AIX.c,v 1.32 2009/02/13 09:18:16 hauk Exp $
- *
  *  @file
  */
 

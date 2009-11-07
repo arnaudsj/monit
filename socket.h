@@ -40,7 +40,6 @@
  * communication between two machines. 
  * 
  * @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
- * @version \$Id: socket.h,v 1.34 2009/02/13 09:18:10 hauk Exp $
  * @file
  */
 

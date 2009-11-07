@@ -39,8 +39,6 @@
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: file.h,v 1.14 2009/02/13 09:18:06 hauk Exp $
- *
  *  @file
  */
 

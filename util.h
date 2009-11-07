@@ -40,7 +40,6 @@
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *  @author Michael Amster, <mamster@webeasy.com> 
  *
- *  @version \$Id: util.h,v 1.27 2009/03/11 20:31:27 hauk Exp $
  *  @file
  */
 

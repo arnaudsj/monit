@@ -45,8 +45,6 @@
  *  @author W. Richard Stevens
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *     
- *  @version \$Id: signal.c,v 1.18 2009/02/13 09:18:09 hauk Exp $
- *
  *  @file
  */
 

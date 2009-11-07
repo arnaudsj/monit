@@ -80,8 +80,6 @@ static volatile int running = FALSE;
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: http.c,v 1.16 2009/03/16 16:58:30 hauk Exp $
- *
  *  @file
  */
 

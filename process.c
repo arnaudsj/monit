@@ -69,8 +69,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: process.c,v 1.44 2009/02/13 09:18:09 hauk Exp $
- *
  *  @file
  */
 

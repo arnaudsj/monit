@@ -75,8 +75,6 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: daemonize.c,v 1.27 2009/02/13 09:18:05 hauk Exp $
- *
  *  @file
  */
 

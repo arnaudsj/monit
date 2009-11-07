@@ -114,7 +114,6 @@ struct pst_status *psall;
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *  @author Joe Bryant <JBryant@RiteAid.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
- *  @version \$Id: sysdep_HPUX.c,v 1.35 2009/02/13 09:18:17 hauk Exp $
  *
  *  @file
  */

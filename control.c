@@ -70,8 +70,6 @@
  *  @author Rory Toma, <rory@digeo.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: control.c,v 1.121 2009/02/13 09:18:05 hauk Exp $
- *
  *  @file
  */
 

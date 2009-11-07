@@ -36,8 +36,6 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: default.c,v 1.19 2009/02/13 09:18:19 hauk Exp $
- *
  *  @file
  */
 int check_default(Socket_T s) {

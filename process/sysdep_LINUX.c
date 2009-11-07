@@ -101,8 +101,6 @@
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Arkadiusz Miskiewicz <arekm@pld-linux.org>
  *
- *  @version \$Id: sysdep_LINUX.c,v 1.54 2009/05/02 19:54:07 martinp Exp $
- *
  *  @file
  */
 

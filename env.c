@@ -93,8 +93,6 @@ static void set_environment(void);
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: env.c,v 1.42 2009/02/13 09:18:06 hauk Exp $
- * 
  *  @file
  */
 

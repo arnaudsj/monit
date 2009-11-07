@@ -48,8 +48,6 @@
  *
  *  @author Tatsuya Nonogaki, <http://www.asahi-net.or.jp/~aa4t-nngk/>
  *
- *  @version \$Id: pgsql.c,v 1.8 2009/02/13 09:18:21 hauk Exp $
- *
  *  @file
  */
 int check_pgsql(Socket_T s) {

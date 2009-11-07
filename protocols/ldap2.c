@@ -59,8 +59,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: ldap2.c,v 1.22 2009/02/13 09:18:20 hauk Exp $
- *
  *  @file
  */
 int check_ldap2(Socket_T s) {

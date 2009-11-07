@@ -33,8 +33,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: sysdep_UNKNOWN.c,v 1.18 2009/02/13 09:18:14 hauk Exp $
- *
  *  @file
  */
 

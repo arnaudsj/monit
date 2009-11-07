@@ -57,8 +57,6 @@ static int expect(Socket_T s, int expect, int log);
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Michael Amster, <mamster@webeasy.com>
  *
- *  @version \$Id: smtp.c,v 1.38 2009/02/13 09:18:22 hauk Exp $
- *
  *  @file
  */
 int check_smtp(Socket_T s) {

@@ -42,8 +42,6 @@
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: net.h,v 1.35 2009/02/13 09:18:08 hauk Exp $
- *
  *  @file
  */
 

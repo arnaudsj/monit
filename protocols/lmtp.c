@@ -45,8 +45,6 @@ static int expect(Socket_T s, int expect, int log);
  *
  *  @author Fco.Javier Felix, <ffelix@inode64.com>
  *
- *  @version \$Id: lmtp.c,v 1.3 2009/02/13 08:31:34 hauk Exp $
- *
  *  @file
  */
 int check_lmtp(Socket_T s) {

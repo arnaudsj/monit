@@ -87,7 +87,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Peter Holdaway <pholdaway@technocom-wireless.com>
  *
- *  @version \$Id: spawn.c,v 1.59 2009/05/04 20:18:20 martinp Exp $
  *  @file
  */
 

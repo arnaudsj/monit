@@ -49,8 +49,6 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: nntp.c,v 1.27 2009/02/13 09:18:21 hauk Exp $
- *
  *  @file
  */
 int check_nntp(Socket_T s) {

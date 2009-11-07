@@ -32,8 +32,6 @@
  *
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: sysdep_NETBSD.c,v 1.13 2009/05/04 19:37:15 martinp Exp $
- *
  *  @file
  */
 

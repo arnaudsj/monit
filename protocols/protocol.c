@@ -78,8 +78,6 @@ static Protocol_T myradius= NULL;
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: protocol.c,v 1.36 2009/02/13 09:18:21 hauk Exp $
- *
  *  @file
  */
 

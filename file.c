@@ -78,8 +78,6 @@
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: file.c,v 1.26 2009/05/02 20:16:06 martinp Exp $
- *
  *  @file
  */
 

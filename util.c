@@ -160,7 +160,6 @@ struct ad_user {
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *  @author Michael Amster, <mamster@webeasy.com> 
  *
- *  @version \$Id: util.c,v 1.241 2009/05/28 21:35:30 martinp Exp $
  *  @file
  */
 

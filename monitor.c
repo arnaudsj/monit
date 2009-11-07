@@ -93,8 +93,6 @@
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: monitor.c,v 1.149 2009/03/24 19:49:05 martinp Exp $
- *
  *  @file
  */
 

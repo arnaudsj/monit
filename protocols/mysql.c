@@ -54,8 +54,6 @@
  *
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: mysql.c,v 1.16 2009/02/13 09:18:20 hauk Exp $
- *
  *  @file
  */
 int check_mysql(Socket_T s) {

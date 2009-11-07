@@ -76,8 +76,6 @@ static void _gc_request(Request_T *);
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: gc.c,v 1.93 2009/05/28 21:35:29 martinp Exp $
- *
  *  @file
  */
 

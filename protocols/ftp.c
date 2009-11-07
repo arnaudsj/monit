@@ -50,8 +50,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Michael Amster, <mamster@webeasy.com>
  *
- *  @version \$Id: ftp.c,v 1.31 2009/02/13 09:18:19 hauk Exp $
- *
  *  @file
  */
 int check_ftp(Socket_T s) {

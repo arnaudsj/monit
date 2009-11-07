@@ -33,8 +33,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: device_common.c,v 1.14 2009/05/04 19:37:14 martinp Exp $
- *
  *  @file
  */
 

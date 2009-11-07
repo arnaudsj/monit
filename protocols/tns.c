@@ -48,8 +48,6 @@
  *
  *  @author Artyom Khafizov, <afk@inbox.ru>
  *
- *  @version \$Id: tns.c,v 1.10 2009/02/13 09:18:22 hauk Exp $
- *
  *  @file
  */
 

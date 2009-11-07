@@ -47,7 +47,6 @@
 //  This script requires PHP, and a working webserver! Tested on PHP4.
 //
 //  @author Author David Fletcher, <david@megapico.co.uk>
-//  @version \$Id: wap.php,v 1.4 2007/10/05 21:32:42 martinp Exp $
 
 //Configuration data
 $addr = 'localhost';

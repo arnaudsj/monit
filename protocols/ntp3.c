@@ -47,8 +47,6 @@
  *
  *  @author Michel Marti, <michel.marti@objectxp.com>
  *
- *  @version \$Id: ntp3.c,v 1.16 2009/02/13 09:18:21 hauk Exp $
- *
  */
 
 

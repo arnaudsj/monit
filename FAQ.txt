@@ -1,9 +1,6 @@
 Short FAQ:
 ----------
 
-   @version \$Id: FAQ.txt,v 1.31 2008/11/18 22:00:11 martinp Exp $
-
-
 1. Q: Monit watches processes by a pid file, so if a program crashes
       without removing its pid file, then monit won't recognize it,
       right?

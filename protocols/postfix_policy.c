@@ -76,8 +76,6 @@
  *
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: postfix_policy.c,v 1.11 2009/02/13 09:18:21 hauk Exp $
- *
  *  @file
  */
 int check_postfix_policy(Socket_T s) {

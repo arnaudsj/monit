@@ -58,8 +58,6 @@
  *
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: dns.c,v 1.11 2009/02/13 09:18:19 hauk Exp $
- *
  *  @file
  */
 int check_dns(Socket_T s)

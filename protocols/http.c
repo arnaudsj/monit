@@ -80,7 +80,6 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
- *  @version \$Id: http.c,v 1.58 2009/02/13 09:18:20 hauk Exp $
  *  @file
  */
 

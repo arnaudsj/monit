@@ -70,8 +70,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: status.c,v 1.69 2009/02/13 09:18:11 hauk Exp $
- *
  *  @file
  */
 

@@ -55,8 +55,6 @@ static unsigned char decode(char c);
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *
- *  @version \$Id: base64.c,v 1.23 2009/02/13 09:18:14 hauk Exp $
- *
  *  @file
  */
 

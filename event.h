@@ -81,7 +81,6 @@ extern EventTable_T Event_Table[];
  * 
  * @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  * @author Martin Pala, <martinp@tildeslash.com>
- * @version \$Id: event.h,v 1.37 2009/04/19 20:13:57 martinp Exp $
  * @file
  */
 

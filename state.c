@@ -74,7 +74,6 @@
  * the default is ~/.monit.state.
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
- *  @version \$Id: state.c,v 1.39 2009/05/04 20:18:21 martinp Exp $
  *  @file
  */
 

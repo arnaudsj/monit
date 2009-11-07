@@ -41,7 +41,6 @@
  *  file, if not set, the default is ~/.monit.state.
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
- *  @version \$Id: state.h,v 1.9 2009/02/13 09:18:10 hauk Exp $
  *  @file
  */
 

@@ -47,8 +47,6 @@
  * 
  *  @author Igor Homyakov, <homyakov@altlinux.ru>
  *
- *  @version \$Id: ssh.c,v 1.21 2009/02/13 09:18:22 hauk Exp $
- *
  *  @file
  */
 int check_ssh(Socket_T s) {

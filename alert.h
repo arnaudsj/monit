@@ -63,7 +63,6 @@
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: alert.h,v 1.29 2009/02/13 09:18:05 hauk Exp $
  *  @file
  */
 

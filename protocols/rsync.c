@@ -50,8 +50,6 @@
  * 
  *  @author Igor Homyakov <homyakov@altlinux.ru>
  *
- *  @version \$Id: rsync.c,v 1.22 2009/05/09 15:11:39 martinp Exp $
- *
  *  @file
  */
 int check_rsync(Socket_T s) {

@@ -73,8 +73,6 @@
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Martin Pala, <martinp@tildeslash.com>
  *
- *  @version \$Id: dwp.c,v 1.24 2009/05/09 15:11:39 martinp Exp $
- *
  *  @file
  */
 int check_dwp(Socket_T s) {

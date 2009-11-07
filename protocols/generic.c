@@ -56,8 +56,6 @@
  *
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: generic.c,v 1.29 2009/05/04 20:00:30 martinp Exp $
- *
  *  @file
  */
 int check_generic(Socket_T s) {

@@ -158,8 +158,6 @@ static char *get_service_status_text(Service_T);
  *  @author Martin Pala <martinp@tildeslash.com>
  *  @author Christian Hopp <chopp@iei.tu-clausthal.de>
  *
- *  @version \$Id: cervlet.c,v 1.260 2009/05/28 07:13:12 hauk Exp $
- *
  *  @file
  */
 

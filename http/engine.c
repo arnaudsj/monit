@@ -117,8 +117,6 @@
  *  @author Christian Hopp, <chopp@iei.tu-clausthal.de>
  *  @author Martin Pala <martinp@tildeslash.com>
  *
- *  @version \$Id: engine.c,v 1.83 2009/02/13 09:18:15 hauk Exp $
- *
  *  @file 
  */
 
