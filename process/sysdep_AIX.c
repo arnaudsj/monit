@@ -126,15 +126,11 @@
  */
 
 /* There is no prototype for getprocs64 as of AIX 5.3 yet */
-int getprocs64(struct procentry64 *ProcessBuffer,
-               int ProcessSize,
-               struct fdsinfo64 *FileBuffer,
-               int FileSize,
-               pid_t *IndexPointer,
-               int Count);
+int getprocs64(struct procentry64 *ProcessBuffer, int ProcessSize, struct fdsinfo64 *FileBuffer, int FileSize, pid_t *IndexPointer, int Count);
 
-static int           page_size;
-static int           cpu_initialized    = 0;
+
+static int                page_size;
+static int                cpu_initialized = 0;
 static unsigned long long cpu_total_old = 0ULL;
 static unsigned long long cpu_user_old  = 0ULL;
 static unsigned long long cpu_syst_old  = 0ULL;
@@ -151,10 +147,9 @@ int init_process_info_sysdep(void) {
     return FALSE;
   }
 
-  page_size = getpagesize();
+  page_size                = getpagesize();
   systeminfo.mem_kbyte_max = (unsigned long)(mem.real_total * (page_size / 1024));
-
-  systeminfo.cpus = sysconf(_SC_NPROCESSORS_ONLN);
+  systeminfo.cpus          = sysconf(_SC_NPROCESSORS_ONLN);
 
   return TRUE;
 }
@@ -196,23 +191,21 @@ int getloadavg_sysdep (double *loadv, int nelem) {
  * @return treesize>0 if succeeded otherwise =0.
  */
 int initprocesstree_sysdep(ProcessTree_T ** reference) {
-  int treesize;
-  int i;
+  int             i;
+  int             treesize;
   struct userinfo user;
-  ProcessTree_T *  pt;
-  pid_t firstproc = 0;
+  ProcessTree_T  *pt;
+  pid_t           firstproc = 0;
 
-  memset(&user,0,sizeof(struct userinfo));
+  memset(&user, 0, sizeof(struct userinfo));
 
-  /* Get number of processes */
   if ((treesize = getprocs64(NULL, 0, NULL, 0, &firstproc, PID_MAX)) < 0) {
     LogError("system statistic error -- getprocs64 failed: %s\n", STRERROR);
     return FALSE;
   }
 
-  procs = xcalloc( sizeof(struct procentry64), treesize);
+  procs = xcalloc(sizeof(struct procentry64), treesize);
 
-  /* Read process info */
   firstproc = 0;
   if ((treesize = getprocs64(procs, sizeof(struct procentry64), NULL, 0, &firstproc, treesize)) < 0) {
     FREE(procs);
@@ -223,7 +216,6 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
   for (i = 0; i < treesize; i++) {
-
     pt[i].cputime     = 0;
     pt[i].cpu_percent = 0;
     pt[i].mem_kbyte   = 0;
@@ -236,7 +228,6 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
       pt[i].mem_kbyte = (user.ui_drss + user.ui_trss) * (page_size / 1024);
       pt[i].cputime   = (user.ui_ru.ru_utime.tv_sec + user.ui_ru.ru_utime.tv_usec * 1.0e-6 + user.ui_ru.ru_stime.tv_sec + user.ui_ru.ru_stime.tv_usec * 1.0e-6) * 10;
     }
-
   }
 
   FREE(procs);
