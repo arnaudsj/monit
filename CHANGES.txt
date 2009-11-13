@@ -29,7 +29,10 @@ NEW FEATURES AND FUNCTIONS:
 BUGFIXES:
 
 * Support resource monitoring (cpu usage, etc.) when Monit is running
-  inside FreeBSD jail.
+  inside virtual environment. Tested on:
+      - FreeBSD jail
+      - Solaris zone
+      - Linux Vserver
 
 * Fix #26752: inside Solaris Zone Monit fails to detect children
   and gets host memory wrong

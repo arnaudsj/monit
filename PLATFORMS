@@ -164,8 +164,6 @@ Compile monit with:
 
   gmake
 
-Monit has to be started as root to work with resource support.  
-
 
 FreeBSD + NetBSD + OpenBSD
 ==========================
@@ -190,7 +188,7 @@ You can get following error in such case for Monit <= 4.9:
  --8<--
 
 You can reenable the kvm interface by adding the kmem to the boot-args
-Open FIrmware variable as root - for example:
+Open Firmware variable as root - for example:
 
  nvram boot-arg="kmem=1"
 
@@ -206,3 +204,4 @@ Monit might be able to compile using the "UNKNOWN" architecure.  In
 case a wrong platform is detected you can enforce this behavior by
 using the "--without-resource" flag in the configure run.  Generally,
 it is advisable to stick to gcc for compiling.
+
