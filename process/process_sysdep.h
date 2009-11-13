@@ -41,9 +41,9 @@ int used_system_cpu_sysdep(SystemInfo_T *);
 double get_float_time(void);
 
 int    initprocesstree_sysdep(ProcessTree_T **);
-void   fillprocesstree(ProcessTree_T *);
+void   fillprocesstree(ProcessTree_T *, int);
 
-int    connectchild(ProcessTree_T * , ProcessTree_T *);
+int    connectchild(ProcessTree_T *, int, int);
 
 
 #endif

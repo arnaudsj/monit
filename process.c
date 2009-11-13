@@ -131,7 +131,7 @@ int init_process_info(void) {
  * @return TRUE if succeeded otherwise FALSE.
  */
 int update_process_data(Service_T s, ProcessTree_T *pt, int treesize, pid_t pid) {
-  ProcessTree_T *leaf;
+  int leaf;
 
   ASSERT(s);
   ASSERT(systeminfo.mem_kbyte_max > 0);
@@ -140,24 +140,24 @@ int update_process_data(Service_T s, ProcessTree_T *pt, int treesize, pid_t pid)
   s->inf->_pid = s->inf->pid;
   s->inf->pid  = pid;
 
-  if ((leaf = findprocess(pid, pt, treesize)) != NULL) {
+  if ((leaf = findprocess(pid, pt, treesize)) != -1) {
  
     /* save the previous ppid and set actual one */
     s->inf->_ppid             = s->inf->ppid;
-    s->inf->ppid              = leaf->ppid;
-    s->inf->children          = leaf->children_sum;
-    s->inf->mem_kbyte         = leaf->mem_kbyte;
-    s->inf->status_flag       = leaf->status_flag;
-    s->inf->total_mem_kbyte   = leaf->mem_kbyte_sum;
-    s->inf->cpu_percent       = leaf->cpu_percent;
-    s->inf->total_cpu_percent = leaf->cpu_percent_sum;
+    s->inf->ppid              = pt[leaf].ppid;
+    s->inf->children          = pt[leaf].children_sum;
+    s->inf->mem_kbyte         = pt[leaf].mem_kbyte;
+    s->inf->status_flag       = pt[leaf].status_flag;
+    s->inf->total_mem_kbyte   = pt[leaf].mem_kbyte_sum;
+    s->inf->cpu_percent       = pt[leaf].cpu_percent;
+    s->inf->total_cpu_percent = pt[leaf].cpu_percent_sum;
 
     if (systeminfo.mem_kbyte_max == 0) {
       s->inf->total_mem_percent = 0;
       s->inf->mem_percent       = 0;
     } else {
-      s->inf->total_mem_percent = (int)((double)leaf->mem_kbyte_sum * 1000.0 / systeminfo.mem_kbyte_max);
-      s->inf->mem_percent       = (int)((double)leaf->mem_kbyte * 1000.0 / systeminfo.mem_kbyte_max);
+      s->inf->total_mem_percent = (int)((double)pt[leaf].mem_kbyte_sum * 1000.0 / systeminfo.mem_kbyte_max);
+      s->inf->mem_percent       = (int)((double)pt[leaf].mem_kbyte * 1000.0 / systeminfo.mem_kbyte_max);
     }
 
   } else {
@@ -229,10 +229,10 @@ error3:
  */
 int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, int *oldsize_r) {
   int i;
-  ProcessTree_T *oldentry;
+  int oldentry;
   ProcessTree_T *pt;
   ProcessTree_T *oldpt;
-  ProcessTree_T *root = NULL;
+  int root = -1;
 
   if (*pt_r != NULL) {  
     *oldpt_r   = *pt_r; 
@@ -252,9 +252,9 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
     return 0;
 
   for (i = 0; i < (volatile int)*size_r; i ++) {
-    if (oldpt && (oldentry = findprocess(pt[i].pid, oldpt, *oldsize_r))) {
-      pt[i].cputime_prev = oldentry->cputime;
-      pt[i].time_prev    = oldentry->time;
+    if (oldpt && ((oldentry = findprocess(pt[i].pid, oldpt, *oldsize_r)) != -1)) {
+      pt[i].cputime_prev = oldpt[oldentry].cputime;
+      pt[i].time_prev    = oldpt[oldentry].time;
  
       /* The cpu_percent may be set already (for example by HPUX module) */
       if (pt[i].cpu_percent  == 0 && pt[i].cputime_prev != 0 && pt[i].cputime != 0 && pt[i].cputime > pt[i].cputime_prev) {
@@ -271,7 +271,7 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
     if (pt[i].pid == pt[i].ppid)
       continue;
 
-    if (! (pt[i].parent = findprocess(pt[i].ppid, pt, *size_r))) {
+    if ((pt[i].parent = findprocess(pt[i].ppid, pt, *size_r)) == -1) {
       /* Parent process wasn't found - on Linux this is normal: main process with PID 0 is not listed, similarly in FreeBSD jail.
        * We create virtual process entry for missing parent so we can have full tree-like structure with root. */
       int j = (*size_r)++;
@@ -279,10 +279,10 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
       pt = *pt_r = xresize(*pt_r, *size_r * sizeof(ProcessTree_T));
       memset(&pt[j], 0, sizeof(ProcessTree_T));
       pt[j].ppid = pt[j].pid  = pt[i].ppid;
-      pt[i].parent = &pt[j];
+      pt[i].parent = j;
     }
     
-    if (! connectchild(pt[i].parent, &pt[i])) {
+    if (! connectchild(pt, pt[i].parent, i)) {
       /* connection to parent process has failed, this is usually caused in the part above */
       DEBUG("system statistic error -- cannot connect process id %d to its parent %d\n", pt[i].pid, pt[i].ppid);
       pt[i].pid = 0;
@@ -293,17 +293,17 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
   /* The main process in Solaris zones and FreeBSD host doesn't have pid 1, so try to find process which is parent of itself */
   for (i = 0; i < *size_r; i++) {
     if (pt[i].pid == pt[i].ppid) {
-      root = &pt[i];
+      root = i;
       break;
     }
   }
 
-  if (! root) {
+  if (root == -1) {
     DEBUG("system statistic error -- cannot find root process id\n");
     return -1;
   }
 
-  fillprocesstree(root);
+  fillprocesstree(pt, root);
 
   return *size_r;
 }
@@ -314,21 +314,21 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
  * @param pid  pid of the process
  * @param pt  processtree
  * @param treesize  size of the processtree
- * @return pointer of the process if succeeded otherwise NULL.
+ * @return process index if succeeded otherwise -1
  */
-ProcessTree_T *findprocess(int pid, ProcessTree_T *pt, int size) {
+int findprocess(int pid, ProcessTree_T *pt, int size) {
   int i;
 
   ASSERT(pt);
 
   if (size <= 0)
-    return NULL;
+    return -1;
 
   for (i = 0; i < size; i++)
     if (pid == pt[i].pid)
-      return &pt[i];
+      return i;
 
-  return NULL;
+  return -1;
 }
 
 /**

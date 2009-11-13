@@ -401,8 +401,8 @@ typedef struct myprocesstree {
   long  cputime;                                           /**< 1/10 seconds */
   long  cputime_prev;                                      /**< 1/10 seconds */
   
-  struct myprocesstree  *parent;
-  struct myprocesstree **children;
+  int parent;
+  int *children;
 } ProcessTree_T;
 
 

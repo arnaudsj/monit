@@ -96,7 +96,7 @@ int read_proc_file(char *buf, int buf_size, char * name, int pid) {
   ASSERT(buf);
   ASSERT(name);
 
-  if ( pid < 0 )
+  if (pid < 0)
     snprintf(filename, STRLEN, "/proc/%s", name);
   else
     snprintf(filename, STRLEN, "/proc/%d/%s", pid, name);
@@ -134,20 +134,21 @@ double get_float_time(void) {
 
 /**
  * Connects child and parent in a process tree
- * @param parent pointer to parents process tree entry
- * @param child pointer to childs process tree entry
+ * @param pt process tree
+ * @param parent index
+ * @param child index
  * @return TRUE if succeeded otherwise FALSE.
  */
-int connectchild(ProcessTree_T * parent, ProcessTree_T * child) {
-  ASSERT(child);
-  ASSERT(parent);
+int connectchild(ProcessTree_T *pt, int parent, int child) {
 
-  if (parent->pid == child->pid)
+  ASSERT(pt);
+
+  if (pt[parent].pid == pt[child].pid)
     return FALSE;
 
-  parent->children = xresize(parent->children, sizeof(ProcessTree_T *) * (parent->children_num + 1));
-  parent->children[parent->children_num] = child;
-  parent->children_num++;
+  pt[parent].children = xresize(pt[parent].children, sizeof(ProcessTree_T *) * (pt[parent].children_num + 1));
+  pt[parent].children[pt[parent].children_num] = child;
+  pt[parent].children_num++;
 
   return TRUE;
 }
@@ -156,31 +157,32 @@ int connectchild(ProcessTree_T * parent, ProcessTree_T * child) {
 /**
  * Fill data in the process tree by recusively walking through it
  * @param pt process tree
+ * @param i process index
  * @return TRUE if succeeded otherwise FALSE.
  */
-void fillprocesstree(ProcessTree_T * pt) {
+void fillprocesstree(ProcessTree_T *pt, int index) {
   int            i;
   ProcessTree_T *parent_pt;
 
   ASSERT(pt);
 
-  if (pt->visited == 1)
+  if (pt[index].visited == 1)
     return;
 
-  pt->visited         = 1;
-  pt->children_sum    = pt->children_num;
-  pt->mem_kbyte_sum   = pt->mem_kbyte;
-  pt->cpu_percent_sum = pt->cpu_percent;
+  pt[index].visited         = 1;
+  pt[index].children_sum    = pt[index].children_num;
+  pt[index].mem_kbyte_sum   = pt[index].mem_kbyte;
+  pt[index].cpu_percent_sum = pt[index].cpu_percent;
 
-  for (i = 0; i < pt->children_num; i++)
-    fillprocesstree(pt->children[i]);
+  for (i = 0; i < pt[index].children_num; i++)
+    fillprocesstree(pt, pt[index].children[i]);
 
-  if (pt->parent != NULL) {
-    parent_pt                   = pt->parent;
-    parent_pt->children_sum    += pt->children_sum;
-    parent_pt->mem_kbyte_sum   += pt->mem_kbyte_sum;
-    parent_pt->cpu_percent_sum += pt->cpu_percent_sum;
-    parent_pt->cpu_percent_sum  = (pt->cpu_percent_sum > 1000) ? 1000 : parent_pt->cpu_percent_sum;
+  if (pt[index].parent != -1) {
+    parent_pt                   = &pt[pt[index].parent];
+    parent_pt->children_sum    += pt[index].children_sum;
+    parent_pt->mem_kbyte_sum   += pt[index].mem_kbyte_sum;
+    parent_pt->cpu_percent_sum += pt[index].cpu_percent_sum;
+    parent_pt->cpu_percent_sum  = (pt[index].cpu_percent_sum > 1000) ? 1000 : parent_pt->cpu_percent_sum;
   } 
 }
 
