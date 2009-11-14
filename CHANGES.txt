@@ -31,6 +31,14 @@ NEW FEATURES AND FUNCTIONS:
   Host header. Thanks to Brady Catherman for patch. Example:
     if failed host 192.168.1.100 protocol http hostheader "example.com" then alert
 
+* When error occurred during Monit command-line execution, report error
+  and exit with 1, so it is possible to react when Monit is used in script.
+  On success 0 is returned as usual. Formerly command-line Monit exited
+  always 0 even if error occurred.
+
+* Do not require SSL version type when setting SSL check and setting M/Monit
+  (SSL version is set to auto).
+
 BUGFIXES:
 
 * Support resource monitoring (cpu usage, etc.) when Monit is running
@@ -44,11 +52,6 @@ BUGFIXES:
 
 * On Solaris, FreeBSD, NetBSD and OpenBSD Monit no longer needs to run as root user
   in order to be able to watch process resource usage (cpu and memory).
-
-* When error occurred during Monit command-line execution, report error
-  and exit with 1, so it is possible to react when Monit is used in script.
-  On success 0 is returned as usual. Formerly command-line Monit exited
-  always 0 even if error occurred.
 
 * Fixed SMTP protocol test which may sometimes incorrectly
   report ESMTP protocol failure. Thanks to Axel Reinhold for
@@ -73,9 +76,6 @@ BUGFIXES:
   commands failed because it used the read-only account so commands
   like start, stop, etc. were rejected. Monit will now use full access
   regardless of allow option order. Thanks to Thorsten Kampe for report.
-
-* Do not require SSL version type when setting SSL check and setting M/Monit
-  (SSL version is set to auto).
 
 * Passive monitoring mode fixed. Thanks to Nelson Vale for report.
 
