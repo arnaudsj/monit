@@ -1275,7 +1275,7 @@ static void check_timeout(Service_T s) {
     if (max < ar->cycle)
       max = ar->cycle;
     if (s->nstart >= ar->count && s->ncycle <= ar->cycle)
-      Event_post(s, EVENT_TIMEOUT, STATE_FAILED, ar->action, "service restarted %d times within %d cycles(s) - %s", actionnames[ar->action->failed->id]);
+      Event_post(s, EVENT_TIMEOUT, STATE_FAILED, ar->action, "service restarted %d times within %d cycles(s) - %s", s->nstart, s->ncycle, actionnames[ar->action->failed->id]);
   }
 
   /* Stop counting and reset if the cycle interval is succeeded */
