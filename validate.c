@@ -122,7 +122,7 @@ static void check_match(Service_T);
 static int  check_match_ignore(Service_T, char *);
 static void check_match_if(Service_T, char *);
 static int  check_skip(Service_T);
-static int  check_timeout(Service_T);
+static void check_timeout(Service_T);
 static void check_checksum(Service_T);
 static void check_timestamp(Service_T);
 static void check_process_state(Service_T);
@@ -178,7 +178,8 @@ int validate() {
   /* Check the services */
   for (s = servicelist; s && !Run.stopped; s = s->next) {
     LOCK(s->mutex)
-      if (!do_scheduled_action(s) && s->monitor && !check_skip(s) && !check_timeout(s)) {
+      if (! do_scheduled_action(s) && s->monitor && ! check_skip(s)) {
+        check_timeout(s);
         if (! s->check(s))
           errors++;
         /* The monitoring may be disabled by some matching rule in s->check
@@ -1257,41 +1258,31 @@ static void check_filesystem_resources(Service_T s, Filesystem_T td) {
 }
 
 
-/**
- * Returns TRUE if the service timed out, otherwise FALSE.
- */
-static int check_timeout(Service_T s) {
+static void check_timeout(Service_T s) {
+  ActionRate_T ar;
+  int max = 0;
 
   ASSERT(s);
 
-  if (!s->def_timeout)
-    return FALSE;
+  if (! s->actionratelist)
+    return;
 
-  /*
-   * Start counting cycles
-   */
+  /* Start counting cycles */
   if (s->nstart > 0)
     s->ncycle++;
 
-  /*
-   * Check timeout
-   */
-  if (s->nstart >= s->to_start && s->ncycle <= s->to_cycle) {
-    Event_post(s, EVENT_TIMEOUT, STATE_FAILED, s->action_TIMEOUT, "service timed out and will not be checked anymore");
-    return TRUE;
+  for (ar = s->actionratelist; ar; ar = ar->next) {
+    if (max < ar->cycle)
+      max = ar->cycle;
+    if (s->nstart >= ar->count && s->ncycle <= ar->cycle)
+      Event_post(s, EVENT_TIMEOUT, STATE_FAILED, ar->action, "service restarted %d times within %d cycles(s) - %s", actionnames[ar->action->failed->id]);
   }
 
-  /*
-   * Stop counting and reset if the
-   * cycle interval is succeeded
-   */
-  if (s->ncycle > s->to_cycle) {
+  /* Stop counting and reset if the cycle interval is succeeded */
+  if (s->ncycle > max) {
     s->ncycle = 0;
     s->nstart = 0;
   }
-
-  return FALSE;
-
 }
 
 

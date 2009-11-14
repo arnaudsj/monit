@@ -53,6 +53,7 @@ static void _gcfilesystem(Filesystem_T *);
 static void _gcicmp(Icmp_T *);
 static void _gcpql(Resource_T *);
 static void _gcptl(Timestamp_T *);
+static void _gcparl(ActionRate_T *);
 static void _gc_action(Action_T *);
 static void _gc_eventaction(EventAction_T *);
 static void _gc_inf(Info_T *);
@@ -211,6 +212,9 @@ static void _gc_service(Service_T *s) {
   if((*s)->timestamplist)
     _gcptl(&(*s)->timestamplist);
 
+  if((*s)->actionratelist)
+    _gcparl(&(*s)->actionratelist);
+
   if((*s)->sizelist)
     _gcso(&(*s)->sizelist);
 
@@ -249,9 +253,6 @@ static void _gc_service(Service_T *s) {
   
   if((*s)->action_NONEXIST)
     _gc_eventaction(&(*s)->action_NONEXIST);
-  
-  if((*s)->action_TIMEOUT)
-    _gc_eventaction(&(*s)->action_TIMEOUT);
   
   if((*s)->action_PID)
     _gc_eventaction(&(*s)->action_PID);
@@ -442,7 +443,6 @@ static void _gc_inf(Info_T *i) {
 
 
 static void _gcptl(Timestamp_T *p) {
-  
   ASSERT(p);
 
   if((*p)->next)
@@ -452,7 +452,19 @@ static void _gcptl(Timestamp_T *p) {
     _gc_eventaction(&(*p)->action);
 
   FREE(*p);
+}
 
+
+static void _gcparl(ActionRate_T *ar) {
+  ASSERT(ar);
+
+  if((*ar)->next)
+    _gcparl(&(*ar)->next);
+
+  if((*ar)->action)
+    _gc_eventaction(&(*ar)->action);
+
+  FREE(*ar);
 }
 
 

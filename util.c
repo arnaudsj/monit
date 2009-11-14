@@ -756,6 +756,7 @@ void Util_printService(Service_T s) {
   Filesystem_T dl;
   Resource_T q;
   Timestamp_T t;
+  ActionRate_T ar;
   Size_T sl;
   Match_T ml;
   Dependant_T d;
@@ -1169,16 +1170,8 @@ void Util_printService(Service_T s) {
   if(s->def_every)
     printf(" %-20s = Check service every %d cycles\n", "Every", s->every);
   
-  if(s->def_timeout && s->action_TIMEOUT) {
-    EventAction_T a= s->action_TIMEOUT;
-    printf(" %-20s = If %d restart within %d cycles then %s "
-      "else if succeeded then %s\n",
-      "Timeout",
-      s->to_start,
-      s->to_cycle,
-      a->failed->description,
-      a->succeeded->description);
-  }
+  for (ar = s->actionratelist; ar; ar = ar->next)
+    printf(" %-20s = If restarted %d times within %d cycle(s) then %s\n", "Timeout", ar->count, ar->cycle, ar->action->failed->description);
 
   for(r= s->maillist; r; r= r->next) {
     printf(" %-20s = %s\n", "Alert mail to", is_str_defined(r->to));

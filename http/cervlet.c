@@ -700,8 +700,8 @@ static void handle_run(HttpRequest req, HttpResponse res) {
 
 
 static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
-
   Dependant_T d;
+  ActionRate_T ar;
   char *status;
   char time[STRLEN];
 
@@ -796,17 +796,8 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
       "<tr><td>Check service</td><td>every %d cycle</td></tr>",
       s->every?s->every:1);
 
-    if(s->def_timeout && s->action_TIMEOUT) {
-      EventAction_T a= s->action_TIMEOUT;
-      out_print(res,
-        "<tr><td>Timeout</td>"
-        "<td>If %d restart within %d cycles then %s else if succeeded "
-        "then %s</td></tr>",
-         s->to_start,
-         s->to_cycle,
-         a->failed->description,
-         a->succeeded->description);
-    }
+    for (ar = s->actionratelist; ar; ar = ar->next)
+      out_print(res, "<tr><td>Timeout</td><td>If restarted %d times within %d cycle(s) then %s</td></tr>", ar->count, ar->cycle, ar->action->failed->description);
 
     ctime_r((const time_t *)&s->collected.tv_sec, time);
     out_print(res,

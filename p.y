@@ -181,6 +181,7 @@
   static struct myresource resourceset;
   static struct mychecksum checksumset;
   static struct mytimestamp timestampset;
+  static struct myactionrate actionrateset;
   static struct IHavePrecedence ihp = {FALSE, FALSE, FALSE};
   static struct myrate rate1 = {1, 1};
   static struct myrate rate2 = {1, 1};
@@ -202,6 +203,7 @@
   static void  addport(Port_T);
   static void  addresource(Resource_T);
   static void  addtimestamp(Timestamp_T, int);
+  static void  addactionrate(ActionRate_T);
   static void  addsize(Size_T);
   static void  addfilesystem(Filesystem_T);
   static void  addicmp(Icmp_T);
@@ -237,6 +239,7 @@
   static void  reset_portset();
   static void  reset_resourceset();
   static void  reset_timestampset();
+  static void  reset_actionrateset();
   static void  reset_sizeset();
   static void  reset_checksumset();
   static void  reset_permset();
@@ -246,7 +249,6 @@
   static void  reset_icmpset();
   static void  reset_rateset();
   static void  check_name(char *);
-  static void  check_timeout(int, int);
   static void  check_every(int);
   static int   check_perm(int);
   static void  check_hostname (char *);
@@ -345,7 +347,7 @@ optproc         : start
                 | ppid
                 | connection
                 | connectionunix
-                | timeout
+                | actionrate
                 | alert
                 | every
                 | mode
@@ -361,7 +363,7 @@ optfilelist      : /* EMPTY */
 optfile         : start
                 | stop
                 | timestamp
-                | timeout
+                | actionrate
                 | every
                 | alert
                 | permission
@@ -381,7 +383,7 @@ optfilesyslist  : /* EMPTY */
 
 optfilesys      : start
                 | stop
-                | timeout
+                | actionrate
                 | every
                 | alert
                 | permission
@@ -402,7 +404,7 @@ optdirlist      : /* EMPTY */
 optdir          : start
                 | stop
                 | timestamp
-                | timeout
+                | actionrate
                 | every
                 | alert
                 | permission
@@ -421,7 +423,7 @@ opthost         : start
                 | stop
                 | connection
                 | icmp
-                | timeout
+                | actionrate
                 | alert
                 | every
                 | mode
@@ -433,7 +435,7 @@ optsystemlist   : /* EMPTY */
                 | optsystemlist optsystem
                 ;
 
-optsystem       : timeout
+optsystem       : actionrate
                 | alert
                 | every
                 | group
@@ -448,7 +450,7 @@ optfifolist     : /* EMPTY */
 optfifo         : start
                 | stop
                 | timestamp
-                | timeout
+                | actionrate
                 | every
                 | alert
                 | permission
@@ -463,7 +465,7 @@ optstatuslist   : /* EMPTY */
                 | optstatuslist optstatus
                 ;
                
-optstatus       : timeout
+optstatus       : actionrate
                 | alert
                 | every
                 | group
@@ -1164,11 +1166,17 @@ nettimeout      : /* EMPTY */ {
                   }
                 ;
 
-timeout         : IF NUMBER RESTART NUMBER CYCLE THEN TIMEOUT {
-                   check_timeout($2, $4);
-                   current->def_timeout = TRUE;
-                   current->to_start = $2;
-                   current->to_cycle = $4;
+actionrate      : IF NUMBER RESTART NUMBER CYCLE THEN action1 {
+                   actionrateset.count = $2;
+                   actionrateset.cycle = $4;
+                   addeventaction(&(actionrateset).action, $<number>7, ACTION_IGNORE);
+                   addactionrate(&actionrateset);
+                 }
+                | IF NUMBER RESTART NUMBER CYCLE THEN TIMEOUT {
+                   actionrateset.count = $2;
+                   actionrateset.cycle = $4;
+                   addeventaction(&(actionrateset).action, ACTION_UNMONITOR, ACTION_IGNORE);
+                   addactionrate(&actionrateset);
                  }
                 ;
 
@@ -1375,8 +1383,7 @@ value           : REAL { $<real>$ = $1; }
                 | NUMBER { $<real>$ = (float) $1; }
                 ;
 
-timestamp       : IF TIMESTAMP operator NUMBER time rate1 THEN action1
-                  recovery {
+timestamp       : IF TIMESTAMP operator NUMBER time rate1 THEN action1 recovery {
                     timestampset.operator = $<number>3;
                     timestampset.time = ($4 * $<number>5);
                     addeventaction(&(timestampset).action, $<number>8, $<number>9);
@@ -1851,6 +1858,7 @@ static void preparse() {
   reset_resourceset();
   reset_checksumset();
   reset_timestampset();
+  reset_actionrateset();
 }
 
 
@@ -1924,7 +1932,6 @@ static void createservice(int type, char *name, char *value, int (*check)(Servic
   addeventaction(&(current)->action_EXEC,     ACTION_ALERT,     ACTION_ALERT);
   addeventaction(&(current)->action_INVALID,  ACTION_RESTART,   ACTION_ALERT);
   addeventaction(&(current)->action_NONEXIST, ACTION_RESTART,   ACTION_ALERT);
-  addeventaction(&(current)->action_TIMEOUT,  ACTION_UNMONITOR, ACTION_ALERT);
   addeventaction(&(current)->action_PID,      ACTION_ALERT,     ACTION_IGNORE);
   addeventaction(&(current)->action_PPID,     ACTION_ALERT,     ACTION_IGNORE);
   addeventaction(&(current)->action_FSFLAG,   ACTION_ALERT,     ACTION_IGNORE);
@@ -2122,8 +2129,33 @@ static void addtimestamp(Timestamp_T ts, int notime) {
   current->timestamplist = t;
 
   reset_timestampset();
-
 }
+
+
+/*
+ * Add a new object to the current service actionrate list
+ */
+static void addactionrate(ActionRate_T ar) {
+  ActionRate_T a;
+
+  ASSERT(ar);
+
+  if (ar->count > ar->cycle)
+    yyerror2("the number of restarts must be less than poll cycles");
+  if (ar->count <= 0 || ar->cycle <= 0)
+    yyerror2("zero or negative values not allowed in a action rate statement");
+
+  NEW(a);
+  a->count  = ar->count;
+  a->cycle  = ar->cycle;
+  a->action = ar->action;
+
+  a->next = current->actionratelist;
+  current->actionratelist = a;
+
+  reset_actionrateset();
+}
+
 
 
 /*
@@ -3091,6 +3123,16 @@ static void reset_timestampset() {
 
 
 /*
+ * Reset the ActionRate set to default values
+ */
+static void reset_actionrateset() {
+  actionrateset.count = 0;
+  actionrateset.cycle = 0;
+  actionrateset.action = NULL;
+}
+
+
+/*
  * Reset the Size set to default values
  */
 static void reset_sizeset() {
@@ -3208,17 +3250,6 @@ static int check_perm(int perm) {
     yyerror2("permission statements must have an octal value between 0 and 7777");
 
   return result;
-}
-
-
-/*
- * Timeout statement semantic check
- */
-static void check_timeout(int s, int c) {
-  if (s > c)
-    yyerror2("the number of restarts must be less than poll cycles");
-  if (s <= 0 || c <= 0)
-    yyerror2("zero or negative values not allowed in a timeout statement");
 }
 
 

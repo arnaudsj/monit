@@ -731,7 +731,7 @@ static void handle_action(Event_T E, Action_T A) {
     spawn(s, A->exec, Event_get_description(E));
     return;
   } else {
-    if (s->def_timeout && (A->id == ACTION_START || A->id == ACTION_RESTART))
+    if (s->actionratelist && (A->id == ACTION_START || A->id == ACTION_RESTART))
       s->nstart++;
 
     if (s->mode == MODE_PASSIVE && (A->id == ACTION_START || A->id == ACTION_STOP  || A->id == ACTION_RESTART))

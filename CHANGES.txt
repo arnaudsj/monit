@@ -11,6 +11,11 @@ Version 5.1
 
 NEW FEATURES AND FUNCTIONS:
 
+* It is now possible to define any action for restart timeout rule.
+  Multiple restart timeout rules can by defined too. Example:
+      if 3 restarts within 5 cycles then exec "/foo/bar"
+      if 8 restarts within 10 cycles then unmonitor
+
 * Added GPS protocol test. Thanks to Sebastien Debrard for patch.
 
 * Added RADIUS protocol test. Thanks to Alan DeKok for patch. Example syntax:

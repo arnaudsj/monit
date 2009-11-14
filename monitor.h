@@ -539,6 +539,17 @@ typedef struct mytimestamp {
 } *Timestamp_T;
 
 
+/** Defines action rate object */
+typedef struct myactionrate {
+  int  count;                                            /**< Action counter */
+  int  cycle;                                             /**< Cycle counter */
+  EventAction_T action;    /**< Description of the action upon matching rate */
+ 
+  /** For internal use */
+  struct myactionrate *next;                   /**< next actionrate in chain */
+} *ActionRate_T;
+
+
 /** Defines size object */
 typedef struct mysize {
   int  operator;                                    /**< Comparison operator */
@@ -672,11 +683,8 @@ typedef struct myservice {
   int  mode;                            /**< Monitoring mode for the service */
   int  ncycle;                          /**< The number of the current cycle */
   int  nstart;           /**< The number of current starts with this service */
-  int  to_start;                                  /**< Timeout start ceiling */
-  int  to_cycle;                                  /**< Timeout cycle ceiling */
   int  every;                        /**< Check this program at given cycles */
   int  nevery;          /**< Counter for every.  When nevery == every, check */
-  int  def_timeout;          /**< TRUE if timeout is defined for the service */
   int  def_every;              /**< TRUE if every is defined for the service */
   int  visited;      /**< Service visited flag, set if dependencies are used */
   int  depend_visited;/**< Depend visited flag, set if dependencies are used */
@@ -687,6 +695,7 @@ typedef struct myservice {
   Mail_T      maillist;                  /**< Alert notification mailinglist */
 
   /** Test rules and event handlers */
+  ActionRate_T actionratelist;                    /**< ActionRate check list */
   Checksum_T  checksum;                                  /**< Checksum check */
   Filesystem_T filesystemlist;                    /**< Filesystem check list */
   Gid_T       gid;                                            /**< Gid check */
@@ -708,7 +717,6 @@ typedef struct myservice {
   EventAction_T action_EXEC;       /**< Description of the action upon event */
   EventAction_T action_INVALID;    /**< Description of the action upon event */
   EventAction_T action_NONEXIST;   /**< Description of the action upon event */
-  EventAction_T action_TIMEOUT;    /**< Description of the action upon event */
 
   /** Internal monit events */
   EventAction_T action_MONIT_START;         /**< Monit instance start action */

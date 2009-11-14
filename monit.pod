@@ -967,43 +967,38 @@ event-files, Monit should be stopped before the removal.
 
 B<monit> provides a service timeout mechanism for situations
 where a service simply refuses to start or respond over a longer
-period. In cases like this, and particularly if monit's poll-cycle
-is low, Monit will simply increase the machine load by trying to
-restart the service.
+period.
 
-The timeout mechanism Monit provides is based on two variables,
-i.e. the number the service has been started and the number of
-poll-cycles. For example, if a service had I<x> restarts within
-I<y> poll-cycles (where I<x> <= I<y>) then Monit will timeout and
-not (re)start the service on subsequent cycles until the service
-is manually re-registered.. If a timeout occurs Monit will send
-you an alert message if you have register interest for this event. 
+The timeout mechanism is based on number if service restarts and
+number of poll-cycles. For example, if a service had I<x> restarts
+within I<y> poll-cycles (where I<x> <= I<y>) then Monit will perform
+custom action (for example unmonitor the service). If a timeout occurs
+Monit will send an alert message if you have register interest for this
+event. 
 
-The syntax for the timeout statement is as follows (keywords
-are in capital):
+The syntax for the timeout statement is as follows (keywords are in capital):
 
 =over 4
 
-=item IF NUMBER RESTART NUMBER CYCLE(S) THEN TIMEOUT
+=item IF <number> RESTART <number> CYCLE(S) THEN <action>
 
 =back
 
-Where the first number is the number of service restarts and the
-second, the number of poll-cycles. If the number of cycles was
-reached without a timeout, the service start-counter is reset to
-zero. This provides some granularity to catch exceptional cases
-and do a service timeout, but let occasional service start and
-restarts happen without having an accumulated timeout.
+Here is an example where Monit will unmonitor the if it was restarted
+2 times within 3 cycles:
 
-Here is an example where Monit will timeout (not check the
-service) if the service was restarted 2 times within 3 cycles:
+ if 2 restarts within 3 cycles then unmonitor
 
- if 2 restarts within 3 cycles then timeout
+To have Monit check the service again after a monitoring was disabled,
+run 'monit monitor <servicename>' from the command line.
 
-To have Monit check the service again after a timeout, run 'monit
-monitor service' from the command line. This will remove the
-timeout lock in the daemon and make the daemon start and check
-the service again.
+Example for setting custom exec on timeout:
+
+ if 5 restarts within 5 cycles then exec "/foo/bar"
+
+Example for stopping the service:
+
+ if 7 restarts within 10 cycles then stop
 
 
 =head1 SERVICE TESTS
