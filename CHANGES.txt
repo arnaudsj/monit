@@ -39,6 +39,8 @@ NEW FEATURES AND FUNCTIONS:
 * Do not require SSL version type when setting SSL check and setting M/Monit
   (SSL version is set to auto).
 
+* Don't block http interface if service is being checked or action performed
+
 BUGFIXES:
 
 * Support resource monitoring (cpu usage, etc.) when Monit is running

@@ -255,7 +255,6 @@ static void is_monit_running(HttpRequest req, HttpResponse res) {
     
 
 static void do_home(HttpRequest req, HttpResponse res) {
-
   char *uptime= Util_getUptime(Util_getProcessUptime(Run.pidfile), "&nbsp;");
  
   HEAD("", Run.polltime)
@@ -286,7 +285,6 @@ static void do_home(HttpRequest req, HttpResponse res) {
   do_home_host(req, res);
   
   FOOT
-      
 }
 
 
@@ -707,141 +705,136 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
 
   ASSERT(s);
 
-  LOCK(s->mutex)
+  HEAD(s->name, Run.polltime)
 
-    HEAD(s->name, Run.polltime)
+  out_print(res,
+    "<p><br><h3>%s status</h3><br>"
+    "<table cellspacing=0 cellpadding=3 border=1 width=\"90%%\" style=\"border:1px solid #ccc;border-collapse:collapse;\">"
+    "<tr>"
+    "<td width=\"30%%\" bgcolor=\"#edf5ff\"><b>Parameter</b></td>"
+    "<td width=\"70%%\" bgcolor=\"#edf5ff\"><b>Value</b></td>"
+    "</tr>"
+    "<tr>"
+    "<td>Name</td>"
+    "<td>%s</td>"
+    "</tr>",
+    servicetypes[s->type],
+    s->name);
 
+  if(s->path && *s->path)
     out_print(res,
-      "<p><br><h3>%s status</h3><br>"
-      "<table cellspacing=0 cellpadding=3 border=1 width=\"90%%\" style=\"border:1px solid #ccc;border-collapse:collapse;\">"
       "<tr>"
-      "<td width=\"30%%\" bgcolor=\"#edf5ff\"><b>Parameter</b></td>"
-      "<td width=\"70%%\" bgcolor=\"#edf5ff\"><b>Value</b></td>"
-      "</tr>"
-      "<tr>"
-      "<td>Name</td>"
+      "<td>%s</td>"
       "<td>%s</td>"
       "</tr>",
-      servicetypes[s->type],
-      s->name);
+      pathnames[s->type],
+      s->path);
 
-    if(s->path && *s->path)
+  status= get_service_status_html(s);
+  out_print(res,
+    "<tr><td>Status</td><td>%s</td></tr>", status);
+  FREE(status);
+
+  if(s->group)
+    out_print(res,
+      "<tr><td>Group</td><td><font color='#0000ff'>%s</font></td></tr>",
+      s->group);
+
+  out_print(res,
+    "<tr><td>Monitoring mode</td><td>%s</td></tr>", modenames[s->mode]);
+
+  out_print(res,
+    "<tr><td>Monitoring status</td><td><font color='#ff8800'>%s"
+    "</font></td></tr>",
+    monitornames[s->monitor]);
+
+  for(d= s->dependantlist; d; d= d->next) {
+    if(d->dependant != NULL) {
       out_print(res,
-        "<tr>"
-        "<td>%s</td>"
-        "<td>%s</td>"
-        "</tr>",
-        pathnames[s->type],
-        s->path);
-
-    status= get_service_status_html(s);
-    out_print(res,
-      "<tr><td>Status</td><td>%s</td></tr>", status);
-    FREE(status);
-
-    if(s->group)
-      out_print(res,
-        "<tr><td>Group</td><td><font color='#0000ff'>%s</font></td></tr>",
-        s->group);
-
-    out_print(res,
-      "<tr><td>Monitoring mode</td><td>%s</td></tr>", modenames[s->mode]);
-
-    out_print(res,
-      "<tr><td>Monitoring status</td><td><font color='#ff8800'>%s"
-      "</font></td></tr>",
-      monitornames[s->monitor]);
-
-    for(d= s->dependantlist; d; d= d->next) {
-      if(d->dependant != NULL) {
-        out_print(res,
-          "<tr><td>Depends on service </td><td> <a href=%s> %s </a></td></tr>",
-          d->dependant, d->dependant);
-      }
+        "<tr><td>Depends on service </td><td> <a href=%s> %s </a></td></tr>",
+        d->dependant, d->dependant);
     }
+  }
 
-    if(s->start) {
-      int i= 0;
-      out_print(res, "<tr><td>Start program</td><td>'");
-      while(s->start->arg[i]) {
-        if(i) out_print(res, " ");
-        out_print(res, "%s", s->start->arg[i++]);
-      }
-      out_print(res, "'");
-      if(s->start->has_uid)
-        out_print(res, " as uid %d", s->start->uid);
-      if(s->start->has_gid)
-        out_print(res, " as gid %d", s->start->gid);
-      out_print(res, " timeout %d second(s)", s->start->timeout);
-      out_print(res, "</td></tr>");
+  if(s->start) {
+    int i= 0;
+    out_print(res, "<tr><td>Start program</td><td>'");
+    while(s->start->arg[i]) {
+      if(i) out_print(res, " ");
+      out_print(res, "%s", s->start->arg[i++]);
     }
+    out_print(res, "'");
+    if(s->start->has_uid)
+      out_print(res, " as uid %d", s->start->uid);
+    if(s->start->has_gid)
+      out_print(res, " as gid %d", s->start->gid);
+    out_print(res, " timeout %d second(s)", s->start->timeout);
+    out_print(res, "</td></tr>");
+  }
 
-    if(s->stop) {
-      int i= 0;
-      out_print(res, "<tr><td>Stop program</td><td>'");
-      while(s->stop->arg[i]) {
-        if(i) out_print(res, " ");
-        out_print(res, "%s", s->stop->arg[i++]);
-      }
-      out_print(res, "'");
-      if(s->stop->has_uid)
-        out_print(res, " as uid %d", s->stop->uid);
-      if(s->stop->has_gid)
-        out_print(res, " as gid %d", s->stop->gid);
-      out_print(res, " timeout %d second(s)", s->stop->timeout);
-      out_print(res, "</td></tr>");
+  if(s->stop) {
+    int i= 0;
+    out_print(res, "<tr><td>Stop program</td><td>'");
+    while(s->stop->arg[i]) {
+      if(i) out_print(res, " ");
+      out_print(res, "%s", s->stop->arg[i++]);
     }
+    out_print(res, "'");
+    if(s->stop->has_uid)
+      out_print(res, " as uid %d", s->stop->uid);
+    if(s->stop->has_gid)
+      out_print(res, " as gid %d", s->stop->gid);
+    out_print(res, " timeout %d second(s)", s->stop->timeout);
+    out_print(res, "</td></tr>");
+  }
 
-    out_print(res,
-      "<tr><td>Check service</td><td>every %d cycle</td></tr>",
-      s->every?s->every:1);
+  out_print(res,
+    "<tr><td>Check service</td><td>every %d cycle</td></tr>",
+    s->every?s->every:1);
 
-    for (ar = s->actionratelist; ar; ar = ar->next)
-      out_print(res, "<tr><td>Timeout</td><td>If restarted %d times within %d cycle(s) then %s</td></tr>", ar->count, ar->cycle, ar->action->failed->description);
+  for (ar = s->actionratelist; ar; ar = ar->next)
+    out_print(res, "<tr><td>Timeout</td><td>If restarted %d times within %d cycle(s) then %s</td></tr>", ar->count, ar->cycle, ar->action->failed->description);
 
-    ctime_r((const time_t *)&s->collected.tv_sec, time);
-    out_print(res,
-      "<tr><td>Data collected</td><td>%s</td></tr>",
-      time);
+  ctime_r((const time_t *)&s->collected.tv_sec, time);
+  out_print(res,
+    "<tr><td>Data collected</td><td>%s</td></tr>",
+    time);
 
-    /* Parameters */
-    print_service_params_icmp(res, s);
-    print_service_params_port(res, s);
-    print_service_params_perm(res, s);
-    print_service_params_uid(res, s);
-    print_service_params_gid(res, s);
-    print_service_params_timestamp(res, s);
-    print_service_params_filesystem(res, s);
-    print_service_params_size(res, s);
-    print_service_params_match(res, s);
-    print_service_params_checksum(res, s);
-    print_service_params_process(res, s);
-    print_service_params_resource(res, s);
+  /* Parameters */
+  print_service_params_icmp(res, s);
+  print_service_params_port(res, s);
+  print_service_params_perm(res, s);
+  print_service_params_uid(res, s);
+  print_service_params_gid(res, s);
+  print_service_params_timestamp(res, s);
+  print_service_params_filesystem(res, s);
+  print_service_params_size(res, s);
+  print_service_params_match(res, s);
+  print_service_params_checksum(res, s);
+  print_service_params_process(res, s);
+  print_service_params_resource(res, s);
 
-    /* Rules */
-    print_service_rules_icmp(res, s);
-    print_service_rules_port(res, s);
-    print_service_rules_perm(res, s);
-    print_service_rules_uid(res, s);
-    print_service_rules_gid(res, s);
-    print_service_rules_timestamp(res, s);
-    print_service_rules_filesystem(res, s);
-    print_service_rules_size(res, s);
-    print_service_rules_match(res, s);
-    print_service_rules_checksum(res, s);
-    print_service_rules_process(res, s);
-    print_service_rules_resource(res, s);
+  /* Rules */
+  print_service_rules_icmp(res, s);
+  print_service_rules_port(res, s);
+  print_service_rules_perm(res, s);
+  print_service_rules_uid(res, s);
+  print_service_rules_gid(res, s);
+  print_service_rules_timestamp(res, s);
+  print_service_rules_filesystem(res, s);
+  print_service_rules_size(res, s);
+  print_service_rules_match(res, s);
+  print_service_rules_checksum(res, s);
+  print_service_rules_process(res, s);
+  print_service_rules_resource(res, s);
 
-    print_alerts(res, s->maillist);
+  print_alerts(res, s->maillist);
 
-    out_print(res, "</table>");
+  out_print(res, "</table>");
 
-    print_buttons(req, res, s);
+  print_buttons(req, res, s);
 
-    FOOT
-
-  END_LOCK;
-
+  FOOT
 }
 
 
