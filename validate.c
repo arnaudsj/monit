@@ -120,7 +120,7 @@ static void check_size(Service_T);
 static void check_perm(Service_T);
 static void check_match(Service_T);
 static int  check_match_ignore(Service_T, char *);
-static void check_match_if (Service_T, char *);
+static void check_match_if(Service_T, char *);
 static int  check_skip(Service_T);
 static int  check_timeout(Service_T);
 static void check_checksum(Service_T);
