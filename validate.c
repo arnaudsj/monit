@@ -179,13 +179,15 @@ int validate() {
   for (s = servicelist; s && !Run.stopped; s = s->next) {
     LOCK(s->mutex)
       if (! do_scheduled_action(s) && s->monitor && ! check_skip(s)) {
-        check_timeout(s);
-        if (! s->check(s))
-          errors++;
-        /* The monitoring may be disabled by some matching rule in s->check
-         * so we have to check again before setting to MONITOR_YES */
-        if (s->monitor != MONITOR_NOT)
-          s->monitor = MONITOR_YES;
+        check_timeout(s); // Can disable monitoring => need to check s->monitor again
+	if (s->monitor) {
+          if (! s->check(s))
+            errors++;
+          /* The monitoring may be disabled by some matching rule in s->check
+           * so we have to check again before setting to MONITOR_YES */
+          if (s->monitor != MONITOR_NOT)
+            s->monitor = MONITOR_YES;
+        }
       }
       gettimeofday(&s->collected, NULL);
     END_LOCK;
