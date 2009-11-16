@@ -432,6 +432,9 @@ static void do_default() {
     else
       LogInfo("Starting %s daemon\n", prog);
     
+    if (Run.startdelay)
+        LogInfo("Monit start delay set -- pause for %ds\n", Run.startdelay);
+
     if (Run.init != TRUE)
       daemonize(); 
     else if (! Run.debug)
@@ -447,13 +450,24 @@ static void do_default() {
 
     atexit(File_finalize);
   
+    if (Run.startdelay) {
+	time_t now = time(NULL);
+        time_t delay = now + Run.startdelay;
+
+        /* sleep can be interrupted by signal => make sure we paused long enough */
+        while (now < delay) {
+    	  sleep(delay - now);
+          if (Run.stopped)
+            do_exit();
+          now = time(NULL);
+        }
+    }
+
     if (can_http())
       monit_http(START_HTTP);
     
     /* send the monit startup notification */
     Event_post(Run.system, EVENT_INSTANCE, STATE_CHANGED, Run.system->action_MONIT_START, "Monit started");
-
-    sleep(Run.startdelay);
 
     while (TRUE) {
       validate();
