@@ -324,6 +324,7 @@ int create_unix_socket(const char *pathname, int timeout) {
   ASSERT(pathname);
 
   if((s= socket(PF_UNIX, SOCK_STREAM, 0)) < 0) {
+    LogError("%s: Cannot create socket -- %s\n", prog, STRERROR);
     return -1;
   }
 
@@ -334,8 +335,7 @@ int create_unix_socket(const char *pathname, int timeout) {
     goto error;
   }
   
-  if(do_connect(s, (struct sockaddr *)&unixsocket, sizeof(unixsocket),
-		timeout) < 0) {
+  if(do_connect(s, (struct sockaddr *)&unixsocket, sizeof(unixsocket), timeout) < 0) {
     goto error;
   }
   
@@ -361,12 +361,13 @@ int create_unix_socket(const char *pathname, int timeout) {
  * @return The socket ready for accept, or -1 if an error occured.
  */
 int create_server_socket(int port, int backlog, const char *bindAddr) {
-  
   int s;
+  int status;
   int flag= 1;
   struct sockaddr_in myaddr;
 
   if((s= socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    LogError("%s: Cannot create socket -- %s\n", prog, STRERROR);
     return -1;
   }
 
@@ -379,8 +380,10 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
 
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;
-    if(getaddrinfo(bindAddr, NULL, &hints, &result) != 0)
+    if((status = getaddrinfo(bindAddr, NULL, &hints, &result)) != 0) {
+      LogError("%s: Cannot translate '%s' to IP address -- %s\n", prog, bindAddr, gai_strerror(status));
       goto error;
+    }
     sa = (struct sockaddr_in *)result->ai_addr;
     memcpy(&myaddr, sa, result->ai_addrlen);
     freeaddrinfo(result);
@@ -390,20 +393,28 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
   myaddr.sin_family= AF_INET;
   myaddr.sin_port= htons(port);
 
-  if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flag, sizeof(flag)) < 0) 
+  if(setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (char *)&flag, sizeof(flag)) < 0)  {
+    LogError("%s: Cannot set reuseaddr option -- %s\n", prog, STRERROR);
     goto error;
+  }
   
   if(! set_noblock(s))
     goto error;
   
-  if(fcntl(s, F_SETFD, FD_CLOEXEC) == -1)
+  if(fcntl(s, F_SETFD, FD_CLOEXEC) == -1) {
+    LogError("%s: Cannot set close on exec option -- %s\n", prog, STRERROR);
     goto error; 
+  }
   
-  if(bind(s, (struct sockaddr *)&myaddr, sizeof(struct sockaddr_in)) < 0)
+  if(bind(s, (struct sockaddr *)&myaddr, sizeof(struct sockaddr_in)) < 0) {
+    LogError("%s: Cannot bind -- %s\n", prog, STRERROR);
     goto error;
+  }
   
-  if(listen(s, backlog) < 0)
+  if(listen(s, backlog) < 0) {
+    LogError("%s: Cannot listen -- %s\n", prog, STRERROR);
     goto error;
+  }
   
   return s;
 
@@ -441,14 +452,13 @@ int close_socket(int socket) {
  * @return TRUE if success, otherwise FALSE
  */
 int set_noblock(int socket) {
-  
-  int flags;
+  int flags = fcntl(socket, F_GETFL, 0);
 
-  flags= fcntl(socket, F_GETFL, 0);
-  flags |= O_NONBLOCK;
-
-  return (fcntl(socket, F_SETFL, flags) == 0);
-
+  if (fcntl(socket, F_SETFL, flags|O_NONBLOCK) == -1) {
+    LogError("%s: Cannot set nonblocking -- %s\n", prog, STRERROR);
+    return FALSE;
+  }
+  return TRUE;
 }
 
 

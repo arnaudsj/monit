@@ -41,6 +41,9 @@ NEW FEATURES AND FUNCTIONS:
 
 * Don't block http interface if service is being checked or action performed
 
+* In case that Monit http interface failed to start, provide more details about
+  the reason.
+
 BUGFIXES:
 
 * Support resource monitoring (cpu usage, etc.) when Monit is running
