@@ -69,6 +69,7 @@ static void _gcath(Auth_T *);
 static void _gc_mmonit(Mmonit_T *);
 static void _gc_url(URL_T *);
 static void _gc_request(Request_T *);
+static void _gc_servicegroup(ServiceGroup_T *);
 
 
 /**
@@ -277,10 +278,12 @@ static void _gc_service(Service_T *s) {
   
   if((*s)->eventlist)
     gc_event(&(*s)->eventlist);
+
+  if((*s)->servicegrouplist)
+    _gc_servicegroup(&(*s)->servicegrouplist);
   
   FREE((*s)->token);
   FREE((*s)->name);
-  FREE((*s)->group);
   FREE((*s)->path);
   
   (*s)->next= NULL;
@@ -615,4 +618,16 @@ static void _gc_mmonit(Mmonit_T *recv) {
   FREE(*recv);
 
 }
+
+
+static void _gc_servicegroup(ServiceGroup_T *sg) {
+  ASSERT(sg && *sg);
+
+  if((*sg)->next)
+    _gc_servicegroup(&(*sg)->next);
+
+  FREE((*sg)->name);
+  FREE(*sg);
+}
+
 

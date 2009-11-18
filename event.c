@@ -113,6 +113,7 @@ static void handle_event(Event_T);
 static void handle_action(Event_T, Action_T);
 static void Event_queue_add(Event_T);
 static void Event_queue_update(Event_T, const char *);
+static char *getservicegroups(ServiceGroup_T);
 
 
 /* ------------------------------------------------------------------ Public */
@@ -147,7 +148,7 @@ void Event_post(Service_T service, long id, short state, EventAction_T action, c
     e->id = id;
     gettimeofday(&e->collected, NULL);
     e->source = xstrdup(service->name);
-    e->group = service->group ? xstrdup(service->group) : xstrdup("");
+    e->group = getservicegroups(service->servicegrouplist);
     e->mode = service->mode;
     e->type = service->type;
     e->state = STATE_INIT;
@@ -205,7 +206,7 @@ void Event_post(Service_T service, long id, short state, EventAction_T action, c
       e->id = id;
       gettimeofday(&e->collected, NULL);
       e->source = xstrdup(service->name);
-      e->group = service->group ? xstrdup(service->group) : xstrdup("");
+      e->group = getservicegroups(service->servicegrouplist);
       e->mode = service->mode;
       e->type = service->type;
       e->state = STATE_INIT;
@@ -885,5 +886,25 @@ static void Event_queue_update(Event_T E, const char *file_name) {
   }
 
   return;
+}
+
+
+static char *getservicegroups(ServiceGroup_T sg) {
+  char *rv = NULL;
+
+  if (sg) {
+    Buffer_T b;
+    ServiceGroup_T g;
+
+    memset(&b, 0, sizeof(Buffer_T));
+    Util_stringbuffer(&b, "<servicegroup>");
+    for (g = sg; g; g = g->next)
+      Util_stringbuffer(&b, "<name>%s</name>", g->name);
+    Util_stringbuffer(&b, "</servicegroup>");
+    rv = b.buf;
+  } else {
+    rv = xstrdup("");
+  }
+  return rv;
 }
 

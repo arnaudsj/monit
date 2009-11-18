@@ -16,6 +16,11 @@ NEW FEATURES AND FUNCTIONS:
       if 3 restarts within 5 cycles then exec "/foo/bar"
       if 8 restarts within 10 cycles then unmonitor
 
+* Service can be added to multiple groups. Syntax:
+    check filesystem wwwdata with path /www
+      group www
+      group filesystem
+
 * Added GPS protocol test. Thanks to Sebastien Debrard for patch.
 
 * Added RADIUS protocol test. Thanks to Alan DeKok for patch. Example syntax:

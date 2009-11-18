@@ -466,4 +466,13 @@ char *Util_getEventratio(Action_T action, char *buf);
 char *Util_portTypeDescription(Port_T p);
 
 
+/**
+ * Print to string buffer
+ * @param b A Buffer object
+ * @param m Format string
+ * @return the socket type description
+ */
+void Util_stringbuffer(Buffer_T *b, const char *m, ...);
+
+
 #endif

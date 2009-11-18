@@ -760,6 +760,7 @@ void Util_printService(Service_T s) {
   Size_T sl;
   Match_T ml;
   Dependant_T d;
+  ServiceGroup_T sg;
   char string[STRLEN];
   char ratio1[STRLEN];
   char ratio2[STRLEN];
@@ -768,8 +769,17 @@ void Util_printService(Service_T s) {
  
   snprintf(string, STRLEN, "%s Name", servicetypes[s->type]);
   printf("%-21s = %s\n", string, s->name);
-  if(s->group)
-    printf(" %-20s = %s\n", "Group", s->group);
+
+  if (s->servicegrouplist) {
+    for (sg = s->servicegrouplist; sg; sg = sg->next) {
+      if (sg == s->servicegrouplist)
+        printf(" %-20s = %s", "Group", sg->name);
+      else
+        printf(", %s", sg->name);
+    }
+    printf("\n");
+  }
+
   if(s->type == TYPE_PROCESS)
     printf(" %-20s = %s\n", "Pid file", s->path);
   else if(s->type != TYPE_HOST && s->type != TYPE_SYSTEM)
@@ -2168,6 +2178,32 @@ char *Util_portTypeDescription(Port_T p) {
       return "UDP";
     default:
       return "UNKNOWN";
+  }
+}
+
+
+void Util_stringbuffer(Buffer_T *b, const char *m, ...) {
+  if (m) {
+    va_list  ap;
+    char    *buf;
+    long     need = 0;
+    ssize_t  have = 0;
+
+    va_start(ap, m);
+    buf = Util_formatString(m, ap, &need);
+    va_end(ap);
+
+    have = (*b).bufsize - (*b).bufused;
+    if (have <= need) {
+      (*b).bufsize += (need + STRLEN);
+      (*b).buf = xresize((*b).buf, (*b).bufsize);
+      if (! (*b).bufused)
+        memset((*b).buf, 0, (*b).bufsize);
+    }
+    memcpy(&(*b).buf[(*b).bufused], buf, need);
+    (*b).bufused += need;
+    (*b).buf[(*b).bufused]= 0;
+    FREE(buf);
   }
 }
 

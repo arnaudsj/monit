@@ -272,6 +272,14 @@ Sigfunc *signal(int signo, Sigfunc * func);
 typedef char MD_T[MD_SIZE];
 
 
+/** Defines an string buffer object */
+typedef struct mybuffer {
+  char          *buf;                               /**< String buffer       */
+  size_t         bufsize;                           /**< String buffer size  */
+  size_t         bufused;                           /**< String buffer usage */
+} Buffer_T;
+
+
 /**
  * Defines a Command with ARGMAX optional arguments. The arguments
  * array must be NULL terminated and the first entry is the program
@@ -506,6 +514,14 @@ typedef struct myicmp {
 } *Icmp_T;
 
 
+typedef struct myservicegroup {
+  char *name;                                     /**< name of service group */
+
+  /** For internal use */
+  struct myservicegroup *next;            /**< next service group in chain   */
+} *ServiceGroup_T;
+
+
 typedef struct mydependant {
   char *dependant;                           /**< name of dependant service  */
 
@@ -676,7 +692,6 @@ typedef struct myservice {
 
   /** Common parameters */
   char *name;                                  /**< Service descriptive name */
-  char *group;                                       /**< Service group name */
   int (*check)(struct myservice *);       /**< Service verification function */
   int  type;                                     /**< Monitored service type */
   int  monitor;                                      /**< Monitor state flag */
@@ -691,6 +706,7 @@ typedef struct myservice {
   Command_T start;                    /**< The start command for the service */
   Command_T stop;                      /**< The stop command for the service */
 
+  ServiceGroup_T servicegrouplist;                  /**< Service groups list */
   Dependant_T dependantlist;                     /**< Dependant service list */
   Mail_T      maillist;                  /**< Alert notification mailinglist */
 

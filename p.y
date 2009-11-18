@@ -200,6 +200,7 @@
   static void  addmail(char *, Mail_T, Mail_T *, unsigned int, unsigned int);
   static void  createservice(int, char *, char *, int (*)(Service_T));
   static void  adddependant(char *);
+  static void  addservicegroup(char *);
   static void  addport(Port_T);
   static void  addresource(Resource_T);
   static void  addtimestamp(Timestamp_T, int);
@@ -1269,7 +1270,7 @@ mode            : MODE ACTIVE  {
                   }
                 ;
 
-group           : GROUP STRINGNAME { current->group = $2; }
+group           : GROUP STRINGNAME { addservicegroup($2); }
                 ;
 
 
@@ -1968,6 +1969,25 @@ static void addservice(Service_T s) {
     servicelist_conf = n;
   }
   tail = n;
+}
+
+
+/* 
+ * Add entry to the current service group list
+ *
+ */
+static void addservicegroup(char *name) {
+  ServiceGroup_T sg;
+
+  ASSERT(name);
+ 
+  NEW(sg);
+ 
+  if (current->servicegrouplist != NULL)
+    sg->next = current->servicegrouplist;
+
+  sg->name = name;
+  current->servicegrouplist = sg;
 }
 
 

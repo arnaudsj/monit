@@ -700,6 +700,7 @@ static void handle_run(HttpRequest req, HttpResponse res) {
 static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
   Dependant_T d;
   ActionRate_T ar;
+  ServiceGroup_T sg;
   char *status;
   char time[STRLEN];
 
@@ -735,10 +736,8 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
     "<tr><td>Status</td><td>%s</td></tr>", status);
   FREE(status);
 
-  if(s->group)
-    out_print(res,
-      "<tr><td>Group</td><td><font color='#0000ff'>%s</font></td></tr>",
-      s->group);
+  for (sg = s->servicegrouplist; sg; sg = sg->next)
+    out_print(res, "<tr><td>Group</td><td><font color='#0000ff'>%s</font></td></tr>", sg->name);
 
   out_print(res,
     "<tr><td>Monitoring mode</td><td>%s</td></tr>", modenames[s->mode]);

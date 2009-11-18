@@ -66,19 +66,12 @@
 
 /* ------------------------------------------------------------- Definitions */
 
-
-/** Defines an output buffer object */
-typedef struct mybuffer {
-  char          *buf;                               /**< Output buffer       */
-  size_t         bufsize;                           /**< Output buffer size  */
-  size_t         bufused;                           /**< Output buffer usage */
-} Buffer_T;
-
 /** Group names cache */
 typedef struct grouplist {
   char *name;
   struct grouplist *next;
 } *Grouplist_T;
+
 
 /* -------------------------------------------------------------- Prototypes */
 
@@ -87,7 +80,6 @@ static void document_head(Buffer_T *);
 static void document_foot(Buffer_T *);
 static void status_service(Service_T, Buffer_T *, short);
 static void status_event(Event_T, Buffer_T *);
-static void buf_print(Buffer_T *, const char *, ...);
 
 
 /* ------------------------------------------------------------------ Public */
@@ -102,7 +94,6 @@ static void buf_print(Buffer_T *, const char *, ...);
 *  the memory.
  */
 char *status_xml(Event_T E, short L) {
-
   Buffer_T  B;
   Service_T S;
 
@@ -110,17 +101,12 @@ char *status_xml(Event_T E, short L) {
 
   document_head(&B);
 
-  if(E)
-  {
+  if(E) {
     /* there is no use for status level in the event (at least now) */
     status_event(E, &B);
-  }
-  else
-  {
+  } else {
     for(S = servicelist_conf; S; S = S->next_conf)
-    {
       status_service(S, &B, L);
-    }
   }
   document_foot(&B);
 
@@ -138,7 +124,7 @@ char *status_xml(Event_T E, short L) {
  */
 static void document_head(Buffer_T *B) {
 
-  buf_print(B,
+  Util_stringbuffer(B,
    "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
    "<monit>"
    "<server>"
@@ -160,7 +146,7 @@ static void document_head(Buffer_T *B) {
    Run.controlfile ? Run.controlfile : "");
 
   if(Run.dohttpd) {
-    buf_print(B,
+    Util_stringbuffer(B,
       "<httpd>"
       "<address>%s</address>"
       "<port>%d</port>"
@@ -171,7 +157,7 @@ static void document_head(Buffer_T *B) {
       Run.httpdssl);
   }
  
-  buf_print(B,
+  Util_stringbuffer(B,
      "</server>"
      "<platform>"
      "<name>%s</name>"
@@ -197,7 +183,7 @@ static void document_head(Buffer_T *B) {
  */
 static void document_foot(Buffer_T *B) {
 
-  buf_print(B, "</monit>");
+  Util_stringbuffer(B, "</monit>");
 
 }
 
@@ -209,8 +195,9 @@ static void document_foot(Buffer_T *B) {
  * @param L Status information level
  */
 static void status_service(Service_T S, Buffer_T *B, short L) {
+  ServiceGroup_T sg;
   Event_T E = S->eventlist;
-  buf_print(B,
+  Util_stringbuffer(B,
 	    "<service type=\"%d\">"
 	    "<collected_sec>%ld</collected_sec>"
 	    "<collected_usec>%ld</collected_usec>"
@@ -219,8 +206,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 	    "<status_hint>%llu</status_hint>"
 	    "<monitor>%d</monitor>"
 	    "<monitormode>%d</monitormode>"
-	    "<pendingaction>%d</pendingaction>"
-	    "<group>%s</group>",
+	    "<pendingaction>%d</pendingaction>",
 	    S->type,
 	    S->collected.tv_sec,
 	    S->collected.tv_usec,
@@ -229,12 +215,19 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 	    S->error_hint,
 	    S->monitor,
 	    S->mode,
-	    S->doaction,
-	    S->group?S->group:"");
+	    S->doaction);
+
+  if (S->servicegrouplist) {
+    Util_stringbuffer(B, "<servicegroup>");
+    for (sg = S->servicegrouplist; sg; sg = sg->next)
+      Util_stringbuffer(B, "<name>%s</name>", sg->name);
+    Util_stringbuffer(B, "</servicegroup>");
+  }
+
   /* if the service is in error state, display first active error message to provide more details */
   while (E) {
     if ((E->state == STATE_FAILED || E->state == STATE_CHANGED) && (S->error & E->id) && E->message) {
-       buf_print(B, "<status_message>%s</status_message>", E->message);
+       Util_stringbuffer(B, "<status_message>%s</status_message>", E->message);
        break;
     }
     E = E->next;
@@ -246,7 +239,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
          S->type == TYPE_DIRECTORY ||
          S->type == TYPE_FIFO ||
          S->type == TYPE_FILESYSTEM) {
-        buf_print(B,
+        Util_stringbuffer(B,
   		"<mode>%o</mode>"
   		"<uid>%d</uid>"
   		"<gid>%d</gid>",
@@ -257,22 +250,22 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
       if(S->type == TYPE_FILE ||
          S->type == TYPE_FIFO ||
          S->type == TYPE_DIRECTORY)  {
-        buf_print(B,
+        Util_stringbuffer(B,
   		"<timestamp>%ld</timestamp>",
   		(long)S->inf->timestamp);
       }
       if(S->type == TYPE_FILE) {
-        buf_print(B,
+        Util_stringbuffer(B,
   		"<size>%llu</size>",
   		(unsigned long long) S->inf->st_size);
         if(S->checksum) {
-          buf_print(B,
+          Util_stringbuffer(B,
   		  "<checksum type=\"%s\">%s</checksum>",
   		  checksumnames[S->checksum->type], S->inf->cs_sum);
         }
       }
       if(S->type == TYPE_FILESYSTEM) {
-        buf_print(B,
+        Util_stringbuffer(B,
   		"<flags>%ld</flags>"
   		"<block>"
   		"<percent>%.1f</percent>"
@@ -284,7 +277,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
   		(float)S->inf->space_total / (float)1048576 * (float)S->inf->f_bsize,
                 (float)S->inf->f_blocks / (float)1048576 * (float)S->inf->f_bsize);
         if(S->inf->f_files > 0) {
-          buf_print(B,
+          Util_stringbuffer(B,
   		  "<inode>"
                   "<percent>%.1f</percent>"
                   "<usage>%ld</usage>"
@@ -296,7 +289,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
         }
       }
       if(S->type == TYPE_PROCESS) {
-        buf_print(B,
+        Util_stringbuffer(B,
   		"<pid>%d</pid>"
   		"<ppid>%d</ppid>"
   		"<uptime>%ld</uptime>",
@@ -304,7 +297,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
   		S->inf->ppid,
   		(long)S->inf->uptime);
         if(Run.doprocess) {
-          buf_print(B,
+          Util_stringbuffer(B,
   		  "<children>%d</children>"
   		  "<memory>"
   		  "<percent>%.1f</percent>"
@@ -328,7 +321,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
       if(S->type == TYPE_HOST && S->icmplist) {
         Icmp_T i;
         for(i= S->icmplist; i; i= i->next) {
-          buf_print(B,
+          Util_stringbuffer(B,
   		  "<icmp>"
   		  "<type>%s</type>"
   		  "<responsetime>%.3f</responsetime>"
@@ -341,7 +334,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
         Port_T p;
         for(p= S->portlist; p; p= p->next) {
           if(p->family == AF_INET) {
-            buf_print(B,
+            Util_stringbuffer(B,
   		    "<port>"
   		    "<hostname>%s</hostname>"
   		    "<portnumber>%d</portnumber>"
@@ -358,7 +351,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
   		    p->is_available?p->response:-1.);
   	  
           } else if(p->family == AF_UNIX) {
-            buf_print(B,
+            Util_stringbuffer(B,
   		    "<unix>"
 		    "<path>%s</path>"
 		    "<protocol>%s</protocol>"
@@ -371,7 +364,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
         }
       }
       if(S->type == TYPE_SYSTEM && Run.doprocess) {
-				buf_print(B,
+				Util_stringbuffer(B,
 					"<system>"
 					"<load>"
 					"<avg01>%.2f</avg01>"
@@ -403,7 +396,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
       }
     }
   }
-  buf_print(B, "</service>");
+  Util_stringbuffer(B, "</service>");
 }
 
 
@@ -413,8 +406,8 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
  * @param B Buffer object
  */
 static void status_event(Event_T E, Buffer_T *B) {
-
   Service_T s;
+  ServiceGroup_T sg;
   Grouplist_T g;
   Grouplist_T glist = NULL;
   struct timeval *tv;
@@ -424,26 +417,28 @@ static void status_event(Event_T E, Buffer_T *B) {
   tv = Event_get_collected(E);
 
   if (Event_get_id(E) == EVENT_INSTANCE) {
-    buf_print(B, "<list>");
+    Util_stringbuffer(B, "<list>");
     for (s = servicelist_conf; s && s->name && *s->name; s = s->next_conf) {
-      buf_print(B, "<service>%s</service>", s->name);
-      if (s->group && *s->group) {
-        for (g = glist; g; g = g->next) {
-          if (IS(g->name, s->group))
-            break;
-        }
-        if (! g) {
-          buf_print(B, "<group>%s</group>", s->group);
-          NEW(g);
-          g->name = xstrdup(s->group);
-          g->next = glist;
-          if (! glist)
-            NEW(glist);
-          glist = g;
+      Util_stringbuffer(B, "<service>%s</service>", s->name);
+      if (s->servicegrouplist) {
+        for (sg = s->servicegrouplist; sg; sg = sg->next) {
+          for (g = glist; g; g = g->next) {
+            if (IS(g->name, sg->name))
+              break;
+          }
+          if (! g) {
+            Util_stringbuffer(B, "<group>%s</group>", sg->name);
+            NEW(g);
+            g->name = xstrdup(sg->name);
+            g->next = glist;
+            if (! glist)
+              NEW(glist);
+            glist = g;
+          }
         }
       }
     }
-    buf_print(B, "</list>");
+    Util_stringbuffer(B, "</list>");
     for (g = glist; g; g = glist) {
       glist = g->next;
       FREE(g->name);
@@ -453,7 +448,7 @@ static void status_event(Event_T E, Buffer_T *B) {
 
   s = Event_get_source(E);
 
-  buf_print(B,
+  Util_stringbuffer(B,
     "<event>"
     "<collected_sec>%ld</collected_sec>"
     "<collected_usec>%ld</collected_usec>"
@@ -474,46 +469,12 @@ static void status_event(Event_T E, Buffer_T *B) {
     Event_get_action(E),
     Event_get_message(E));
   if (s->token) {
-    buf_print(B,
+    Util_stringbuffer(B,
       "<token>%s</token>",
       s->token);
   }
-  buf_print(B,
+  Util_stringbuffer(B,
     "</event>");
 }
 
-
-/**
- * Prints a string into the given buffer.
- * @param B Buffer object
- * @param m A formated string to be written to the buffer
- */
-static void buf_print(Buffer_T *B, const char *m, ...) {
-  if(m)
-  {
-    va_list  ap;
-    char    *buf;
-    long     need= 0;
-    ssize_t  have= 0;
-
-    va_start(ap, m);
-    buf = Util_formatString(m, ap, &need);
-    va_end(ap);
-
-    have = (*B).bufsize - (*B).bufused;
-    if(have <= need)
-    {
-      (*B).bufsize += (need + STRLEN);
-      (*B).buf = xresize((*B).buf, (*B).bufsize);
-      if(!(*B).bufused)
-      {
-        memset((*B).buf, 0, (*B).bufsize);
-      }
-    }
-    memcpy(&(*B).buf[(*B).bufused], buf, need);
-    (*B).bufused += need;
-    (*B).buf[(*B).bufused]= 0;
-    FREE(buf);
-  }
-}
 

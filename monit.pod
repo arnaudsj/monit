@@ -440,6 +440,12 @@ Note:
 the I<status> and I<summary> commands don't support the -g
 option and will print the state of all services.
 
+Service can be added to multiple groups by adding group statement
+multiple times:
+
+  group www
+  group filesystem
+
 
 =head1 MONITORING MODE
 
