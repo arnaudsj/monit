@@ -105,7 +105,6 @@ static void  do_reinit();           /* Re-initialize the runtime application */
 static void  do_action(char **);         /* Dispatch to the submitted action */
 static void  do_exit();                                    /* Finalize monit */
 static void  do_default();                              /* Do default action */
-static int   ismember(ServiceGroup_T, char *);     /* Check group membership */
 static void  handle_options(int, char **);         /* Handle program options */
 static void  help();                 /* Print program help message to stdout */
 static void  version();                         /* Print version information */
@@ -121,6 +120,7 @@ char   *prog;                                  /**< The Name of this Program */
 struct myrun Run;                      /**< Struct holding runtime constants */
 Service_T servicelist;                /**< The service list (created in p.y) */
 Service_T servicelist_conf;   /**< The service list in conf file (c. in p.y) */
+ServiceGroup_T servicegrouplist;/**< The service group list (created in p.y) */
 SystemInfo_T systeminfo;                              /**< System infomation */
 
 
@@ -357,14 +357,27 @@ static void do_action(char **args) {
       int errors = 0;
       int (*_control_service)(const char *, const char *) = exist_daemon() ? control_service_daemon : control_service_string;
 
-      if (Run.mygroup || IS(service, "all")) {
+      if (Run.mygroup) {
+        ServiceGroup_T sg = NULL;
+
+        for (sg = servicegrouplist; sg; sg = sg->next) {
+          if (! strcasecmp(Run.mygroup, sg->name)) {
+            ServiceGroupMember_T sgm = NULL;
+
+            for (sgm = sg->members; sgm; sgm = sgm->next)
+              if (! _control_service(sgm->name, action))
+                errors++;
+
+            break;
+          }
+        }
+      } else if (IS(service, "all")) {
         Service_T s = NULL;
 
         for (s = servicelist; s; s = s->next) {
           if (s->visited)
             continue;
-          if (!Run.mygroup || ismember(s->servicegrouplist, Run.mygroup))
-            if (! _control_service(s->name, action))
+          if (! _control_service(s->name, action))
               errors++;
         }
       } else {
@@ -491,18 +504,6 @@ static void do_default() {
   } else {
     validate();
   }
-}
-
-
-/**
- * Check if group is in given grouplist
- */
-static int ismember(ServiceGroup_T sg, char *name) {
-  ServiceGroup_T g;
-  for (g = sg; g; g = g->next)
-    if (IS(name, g->name))
-      return TRUE;
-  return FALSE;
 }
 
 

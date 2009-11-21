@@ -47,6 +47,8 @@
 /* Private prototypes */
 static void _gc_service_list(Service_T *);
 static void _gc_service(Service_T *);
+static void _gc_servicegroup(ServiceGroup_T *);
+static void _gc_servicegroup_member(ServiceGroupMember_T *);
 static void _gc_mail_server(MailServer_T *);
 static void _gcppl(Port_T *);
 static void _gcfilesystem(Filesystem_T *);
@@ -69,7 +71,6 @@ static void _gcath(Auth_T *);
 static void _gc_mmonit(Mmonit_T *);
 static void _gc_url(URL_T *);
 static void _gc_request(Request_T *);
-static void _gc_servicegroup(ServiceGroup_T *);
 
 
 /**
@@ -98,6 +99,9 @@ void gc() {
   
   if(servicelist)
     _gc_service_list(&servicelist);
+  
+  if(servicegrouplist)
+    _gc_servicegroup(&servicegrouplist);
   
   if(Run.credentials)
     _gcath(&Run.credentials);
@@ -166,7 +170,6 @@ void gc_event(Event_T *e) {
 
   (*e)->action= NULL;
   FREE((*e)->source);
-  FREE((*e)->group);
   FREE((*e)->message);
   FREE(*e);
 
@@ -279,9 +282,6 @@ static void _gc_service(Service_T *s) {
   if((*s)->eventlist)
     gc_event(&(*s)->eventlist);
 
-  if((*s)->servicegrouplist)
-    _gc_servicegroup(&(*s)->servicegrouplist);
-  
   FREE((*s)->token);
   FREE((*s)->name);
   FREE((*s)->path);
@@ -294,6 +294,31 @@ static void _gc_service(Service_T *s) {
 
 }
   
+
+static void _gc_servicegroup(ServiceGroup_T *sg) {
+  ASSERT(sg && *sg);
+
+  if((*sg)->next)
+    _gc_servicegroup(&(*sg)->next);
+
+  if((*sg)->members)
+    _gc_servicegroup_member(&(*sg)->members);
+  FREE((*sg)->name);
+  FREE(*sg);
+}
+
+
+static void _gc_servicegroup_member(ServiceGroupMember_T *m) {
+  ASSERT(m && *m);
+
+  if((*m)->next)
+    _gc_servicegroup_member(&(*m)->next);
+
+  FREE((*m)->name);
+  FREE(*m);
+}
+
+
 static void _gc_request(Request_T *r) {
   
   ASSERT(r);
@@ -617,17 +642,6 @@ static void _gc_mmonit(Mmonit_T *recv) {
   FREE((*recv)->ssl.certmd5);
   FREE(*recv);
 
-}
-
-
-static void _gc_servicegroup(ServiceGroup_T *sg) {
-  ASSERT(sg && *sg);
-
-  if((*sg)->next)
-    _gc_servicegroup(&(*sg)->next);
-
-  FREE((*sg)->name);
-  FREE(*sg);
 }
 
 

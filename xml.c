@@ -64,15 +64,6 @@
  */
 
 
-/* ------------------------------------------------------------- Definitions */
-
-/** Group names cache */
-typedef struct grouplist {
-  char *name;
-  struct grouplist *next;
-} *Grouplist_T;
-
-
 /* -------------------------------------------------------------- Prototypes */
 
 
@@ -195,7 +186,6 @@ static void document_foot(Buffer_T *B) {
  * @param L Status information level
  */
 static void status_service(Service_T S, Buffer_T *B, short L) {
-  ServiceGroup_T sg;
   Event_T E = S->eventlist;
   Util_stringbuffer(B,
 	    "<service type=\"%d\">"
@@ -216,13 +206,6 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 	    S->monitor,
 	    S->mode,
 	    S->doaction);
-
-  if (S->servicegrouplist) {
-    Util_stringbuffer(B, "<servicegroup>");
-    for (sg = S->servicegrouplist; sg; sg = sg->next)
-      Util_stringbuffer(B, "<name>%s</name>", sg->name);
-    Util_stringbuffer(B, "</servicegroup>");
-  }
 
   /* if the service is in error state, display first active error message to provide more details */
   while (E) {
@@ -408,8 +391,7 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 static void status_event(Event_T E, Buffer_T *B) {
   Service_T s;
   ServiceGroup_T sg;
-  Grouplist_T g;
-  Grouplist_T glist = NULL;
+  ServiceGroupMember_T sgm;
   struct timeval *tv;
 
   ASSERT(E);
@@ -418,32 +400,15 @@ static void status_event(Event_T E, Buffer_T *B) {
 
   if (Event_get_id(E) == EVENT_INSTANCE) {
     Util_stringbuffer(B, "<list>");
-    for (s = servicelist_conf; s && s->name && *s->name; s = s->next_conf) {
+    for (s = servicelist_conf; s && s->name && *s->name; s = s->next_conf)
       Util_stringbuffer(B, "<service>%s</service>", s->name);
-      if (s->servicegrouplist) {
-        for (sg = s->servicegrouplist; sg; sg = sg->next) {
-          for (g = glist; g; g = g->next) {
-            if (IS(g->name, sg->name))
-              break;
-          }
-          if (! g) {
-            Util_stringbuffer(B, "<group>%s</group>", sg->name);
-            NEW(g);
-            g->name = xstrdup(sg->name);
-            g->next = glist;
-            if (! glist)
-              NEW(glist);
-            glist = g;
-          }
-        }
-      }
+    for (sg = servicegrouplist; sg; sg = sg->next) {
+      Util_stringbuffer(B, "<group name=\"%s\">", sg->name);
+      for (sgm = sg->members; sgm; sgm = sgm->next)
+        Util_stringbuffer(B, "<service>%s</service>", sgm->name);
+      Util_stringbuffer(B, "</group>");
     }
     Util_stringbuffer(B, "</list>");
-    for (g = glist; g; g = glist) {
-      glist = g->next;
-      FREE(g->name);
-      FREE(g);
-    }
   }
 
   s = Event_get_source(E);
@@ -454,7 +419,6 @@ static void status_event(Event_T E, Buffer_T *B) {
     "<collected_usec>%ld</collected_usec>"
     "<service>%s</service>"
     "<type>%d</type>"
-    "<group>%s</group>"
     "<id>%d</id>"
     "<state>%d</state>"
     "<action>%d</action>"
@@ -463,7 +427,6 @@ static void status_event(Event_T E, Buffer_T *B) {
     tv->tv_usec,
     Event_get_id(E) == EVENT_INSTANCE ? "Monit" : Event_get_source_name(E),
     Event_get_source_type(E),
-    Event_get_source_group(E),
     Event_get_id(E),
     Event_get_state(E),
     Event_get_action(E),
@@ -476,5 +439,4 @@ static void status_event(Event_T E, Buffer_T *B) {
   Util_stringbuffer(B,
     "</event>");
 }
-
 

@@ -514,19 +514,28 @@ typedef struct myicmp {
 } *Icmp_T;
 
 
-typedef struct myservicegroup {
-  char *name;                                     /**< name of service group */
+typedef struct myservicegroupmember {
+  char *name;                                           /**< name of service */
 
   /** For internal use */
-  struct myservicegroup *next;            /**< next service group in chain   */
+  struct myservicegroupmember *next;              /**< next service in chain */
+} *ServiceGroupMember_T;
+
+
+typedef struct myservicegroup {
+  char *name;                                     /**< name of service group */
+  struct myservicegroupmember *members;           /**< Service group members */
+
+  /** For internal use */
+  struct myservicegroup *next;              /**< next service group in chain */
 } *ServiceGroup_T;
 
 
 typedef struct mydependant {
-  char *dependant;                           /**< name of dependant service  */
+  char *dependant;                            /**< name of dependant service */
 
   /** For internal use */
-  struct mydependant *next;           /**< next dependant service in chain   */
+  struct mydependant *next;             /**< next dependant service in chain */
 } *Dependant_T;
 
 
@@ -706,7 +715,6 @@ typedef struct myservice {
   Command_T start;                    /**< The start command for the service */
   Command_T stop;                      /**< The stop command for the service */
 
-  ServiceGroup_T servicegrouplist;                  /**< Service groups list */
   Dependant_T dependantlist;                     /**< Dependant service list */
   Mail_T      maillist;                  /**< Alert notification mailinglist */
 
@@ -750,11 +758,10 @@ typedef struct myservice {
 
   /** Events */
   struct myevent {
-    #define           EVENT_VERSION  2      /**< The event structure version */
+    #define           EVENT_VERSION  3      /**< The event structure version */
     int               id;                      /**< The event identification */
     struct timeval    collected;                 /**< When the event occured */
     char             *source;                 /**< Event source service name */
-    char             *group;                         /**< Service group name */
     int               mode;             /**< Monitoring mode for the service */
     int               type;                      /**< Monitored service type */
     short             state;         /**< TRUE if failed, FALSE if succeeded */
@@ -859,6 +866,7 @@ extern char          *prog;
 extern struct myrun   Run;
 extern Service_T      servicelist;
 extern Service_T      servicelist_conf;
+extern ServiceGroup_T servicegrouplist;
 extern SystemInfo_T   systeminfo;
 extern ProcessTree_T *ptree;     
 extern int            ptreesize;    

@@ -112,14 +112,6 @@ char *Event_get_source_name(Event_T E);
 
 
 /**
- * Get the group name of the service where the event orginated
- * @param E An event object
- * @return The group name of the service where the event orginated
- */
-char *Event_get_source_group(Event_T E);
-
-
-/**
  * Get the service type of the service where the event orginated
  * @param E An event object
  * @return The service type of the service where the event orginated

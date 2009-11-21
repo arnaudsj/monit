@@ -113,7 +113,6 @@ static void handle_event(Event_T);
 static void handle_action(Event_T, Action_T);
 static void Event_queue_add(Event_T);
 static void Event_queue_update(Event_T, const char *);
-static char *getservicegroups(ServiceGroup_T);
 
 
 /* ------------------------------------------------------------------ Public */
@@ -148,7 +147,6 @@ void Event_post(Service_T service, long id, short state, EventAction_T action, c
     e->id = id;
     gettimeofday(&e->collected, NULL);
     e->source = xstrdup(service->name);
-    e->group = getservicegroups(service->servicegrouplist);
     e->mode = service->mode;
     e->type = service->type;
     e->state = STATE_INIT;
@@ -206,7 +204,6 @@ void Event_post(Service_T service, long id, short state, EventAction_T action, c
       e->id = id;
       gettimeofday(&e->collected, NULL);
       e->source = xstrdup(service->name);
-      e->group = getservicegroups(service->servicegrouplist);
       e->mode = service->mode;
       e->type = service->type;
       e->state = STATE_INIT;
@@ -266,17 +263,6 @@ Service_T Event_get_source(Event_T E) {
 char *Event_get_source_name(Event_T E) {
   ASSERT(E);
   return (E->source);
-}
-
-
-/**
- * Get the group name of the service where the event orginated
- * @param E An event object
- * @return The group name of the service where the event orginated
- */
-char *Event_get_source_group(Event_T E) {
-  ASSERT(E);
-  return (E->group);
 }
 
 
@@ -541,19 +527,15 @@ void Event_queue_process() {
       if (!(e->source = File_readQueue(file, &size)))
         goto error4;
 
-      /* read group */
-      if (!(e->group = File_readQueue(file, &size)))
-        goto error5;
-
       /* read message */
       if (!(e->message = File_readQueue(file, &size)))
-        goto error6;
+        goto error5;
 
       /* read event action */
       if (!(action = File_readQueue(file, &size)))
-        goto error7;
+        goto error6;
       if (size != sizeof(short))
-        goto error8;
+        goto error7;
       a->id = *action;
       if (e->state == STATE_FAILED)
         ea->failed = a;
@@ -605,12 +587,10 @@ void Event_queue_process() {
         Event_queue_update(e, file_name);
       }
 
-error8:
-      FREE(action);
 error7:
-      FREE(e->message);
+      FREE(action);
 error6:
-      FREE(e->group);
+      FREE(e->message);
 error5:
       FREE(e->source);
 error4:
@@ -793,10 +773,6 @@ static void Event_queue_add(Event_T E) {
   if (!(rv = File_writeQueue(file, E->source, E->source ? strlen(E->source)+1 : 0)))
     goto error;
 
-  /* write group */
-  if (!(rv = File_writeQueue(file, E->group, E->group ? strlen(E->group)+1 : 0)))
-    goto error;
-
   /* write message */
   if (!(rv = File_writeQueue(file, E->message, E->message ? strlen(E->message)+1 : 0)))
     goto error;
@@ -865,10 +841,6 @@ static void Event_queue_update(Event_T E, const char *file_name) {
   if (!(rv = File_writeQueue(file, E->source, E->source ? strlen(E->source)+1 : 0)))
     goto error;
 
-  /* write group */
-  if (!(rv = File_writeQueue(file, E->group, E->group ? strlen(E->group)+1 : 0)))
-    goto error;
-
   /* write message */
   if (!(rv = File_writeQueue(file, E->message, E->message ? strlen(E->message)+1 : 0)))
     goto error;
@@ -886,25 +858,5 @@ static void Event_queue_update(Event_T E, const char *file_name) {
   }
 
   return;
-}
-
-
-static char *getservicegroups(ServiceGroup_T sg) {
-  char *rv = NULL;
-
-  if (sg) {
-    Buffer_T b;
-    ServiceGroup_T g;
-
-    memset(&b, 0, sizeof(Buffer_T));
-    Util_stringbuffer(&b, "<servicegroup>");
-    for (g = sg; g; g = g->next)
-      Util_stringbuffer(&b, "<name>%s</name>", g->name);
-    Util_stringbuffer(&b, "</servicegroup>");
-    rv = b.buf;
-  } else {
-    rv = xstrdup("");
-  }
-  return rv;
 }
 

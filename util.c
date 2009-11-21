@@ -749,7 +749,7 @@ void Util_printRunList() {
  * @param p A Service_T object
  */
 void Util_printService(Service_T s) {
-  
+  int sgheader = FALSE;
   Port_T n;
   Icmp_T i;
   Mail_T r;
@@ -761,6 +761,7 @@ void Util_printService(Service_T s) {
   Match_T ml;
   Dependant_T d;
   ServiceGroup_T sg;
+  ServiceGroupMember_T sgm;
   char string[STRLEN];
   char ratio1[STRLEN];
   char ratio2[STRLEN];
@@ -770,15 +771,19 @@ void Util_printService(Service_T s) {
   snprintf(string, STRLEN, "%s Name", servicetypes[s->type]);
   printf("%-21s = %s\n", string, s->name);
 
-  if (s->servicegrouplist) {
-    for (sg = s->servicegrouplist; sg; sg = sg->next) {
-      if (sg == s->servicegrouplist)
-        printf(" %-20s = %s", "Group", sg->name);
-      else
-        printf(", %s", sg->name);
+  for (sg = servicegrouplist; sg; sg = sg->next) {
+    for (sgm = sg->members; sgm; sgm = sgm->next) {
+      if (! strcasecmp(sgm->name, s->name)) {
+        if (! sgheader) {
+          printf(" %-20s = %s", "Group", sg->name);
+          sgheader = TRUE;
+        } else
+          printf(", %s", sg->name);
+      }
     }
-    printf("\n");
   }
+  if (sgheader)
+    printf("\n");
 
   if(s->type == TYPE_PROCESS)
     printf(" %-20s = %s\n", "Pid file", s->path);

@@ -1270,7 +1270,7 @@ mode            : MODE ACTIVE  {
                   }
                 ;
 
-group           : GROUP STRINGNAME { addservicegroup($2); }
+group           : GROUP STRINGNAME { addservicegroup($2); FREE($2);}
                 ;
 
 
@@ -1973,21 +1973,30 @@ static void addservice(Service_T s) {
 
 
 /* 
- * Add entry to the current service group list
- *
+ * Add entry to service group list
  */
 static void addservicegroup(char *name) {
-  ServiceGroup_T sg;
+  ServiceGroup_T g;
+  ServiceGroupMember_T m;
 
   ASSERT(name);
  
-  NEW(sg);
- 
-  if (current->servicegrouplist != NULL)
-    sg->next = current->servicegrouplist;
+  /* Check if service group with the same name is defined already */
+  for (g = servicegrouplist; g; g = g->next)
+    if (! strcasecmp(g->name, name))
+      break;
 
-  sg->name = name;
-  current->servicegrouplist = sg;
+  if (! g) {
+    NEW(g);
+    g->name = xstrdup(name);
+    g->next = servicegrouplist;
+    servicegrouplist = g;
+  }
+
+  NEW(m);
+  m->name = xstrdup(current->name);
+  m->next = g->members;
+  g->members = m;
 }
 
 
