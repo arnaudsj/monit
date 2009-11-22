@@ -363,7 +363,7 @@ init' statement in monit's control file or use the -I option from
 the command line and here is what you must add to /etc/inittab:
 
   # Run Monit in standard run-levels
-  mo:2345:respawn:/usr/local/bin/Monit -Ic /etc/monitrc
+  mo:2345:respawn:/usr/local/bin/monit -Ic /etc/monitrc
 
 After you have modified init's configuration file, you can run
 the following command to re-examine /etc/inittab and start monit:
