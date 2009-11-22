@@ -422,7 +422,7 @@ init' statement in monit's control file or use the -I option from
 the command line and here is what you must add to /etc/inittab:</p>
 <pre>
   # Run Monit in standard run-levels
-  mo:2345:respawn:/usr/local/bin/Monit -Ic /etc/monitrc</pre>
+  mo:2345:respawn:/usr/local/bin/monit -Ic /etc/monitrc</pre>
 <p>After you have modified init's configuration file, you can run
 the following command to re-examine /etc/inittab and start monit:</p>
 <pre>
