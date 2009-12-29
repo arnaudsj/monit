@@ -1369,7 +1369,7 @@ int Util_isProcessRunning(Service_T s) {
   ASSERT(s);
   
   errno= 0;
-  if((pid= Util_getPid(s->path)) >= 0) {
+  if((pid= Util_getPid(s->path)) > 0) {
     if( (getpgid(pid) > -1) || (errno == EPERM) )
       return pid;
     DEBUG("'%s' Error testing process id [%d] -- %s\n", s->name, pid, STRERROR);

@@ -218,8 +218,6 @@ int check_process(Service_T s) {
 
   /* Test for running process */
   if (!(pid = Util_isProcessRunning(s))) {
-    /* Reset the service info object to prevent false data in the first run */
-    Util_resetInfo(s);
     Event_post(s, EVENT_NONEXIST, STATE_FAILED, s->action_NONEXIST, "process is not running");
     return FALSE;
   } else
