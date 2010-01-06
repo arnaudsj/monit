@@ -92,13 +92,11 @@ char *status_xml(Event_T E, short L) {
 
   document_head(&B);
 
-  if(E) {
-    /* there is no use for status level in the event (at least now) */
+  for (S = servicelist_conf; S; S = S->next_conf)
+    status_service(S, &B, L);
+  if (E)
     status_event(E, &B);
-  } else {
-    for(S = servicelist_conf; S; S = S->next_conf)
-      status_service(S, &B, L);
-  }
+
   document_foot(&B);
 
   return B.buf;
@@ -120,7 +118,7 @@ static void document_head(Buffer_T *B) {
    "<monit>"
    "<server>"
    "<id>%s</id>"
-   "<incarnation>%ld</incarnation>"
+   "<incarnation>%lld</incarnation>"
    "<version>%s</version>"
    "<uptime>%ld</uptime>"
    "<poll>%d</poll>"
@@ -186,7 +184,10 @@ static void document_foot(Buffer_T *B) {
  * @param L Status information level
  */
 static void status_service(Service_T S, Buffer_T *B, short L) {
+  ServiceGroup_T sg;
+  ServiceGroupMember_T sgm;
   Event_T E = S->eventlist;
+
   Util_stringbuffer(B,
 	    "<service type=\"%d\">"
 	    "<collected_sec>%ld</collected_sec>"
@@ -200,17 +201,24 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 	    S->type,
 	    S->collected.tv_sec,
 	    S->collected.tv_usec,
-	    S->name?S->name:"",
+	    S->name ? S->name : "",
 	    S->error,
 	    S->error_hint,
 	    S->monitor,
 	    S->mode,
 	    S->doaction);
 
+  Util_stringbuffer(B, "<groups>");
+  for (sg = servicegrouplist; sg; sg = sg->next)
+    for (sgm = sg->members; sgm; sgm = sgm->next)
+      if (S->name && ! strcasecmp(sgm->name, S->name))
+        Util_stringbuffer(B, "<name>%s</name>", sg->name);
+  Util_stringbuffer(B, "</groups>");
+
   /* if the service is in error state, display first active error message to provide more details */
   while (E) {
     if ((E->state == STATE_FAILED || E->state == STATE_CHANGED) && (S->error & E->id) && E->message) {
-       Util_stringbuffer(B, "<status_message>%s</status_message>", E->message);
+       Util_stringbuffer(B, "<status_message><![CDATA[%s]]></status_message>", E->message);
        break;
     }
     E = E->next;
@@ -390,27 +398,11 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
  */
 static void status_event(Event_T E, Buffer_T *B) {
   Service_T s;
-  ServiceGroup_T sg;
-  ServiceGroupMember_T sgm;
   struct timeval *tv;
 
   ASSERT(E);
 
   tv = Event_get_collected(E);
-
-  if (Event_get_id(E) == EVENT_INSTANCE) {
-    Util_stringbuffer(B, "<list>");
-    for (s = servicelist_conf; s && s->name && *s->name; s = s->next_conf)
-      Util_stringbuffer(B, "<service>%s</service>", s->name);
-    for (sg = servicegrouplist; sg; sg = sg->next) {
-      Util_stringbuffer(B, "<group name=\"%s\">", sg->name);
-      for (sgm = sg->members; sgm; sgm = sgm->next)
-        Util_stringbuffer(B, "<service>%s</service>", sgm->name);
-      Util_stringbuffer(B, "</group>");
-    }
-    Util_stringbuffer(B, "</list>");
-  }
-
   s = Event_get_source(E);
 
   Util_stringbuffer(B,
@@ -422,7 +414,7 @@ static void status_event(Event_T E, Buffer_T *B) {
     "<id>%d</id>"
     "<state>%d</state>"
     "<action>%d</action>"
-    "<message>%s</message>",
+    "<message><![CDATA[%s]]></message>",
     tv->tv_sec,
     tv->tv_usec,
     Event_get_id(E) == EVENT_INSTANCE ? "Monit" : Event_get_source_name(E),

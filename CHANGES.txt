@@ -95,6 +95,8 @@ BUGFIXES:
 
 * Solaris resource usage fix when Monit was compiled with optimizations enabled.
 
+* Fixed #28369: escape XML properly
+
 
 Version 5.0.3
 
