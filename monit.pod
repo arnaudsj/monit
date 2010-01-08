@@ -3760,7 +3760,7 @@ See also http://mmonit.com/monit/who/
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009 by Tildeslash Ltd. All Rights Reserved. This
+Copyright (C) 2010 by Tildeslash Ltd. All Rights Reserved. This
 product is distributed in the hope that it will be useful, but
 WITHOUT any warranty; without even the implied warranty of
 MERCHANTABILITY or FITNESS for a particular purpose.

@@ -1,7 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 # Mark Ferlatte, <ferlatte@cryptio.net>
 #
-# $Id: configure.ac,v 1.194 2009/05/09 10:18:31 martinp Exp $
 
 # autoconf requirement
 AC_PREREQ([2.53])

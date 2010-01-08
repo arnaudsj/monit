@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Tildeslash Ltd. All rights reserved.
+ * Copyright (C) 2010 Tildeslash Ltd. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3.
@@ -97,7 +97,7 @@
 
 #define FOOT_HTML "</center>"\
 "<div align=\"center\" class=\"foot\" style=\"margin:20px auto\">"\
-"Copyright &copy; 2000-2009 <a href=\"http://tildeslash.com/\">Tildeslash</a>. All rights reserved. | "\
+"Copyright &copy; 2000-2010 <a href=\"http://tildeslash.com/\">Tildeslash</a>. All rights reserved. | "\
 "<a href=\"http://mmonit.com/monit/\">Monit web site</a> | "\
 "<a href=\"http://mmonit.com/wiki/\">Monit Wiki</a> | "\
 "<a href=\"http://mmonit.com/\">M/Monit</a>"\

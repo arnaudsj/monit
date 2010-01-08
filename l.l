@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Tildeslash Ltd. All rights reserved.
+ * Copyright (C) 2010 Tildeslash Ltd. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3.
@@ -43,8 +43,6 @@
  *   Christian Hopp, <chopp@iei.tu-clausthal.de>
  *   Martin Pala, <martinp@tildeslash.com>
  *
- *  CVS INFO
- *     $Id: l.l,v 1.139 2009/05/04 21:51:10 martinp Exp $
  */
 
 #include <config.h>

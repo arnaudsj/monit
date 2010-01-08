@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Tildeslash Ltd. All rights reserved.
+ * Copyright (C) 2010 Tildeslash Ltd. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3.
@@ -296,7 +296,7 @@ static void do_about(HttpRequest req, HttpResponse res) {
     "monit " VERSION "</a></center></h1>");
   out_print(res,
     "<ul>"
-    "<li style='padding-bottom:10px;'>Copyright &copy; 2000-2009 by <a "
+    "<li style='padding-bottom:10px;'>Copyright &copy; 2000-2010 by <a "
     "href=\"http://tildeslash.com/\">Tildeslash Ltd"
     "</a>. All Rights Reserved.</li>"
     "<li>Portions of this software are copyright &copy; 1995, 1996 "
