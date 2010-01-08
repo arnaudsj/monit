@@ -1,10 +1,10 @@
 Name: monit
 Summary: Process monitor and restart utility
-Version: 5.0.3
+Version: 5.1
 Release: 1
-Source: http://www.tildeslash.com/monit/dist/%{name}-%{version}.tar.gz
+Source: http://www.mmonit.com/monit/dist/%{name}-%{version}.tar.gz
 Group: Utilities/Console
-URL: http://www.tildeslash.com/monit/
+URL: http://www.mmonit.com/monit/
 BuildRoot: %{_tmppath}/%{name}-buildroot
 License: GPL
 BuildRequires: flex
@@ -58,6 +58,9 @@ fi
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Sat Jan 09 2010 Martin Pala <martinp@tildeslash.com>
+- Upgraded to monit-5.1
+
 * Thu May 28 2009 Martin Pala <martinp@tildeslash.com>
 - Upgraded to monit-5.0.3
 
