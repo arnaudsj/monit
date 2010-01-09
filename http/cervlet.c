@@ -746,9 +746,7 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
     "<tr><td>Monitoring mode</td><td>%s</td></tr>", modenames[s->mode]);
 
   out_print(res,
-    "<tr><td>Monitoring status</td><td><font color='#ff8800'>%s"
-    "</font></td></tr>",
-    monitornames[s->monitor]);
+    "<tr><td>Monitoring status</td><td><font color='#ff8800'>%s</font></td></tr>", monitornames[s->monitor]);
 
   for(d= s->dependantlist; d; d= d->next) {
     if(d->dependant != NULL) {
@@ -2034,7 +2032,7 @@ static void print_service_params_port(HttpResponse res, Service_T s) {
         if(p->family == AF_INET) {
           if(!p->is_available) {
             out_print(res,
-              "<tr><td>Port Response time</font></td><td>"
+              "<tr><td>Port Response time</td><td>"
               "<font color='#ff0000'>connection failed to %s:%d%s [%s via %s]</font>"
               "</td></tr>",
               p->hostname, p->port, p->request?p->request:"",
@@ -2049,7 +2047,7 @@ static void print_service_params_port(HttpResponse res, Service_T s) {
         } else if(p->family == AF_UNIX) {
           if(!p->is_available) {
             out_print(res,
-              "<tr><td>Unix Socket Response time</font></td><td>"
+              "<tr><td>Unix Socket Response time</td><td>"
               "<font color='#ff0000'>connection failed to %s [%s]</font>"
               "</td></tr>",
               p->pathname, p->protocol->name);
@@ -2081,13 +2079,9 @@ static void print_service_params_icmp(HttpResponse res, Service_T s) {
 
       for(i= s->icmplist; i; i= i->next) {
         if(!i->is_available) {
-          out_print(res,
-            "<tr><td>ICMP Response time</font></td><td><font color='#ff0000'>"
-            "connection failed [%s]</font></td></tr>", icmpnames[i->type]);
+          out_print(res, "<tr><td>ICMP Response time</td><td><font color='#ff0000'>connection failed [%s]</font></td></tr>", icmpnames[i->type]);
         } else {
-          out_print(res,
-            "<tr><td>ICMP Response time</td><td>%.3fs [%s]</td></tr>",
-            i->response, icmpnames[i->type]);
+          out_print(res, "<tr><td>ICMP Response time</td><td>%.3fs [%s]</td></tr>", i->response, icmpnames[i->type]);
         }
       }
     }
@@ -2104,7 +2098,7 @@ static void print_service_params_perm(HttpResponse res, Service_T s) {
 
     if(!Util_hasServiceStatus(s)) {
 
-      out_print(res, "<tr><td>Permission</td><td>-</font></td></tr>");
+      out_print(res, "<tr><td>Permission</td><td>-</td></tr>");
 
     } else {
 
@@ -2127,7 +2121,7 @@ static void print_service_params_uid(HttpResponse res, Service_T s) {
 
     if(!Util_hasServiceStatus(s)) {
 
-      out_print(res, "<tr><td>UID</td><td>-</font></td></tr>");
+      out_print(res, "<tr><td>UID</td><td>-</td></tr>");
 
     } else {
 
@@ -2150,7 +2144,7 @@ static void print_service_params_gid(HttpResponse res, Service_T s) {
 
     if(!Util_hasServiceStatus(s)) {
 
-      out_print(res, "<tr><td>GID</td><td>-</font></td></tr>");
+      out_print(res, "<tr><td>GID</td><td>-</td></tr>");
 
     } else {
 
@@ -2172,7 +2166,7 @@ static void print_service_params_timestamp(HttpResponse res, Service_T s) {
 
     if(!Util_hasServiceStatus(s)) {
 
-      out_print(res, "<tr><td>Timestamp</td><td>-</font></td></tr>");
+      out_print(res, "<tr><td>Timestamp</td><td>-</td></tr>");
 
     } else {
 
@@ -2257,7 +2251,7 @@ static void print_service_params_size(HttpResponse res, Service_T s) {
     if(!Util_hasServiceStatus(s)) {
 
       out_print(res,
-        "<tr><td>Size</td><td>-</font></td></tr>");
+        "<tr><td>Size</td><td>-</td></tr>");
 
     } else {
 
@@ -2277,7 +2271,7 @@ static void print_service_params_match(HttpResponse res, Service_T s) {
     if(!Util_hasServiceStatus(s)) {
 
       out_print(res,
-        "<tr><td>Match regex</td><td>-</font></td></tr>");
+        "<tr><td>Match regex</td><td>-</td></tr>");
 
     } else {
 
@@ -2296,7 +2290,7 @@ static void print_service_params_checksum(HttpResponse res, Service_T s) {
 
     if(!Util_hasServiceStatus(s)) {
 
-      out_print(res, "<tr><td>Checksum</td><td>-</font></td></tr>");
+      out_print(res, "<tr><td>Checksum</td><td>-</td></tr>");
 
     } else {
 
