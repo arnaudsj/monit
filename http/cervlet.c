@@ -88,14 +88,20 @@
 #define PING        "/_ping"
 #define GETID       "/_getid"
 #define PIXEL       "/_pixel"
+#define TOP         "/_top"
 #define STATUS      "/_status"
 #define RUN         "/_runtime"
 #define VIEWLOG     "/_viewlog"
 #define DOACTION    "/_doaction"
 
+typedef enum {
+  Img_Pixel = 0,
+  Img_Top
+} Img;
+
 /* Private prototypes */
 static int is_readonly(HttpRequest);
-static void printPixel(HttpResponse);
+static void printImg(HttpResponse, Img);
 static void doGet(HttpRequest, HttpResponse);
 static void doPost(HttpRequest, HttpResponse);
 static void do_home(HttpRequest, HttpResponse);
@@ -223,7 +229,9 @@ static void doGet(HttpRequest req, HttpResponse res) {
   } else if(ACTION(GETID)) {
     do_getid(req, res);
   } else if(ACTION(PIXEL)) {
-    printPixel(res);
+    printImg(res, Img_Pixel);
+  } else if(ACTION(TOP)) {
+    printImg(res, Img_Top);
   } else if(ACTION(STATUS)) {
     print_status(req, res);
   } else if(ACTION(DOACTION)) {
@@ -259,13 +267,9 @@ static void do_home(HttpRequest req, HttpResponse res) {
  
   HEAD("", Run.polltime)
   out_print(res,
-    "<table cellspacing=\"0\" cellpadding=\"5\" width=\"100%%\" border=\"0\">"
-    " <tr bgcolor=\"#BBDDFF\">"
-    "  <td colspan=2 valign=\"top\" align=\"left\" bgcolor=\"#EFF7FF\" width=\"100%%\">"
-    "  <br><h2 align=\"center\">Monit Service Manager</h2>"
-    "  <p align=\"center\">Monit is <a href='_runtime'>running</a> on %s "
-    "  with <i>uptime, %s</i> and monitoring:</p><br>"
-    "  </td>"
+    "<table align=\"center\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\" border=\"0\">"
+    " <tr bgcolor=\"#42AE1C\">"
+    "  <th><a href=\"http://www.mmonit.com\"><img src=\"_top\" heigh=\"90\" border=\"0\"></a></th>"
     " </tr>"
     "</table>"
     "<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%%\" border=\"0\">"
@@ -840,25 +844,27 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
 }
 
 
-static void printPixel(HttpResponse res) {
+static void printImg(HttpResponse res, Img img) {
+  int l;
+  char *src = NULL;
+  char *dst = NULL;
+  Socket_T S = res->S;
 
-  static int l;
-  Socket_T S= res->S;
-  static unsigned char *pixel= NULL;
-  
-  if(! pixel) {
-    pixel= xcalloc(sizeof(unsigned char), strlen(PIXEL_GIF));
-    l= decode_base64(pixel, PIXEL_GIF);
+  switch (img) {
+    case Img_Pixel: src = PIXEL_PNG; break;
+    case Img_Top:   src = TOP_PNG;   break;
+    default:                         return;
   }
-  if (l) {
-    res->is_committed= TRUE;
+  dst = xcalloc(sizeof(char), strlen(src));
+  if ((l = decode_base64((unsigned char *)dst, src))) {
+    res->is_committed = TRUE;
     socket_print(S, "HTTP/1.0 200 OK\r\n");
     socket_print(S, "Content-length: %d\r\n", l);
-    socket_print(S, "Content-Type: image/gif\r\n");
+    socket_print(S, "Content-Type: image/png\r\n");
     socket_print(S, "Connection: close\r\n\r\n");
-    socket_write(S, pixel, l);
+    socket_write(S, dst, l);
   }
-  
+  FREE(dst);
 }
 
 
