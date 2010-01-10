@@ -92,7 +92,8 @@
 
 #define FOOT_HTML "</center>"\
 "<div align=\"center\" class=\"foot\" style=\"margin:20px auto\">"\
-"Copyright &copy; 2000-2010 <a href=\"http://tildeslash.com/\">Tildeslash</a>. All rights reserved. | "\
+"Copyright &copy; 2000-2010 <a href=\"http://tildeslash.com/\">Tildeslash</a>. All rights reserved. "\
+"<span style='margin-left:5px;'></span>"\
 "<a href=\"http://mmonit.com/monit/\">Monit web site</a> | "\
 "<a href=\"http://mmonit.com/wiki/\">Monit Wiki</a> | "\
 "<a href=\"http://mmonit.com/\">M/Monit</a>"\
