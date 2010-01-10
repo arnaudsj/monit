@@ -313,8 +313,7 @@ static void do_about(HttpRequest req, HttpResponse res) {
     "<p style='font-weight: bold; text-align:center; padding-top:30px;'>Please consider making a <a href=\"http://mmonit.com/monit/donate/\">"
     "donation</a> to support our work with Monit.</p>");
   out_print(res,
-    "<center><p style='padding-top:20px;'>[Click <a href=\".\">here</a> to "
-    "go back to Monit]</p></body></html>");
+    "<center><p style='padding-top:20px;'>[<a href=\".\">Back to Monit</a>]</p></body></html>");
 
 }
 
