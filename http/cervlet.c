@@ -310,10 +310,7 @@ static void do_about(HttpRequest req, HttpResponse res) {
     "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
     "<a href='http://www.gnu.org/licenses/gpl.html'>GNU "
     "General Public License</a> for more details.</p>"
-    "<p style='border-top:1px solid #ccc; padding-top:1em;'>"
-    "Running Monit on more than one server? Use <a href='http://mmonit.com/'>"
-    "M/Monit</a> to manage all your Monit instances.</p>"
-    "<p style='font-weight: bold;'>Please consider making a <a href=\"http://mmonit.com/monit/donate/\">"
+    "<p style='font-weight: bold; text-align:center; padding-top:30px;'>Please consider making a <a href=\"http://mmonit.com/monit/donate/\">"
     "donation</a> to support our work with Monit.</p>");
   out_print(res,
     "<center><p style='padding-top:20px;'>[Click <a href=\".\">here</a> to "
