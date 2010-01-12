@@ -354,7 +354,7 @@ Short FAQ:
 
     A: You are most probably running monit on system with security
        restrictions which hides process with PID 1. For example LIDS 
-       and Linux-VServer are optionaly able to do so. Monit can run and 
+       and Linux-VServer are optionally able to do so. Monit can run and 
        work in this environment, but some system or process resource
        statistics may be not available (will show zero as value). You can
        also unhide PID 1 for monit's context and use for example unkillable

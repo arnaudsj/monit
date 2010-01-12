@@ -97,6 +97,10 @@ BUGFIXES:
 
 * Fixed #28369: escape XML properly
 
+* Check service name uniqueness when 'check system' is missing in monitrc and virtual
+  system service with name set to local hostname is added. Thanks to Marcus Muelbuesch
+  for report.
+
 
 Version 5.0.3
 

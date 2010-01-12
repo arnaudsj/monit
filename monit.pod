@@ -1811,7 +1811,7 @@ that the process was replaced.
 For example sshd daemon can restart very quickly, thus if someone
 changes its configuration and do sshd restart outside of Monit's
 control you will be notified that the process was replaced by a
-new instance (or you can optionaly do some other action such as
+new instance (or you can optionally do some other action such as
 preventively stop sshd).
 
 Another example is a MySQL Cluster which has its own watchdog

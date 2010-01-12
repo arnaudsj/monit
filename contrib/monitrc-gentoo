@@ -45,7 +45,7 @@ set daemon  120
 #
 # set eventqueue
 #     basedir /var/monit  # set the base directory where events will be stored
-#     slots 100           # optionaly limit the queue size
+#     slots 100           # optionally limit the queue size
 #
 #
 ## Monit by default uses the following alert mail format:
