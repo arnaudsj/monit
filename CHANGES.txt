@@ -101,6 +101,9 @@ BUGFIXES:
   system service with name set to local hostname is added. Thanks to Marcus Muelbuesch
   for report.
 
+* Fix crash when queued event delivery was retried for service which is no longer
+  configured in Monit.
+
 
 Version 5.0.3
 
