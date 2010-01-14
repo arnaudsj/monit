@@ -403,7 +403,6 @@ static void status_event(Event_T E, Buffer_T *B) {
   ASSERT(E);
 
   tv = Event_get_collected(E);
-  s = Event_get_source(E);
 
   Util_stringbuffer(B,
     "<event>"
@@ -423,11 +422,8 @@ static void status_event(Event_T E, Buffer_T *B) {
     Event_get_state(E),
     Event_get_action(E),
     Event_get_message(E));
-  if (s->token) {
-    Util_stringbuffer(B,
-      "<token>%s</token>",
-      s->token);
-  }
+  if ((s = Event_get_source(E)) && s->token)
+    Util_stringbuffer(B, "<token>%s</token>", s->token);
   Util_stringbuffer(B,
     "</event>");
 }
