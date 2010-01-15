@@ -78,7 +78,7 @@
 "<table cellspacing=\"0\" cellpadding=\"10\" width=\"100%%\" border=\"0\">"\
 "  <tr bgcolor=\"#DDDDDD\">"\
 "    <td align=\"left\" valign=\"top\" width=\"20%%\" bgcolor=\"#DDDDDD\"><font color=\"#000000\"><small><a href='.'>Home</a>&gt;<a href='%s'>%s</a></small></font></td>"\
-"    <td align=\"center\" valign=\"top\" width=\"60%%\" bgcolor=\"#DDDDDD\">Running Monit on more than one server? Use <a href='http://www.mmonit.com'>M/Monit</a> to manage all your Monit instances</td>"\
+"    <td align=\"center\" valign=\"top\" width=\"60%%\" bgcolor=\"#DDDDDD\">Running Monit on more than one server? Use <a href='http://mmonit.com/'>M/Monit</a> to manage all your Monit instances</td>"\
 "    <td align=\"left\" valign=\"top\" width=\"20%%\" bgcolor=\"#DDDDDD\"><p align=\"right\"><small><a href='_about'>monit " VERSION "</a></small></td>"\
 "  </tr>"\
 "</table>"\
