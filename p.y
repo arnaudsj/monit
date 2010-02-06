@@ -1900,6 +1900,8 @@ static void postparse() {
       cfg_errflag++;
     }
   }
+
+  Run.heartbeat = HEARTBEAT;
 }
 
 

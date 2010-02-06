@@ -108,6 +108,7 @@ static void  do_default();                              /* Do default action */
 static void  handle_options(int, char **);         /* Handle program options */
 static void  help();                 /* Print program help message to stdout */
 static void  version();                         /* Print version information */
+static void *heartbeat(void *args);              /* M/Monit heartbeat thread */
 static RETSIGTYPE do_reload(int);       /* Signalhandler for a daemon reload */
 static RETSIGTYPE do_destroy(int);   /* Signalhandler for monit finalization */
 static RETSIGTYPE do_wakeup(int);  /* Signalhandler for a daemon wakeup call */
@@ -122,6 +123,7 @@ Service_T servicelist;                /**< The service list (created in p.y) */
 Service_T servicelist_conf;   /**< The service list in conf file (c. in p.y) */
 ServiceGroup_T servicegrouplist;/**< The service group list (created in p.y) */
 SystemInfo_T systeminfo;                              /**< System infomation */
+pthread_t heartbeat_thread;                    /**< M/Monit heartbeat thread */
 
 
 /* ------------------------------------------------------------------ Public */
@@ -412,6 +414,7 @@ static void do_action(char **args) {
  * Finalize monit
  */
 static void do_exit() {
+  int status;
   sigset_t ns;
 
   set_signal_block(&ns, NULL);
@@ -419,6 +422,9 @@ static void do_exit() {
   if (Run.isdaemon && !Run.once) {
     if (can_http())
       monit_http(STOP_HTTP);
+
+    if((status = pthread_join(heartbeat_thread, NULL)) != 0)
+      LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
 
     LogInfo("%s daemon with pid [%d] killed\n", prog, (int)getpid());
 
@@ -436,6 +442,8 @@ static void do_exit() {
  * Also, if specified, start the monit http server if in deamon mode.
  */
 static void do_default() {
+  int status;
+
   if (Run.isdaemon) {
     if (do_wakeupcall())
       exit(0);
@@ -482,6 +490,9 @@ static void do_default() {
     
     /* send the monit startup notification */
     Event_post(Run.system, EVENT_INSTANCE, STATE_CHANGED, Run.system->action_MONIT_START, "Monit started");
+
+    if((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0)
+      LogError("%s: Failed to create the heartbeat thread -- %s\n", prog, strerror(status));
 
     while (TRUE) {
       validate();
@@ -654,6 +665,40 @@ static void version() {
   printf("This is monit version %s\n", VERSION);
   printf("Copyright (C) 2000-2010 by Tildeslash Ltd.");
   printf(" All Rights Reserved.\n");
+}
+
+
+/**
+ * M/Monit heartbeat thread
+ */
+static void *heartbeat(void *args) {
+  sigset_t ns;
+  set_signal_block(&ns, NULL);
+  LogInfo("M/Monit heartbeat started\n");
+  while (! Run.stopped) {
+    time_t t = time(NULL);
+
+    if (t >= Run.heartbeat) {
+      Event_T e;
+      NEW(e);
+      e->collected.tv_sec  = t;
+      e->collected.tv_usec = 0;
+      e->id                = EVENT_HEARTBEAT;
+      e->source            = Run.system->name;
+      e->mode              = MODE_ACTIVE;
+      e->type              = TYPE_SYSTEM;
+      e->state             = STATE_SUCCEEDED;
+      e->state_changed     = TRUE;
+      e->action            = Run.system->action_MONIT_START;
+      e->message           = "M/Monit Hearbeat";
+      DEBUG("Heartbeat deadline matched\n");
+      handle_mmonit(e);
+      FREE(e);
+    }
+    sleep(1);
+  }
+  LogInfo("M/Monit heartbeat stopped\n");
+  return NULL;
 }
 
 
