@@ -348,7 +348,6 @@ typedef struct mymmonit {
   URL_T url;                                             /**< URL definition */
   Ssl_T ssl;                                             /**< SSL definition */
   int   timeout;              /**< The timeout to wait for connection or i/o */
-  Socket_T       socket;                     /**< Socket used for connection */
 
   /** For internal use */
   struct mymmonit *next;                         /**< next receiver in chain */

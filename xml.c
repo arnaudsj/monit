@@ -126,7 +126,7 @@ static void document_head(Buffer_T *B) {
    "<localhostname>%s</localhostname>"
    "<controlfile>%s</controlfile>",
    Run.id,
-   Run.incarnation,
+   (long long)Run.incarnation,
    VERSION,
    (long)Util_getProcessUptime(Run.pidfile),
    Run.polltime,

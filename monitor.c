@@ -284,10 +284,15 @@ static void do_init() {
  * monit daemon receives the SIGHUP signal.
  */
 static void do_reinit() {
-  Run.doreload = FALSE;
-  
+  int status;
+
   LogInfo("Awakened by the SIGHUP signal\n");
   LogInfo("Reinitializing %s - Control file '%s'\n", prog, Run.controlfile);
+  
+  if((status = pthread_join(heartbeat_thread, NULL)) != 0)
+    LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
+
+  Run.doreload = FALSE;
   
   /* Stop http interface */
   if (Run.dohttpd)
@@ -336,6 +341,8 @@ static void do_reinit() {
   /* send the monit startup notification */
   Event_post(Run.system, EVENT_INSTANCE, STATE_CHANGED, Run.system->action_MONIT_RELOAD, "Monit reloaded");
 
+  if((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0)
+    LogError("%s: Failed to create the heartbeat thread -- %s\n", prog, strerror(status));
 }
 
 
@@ -675,7 +682,7 @@ static void *heartbeat(void *args) {
   sigset_t ns;
   set_signal_block(&ns, NULL);
   LogInfo("M/Monit heartbeat started\n");
-  while (! Run.stopped) {
+  while (! Run.stopped && ! Run.doreload) {
     time_t t = time(NULL);
 
     if (t >= Run.heartbeat) {

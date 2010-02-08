@@ -64,8 +64,8 @@
 /* -------------------------------------------------------------- Prototypes */
 
 
-static int data_send(Mmonit_T, char *);
-static int data_check(Mmonit_T);
+static int data_send(Socket_T, Mmonit_T, char *);
+static int data_check(Socket_T, Mmonit_T);
 
 
 /* ------------------------------------------------------------------ Public */
@@ -77,15 +77,16 @@ static int data_check(Mmonit_T);
  * @return If failed, return HANDLER_MMONIT flag or HANDLER_SUCCEEDED flag if succeeded
  */
 int handle_mmonit(Event_T E) {
-  char        *D = NULL;
-  Mmonit_T     C = Run.mmonits;
-  int          rv = HANDLER_SUCCEEDED;
+  char     *D = NULL;
+  Mmonit_T  C = Run.mmonits;
+  int       rv = HANDLER_SUCCEEDED;
+  Socket_T  socket;
 
   /* The event is sent to mmonit just once - only in the case that the state changed */
   if(!C || (E && !E->state_changed))
     return rv;
 
-  while(!(C->socket = socket_create_t(C->url->hostname, C->url->port, SOCKET_TCP, C->ssl, C->timeout))) {
+  while(!(socket = socket_create_t(C->url->hostname, C->url->port, SOCKET_TCP, C->ssl, C->timeout))) {
     LogError("M/Monit: cannot open a connection to %s -- %s\n", C->url->url, STRERROR);
 
     if((C = C->next)) {
@@ -100,7 +101,7 @@ int handle_mmonit(Event_T E) {
 
   D = status_xml(E, LEVEL_FULL);
 
-  if(!data_send(C, D)) {
+  if(!data_send(socket, C, D)) {
     LogError("M/Monit: communication failed\n");
     rv = HANDLER_MMONIT;
     goto exit1;
@@ -108,9 +109,9 @@ int handle_mmonit(Event_T E) {
   
   /* Close write part of socket to indicate to M/Monit that message was sent
   and stop M/Monit XML parser from waiting for more data */
-  socket_shutdown_write(C->socket);
+  socket_shutdown_write(socket);
   
-  if(!data_check(C)) {
+  if(!data_check(socket, C)) {
     LogError("M/Monit: communication failed (%s message)\n", E ? "event" : "status");
     rv = HANDLER_MMONIT;
     goto exit1;
@@ -120,8 +121,8 @@ int handle_mmonit(Event_T E) {
 
 exit1:
   FREE(D);
-  if(C->socket)
-    socket_free(&C->socket);
+  if(socket)
+    socket_free(&socket);
 exit2:
   return rv;
 }
@@ -136,12 +137,12 @@ exit2:
  * @param D Data to send
  * @return TRUE if the message sending succeeded otherwise FALSE
  */
-static int data_send(Mmonit_T C, char *D) {
+static int data_send(Socket_T socket, Mmonit_T C, char *D) {
   int   rv;
   char *auth;
 
   auth = Util_getBasicAuthHeader(C->url->user, C->url->password);
-  rv = socket_print(C->socket,
+  rv = socket_print(socket,
          "POST %s HTTP/1.1\r\n"
          "Host: %s:%d\r\n"
          "Content-Type: text/xml\r\n"
@@ -173,12 +174,12 @@ static int data_send(Mmonit_T C, char *D) {
  * @param C An mmonit object
  * @return TRUE if the response is valid otherwise FALSE
  */
-static int data_check(Mmonit_T C) {
+static int data_check(Socket_T socket, Mmonit_T C) {
   int  n;
   int  status;
   char buf[STRLEN];
 
-  if(!socket_readln(C->socket, buf, sizeof(buf))) {
+  if(!socket_readln(socket, buf, sizeof(buf))) {
     LogError("M/Monit: error receiving data from %s -- %s\n", C->url->url, STRERROR);
     return FALSE;
   }
