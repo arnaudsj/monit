@@ -1836,6 +1836,7 @@ static void preparse() {
   Run.eventlist_slots    = -1;
   Run.system             = NULL;
   Run.expectbuffer       = STRLEN;
+  Run.mmonits            = NULL;
   Run.maillist           = NULL;
   Run.mailservers        = NULL;
   Run.MailFormat.from    = NULL;
