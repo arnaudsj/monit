@@ -289,7 +289,7 @@ static void do_reinit() {
   LogInfo("Awakened by the SIGHUP signal\n");
   LogInfo("Reinitializing %s - Control file '%s'\n", prog, Run.controlfile);
   
-  if((status = pthread_join(heartbeat_thread, NULL)) != 0)
+  if(Run.mmonits && ((status = pthread_join(heartbeat_thread, NULL)) != 0))
     LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
 
   Run.doreload = FALSE;
@@ -341,7 +341,7 @@ static void do_reinit() {
   /* send the monit startup notification */
   Event_post(Run.system, EVENT_INSTANCE, STATE_CHANGED, Run.system->action_MONIT_RELOAD, "Monit reloaded");
 
-  if((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0)
+  if(Run.mmonits && ((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0))
     LogError("%s: Failed to create the heartbeat thread -- %s\n", prog, strerror(status));
 }
 
@@ -430,7 +430,7 @@ static void do_exit() {
     if (can_http())
       monit_http(STOP_HTTP);
 
-    if((status = pthread_join(heartbeat_thread, NULL)) != 0)
+    if(Run.mmonits && ((status = pthread_join(heartbeat_thread, NULL)) != 0))
       LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
 
     LogInfo("%s daemon with pid [%d] killed\n", prog, (int)getpid());
@@ -498,7 +498,7 @@ static void do_default() {
     /* send the monit startup notification */
     Event_post(Run.system, EVENT_INSTANCE, STATE_CHANGED, Run.system->action_MONIT_START, "Monit started");
 
-    if((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0)
+    if(Run.mmonits && ((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0))
       LogError("%s: Failed to create the heartbeat thread -- %s\n", prog, strerror(status));
 
     while (TRUE) {
