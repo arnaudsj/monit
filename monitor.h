@@ -218,8 +218,6 @@
 #define ICMP_ATTEMPT_COUNT      3         
 #define ICMP_MAX_COUNT          20
 
-#define HEARTBEAT (time(NULL) + 1.5 * Run.polltime)
-
 
 /** ------------------------------------------------- Special purpose macros */
 
@@ -828,7 +826,6 @@ struct myrun {
   mode_t umask;                /**< The initial umask monit was started with */
   int  testing;   /**< Running in configuration testing mode - TRUE or FALSE */
   time_t incarnation;              /**< Unique ID for running monit instance */
-  time_t heartbeat;                                  /**< Heartbeat deadline */
   int  handler_init;                  /**< The handlers queue initialization */
   int  handler_flag;                            /**< The handlers state flag */
   int  handler_queue[HANDLER_MAX+1];         /**< The handlers queue counter */

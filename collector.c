@@ -117,7 +117,6 @@ int handle_mmonit(Event_T E) {
     goto exit1;
   }
   DEBUG("M/Monit: %s message sent to %s\n", E ? "event" : "status", C->url->url);
-  Run.heartbeat = HEARTBEAT;
 
 exit1:
   FREE(D);

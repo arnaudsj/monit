@@ -679,30 +679,17 @@ static void version() {
  * M/Monit heartbeat thread
  */
 static void *heartbeat(void *args) {
+  int status;
   sigset_t ns;
+
   set_signal_block(&ns, NULL);
   LogInfo("M/Monit heartbeat started\n");
   while (! Run.stopped && ! Run.doreload) {
-    time_t t = time(NULL);
-
-    if (t >= Run.heartbeat) {
-      Event_T e;
-      NEW(e);
-      e->collected.tv_sec  = t;
-      e->collected.tv_usec = 0;
-      e->id                = EVENT_HEARTBEAT;
-      e->source            = Run.system->name;
-      e->mode              = MODE_ACTIVE;
-      e->type              = TYPE_SYSTEM;
-      e->state             = STATE_SUCCEEDED;
-      e->state_changed     = TRUE;
-      e->action            = Run.system->action_MONIT_START;
-      e->message           = "M/Monit Hearbeat";
-      DEBUG("Heartbeat deadline matched\n");
-      handle_mmonit(e);
-      FREE(e);
-    }
-    sleep(1);
+    DEBUG("Sending M/Monit heartbeat\n");
+    if ((status = handle_mmonit(NULL)) == HANDLER_SUCCEEDED)
+      sleep(Run.polltime);
+    else
+      sleep(1);
   }
   LogInfo("M/Monit heartbeat stopped\n");
   return NULL;

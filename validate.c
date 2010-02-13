@@ -198,8 +198,6 @@ int validate() {
 
   reset_depend();
 
-  handle_mmonit(NULL);
-
   return errors;
 }
 
