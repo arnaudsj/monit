@@ -123,7 +123,11 @@ Service_T servicelist;                /**< The service list (created in p.y) */
 Service_T servicelist_conf;   /**< The service list in conf file (c. in p.y) */
 ServiceGroup_T servicegrouplist;/**< The service group list (created in p.y) */
 SystemInfo_T systeminfo;                              /**< System infomation */
-pthread_t heartbeat_thread;                    /**< M/Monit heartbeat thread */
+
+pthread_t       heartbeatThread;               /**< M/Monit heartbeat thread */
+pthread_cond_t  heartbeatCond;                /**< Hearbeat wakeup condition */
+pthread_mutex_t heartbeatMutex;                          /**< Hearbeat mutex */
+
 
 
 /* ------------------------------------------------------------------ Public */
@@ -221,6 +225,20 @@ static void do_init() {
     exit(1);
   }
 
+  /*
+   * Initialize heartbeat mutex and condition
+   */
+  status = pthread_mutex_init(&heartbeatMutex, NULL);
+  if (status != 0) {
+    LogError("%s: Cannot initialize heartbeat mutex -- %s\n", prog, strerror(status));
+    exit(1);
+  }
+  status = pthread_cond_init(&heartbeatCond, NULL);
+  if (status != 0) {
+    LogError("%s: Cannot initialize heartbeat condition -- %s\n", prog, strerror(status));
+    exit(1);
+  }
+
   /* 
    * Get the position of the control file 
    */
@@ -289,8 +307,12 @@ static void do_reinit() {
   LogInfo("Awakened by the SIGHUP signal\n");
   LogInfo("Reinitializing %s - Control file '%s'\n", prog, Run.controlfile);
   
-  if(Run.mmonits && ((status = pthread_join(heartbeat_thread, NULL)) != 0))
-    LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
+  if(Run.mmonits) {
+    if ((status = pthread_cond_signal(&heartbeatCond)) != 0)
+      LogError("%s: Failed to signal the heartbeat thread -- %s\n", prog, strerror(status));
+    if ((status = pthread_join(heartbeatThread, NULL)) != 0)
+      LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
+  }
 
   Run.doreload = FALSE;
   
@@ -341,7 +363,7 @@ static void do_reinit() {
   /* send the monit startup notification */
   Event_post(Run.system, EVENT_INSTANCE, STATE_CHANGED, Run.system->action_MONIT_RELOAD, "Monit reloaded");
 
-  if(Run.mmonits && ((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0))
+  if(Run.mmonits && ((status = pthread_create(&heartbeatThread, NULL, heartbeat, NULL)) != 0))
     LogError("%s: Failed to create the heartbeat thread -- %s\n", prog, strerror(status));
 }
 
@@ -430,8 +452,12 @@ static void do_exit() {
     if (can_http())
       monit_http(STOP_HTTP);
 
-    if(Run.mmonits && ((status = pthread_join(heartbeat_thread, NULL)) != 0))
-      LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
+    if(Run.mmonits) {
+      if ((status = pthread_cond_signal(&heartbeatCond)) != 0)
+        LogError("%s: Failed to signal the heartbeat thread -- %s\n", prog, strerror(status));
+      if ((status = pthread_join(heartbeatThread, NULL)) != 0)
+        LogError("%s: Failed to stop the heartbeat thread -- %s\n", prog, strerror(status));
+    }
 
     LogInfo("%s daemon with pid [%d] killed\n", prog, (int)getpid());
 
@@ -498,7 +524,7 @@ static void do_default() {
     /* send the monit startup notification */
     Event_post(Run.system, EVENT_INSTANCE, STATE_CHANGED, Run.system->action_MONIT_START, "Monit started");
 
-    if(Run.mmonits && ((status = pthread_create(&heartbeat_thread, NULL, heartbeat, NULL)) != 0))
+    if(Run.mmonits && ((status = pthread_create(&heartbeatThread, NULL, heartbeat, NULL)) != 0))
       LogError("%s: Failed to create the heartbeat thread -- %s\n", prog, strerror(status));
 
     while (TRUE) {
@@ -681,16 +707,23 @@ static void version() {
 static void *heartbeat(void *args) {
   int status;
   sigset_t ns;
+  struct timespec wait;
 
+  wait.tv_nsec = 0;
   set_signal_block(&ns, NULL);
   LogInfo("M/Monit heartbeat started\n");
-  while (! Run.stopped && ! Run.doreload) {
-    DEBUG("Sending M/Monit heartbeat\n");
-    if ((status = handle_mmonit(NULL)) == HANDLER_SUCCEEDED)
-      sleep(Run.polltime);
-    else
-      sleep(1);
+  LOCK(heartbeatMutex)
+  {
+    while (! Run.stopped && ! Run.doreload) {
+      DEBUG("Sending M/Monit heartbeat\n");
+      if ((status = handle_mmonit(NULL)) == HANDLER_SUCCEEDED)
+        wait.tv_sec = time(NULL) + Run.polltime;
+      else
+        wait.tv_sec = time(NULL) + 1;
+      pthread_cond_timedwait(&heartbeatCond, &heartbeatMutex, &wait);
+    }
   }
+  END_LOCK;
   LogInfo("M/Monit heartbeat stopped\n");
   return NULL;
 }
