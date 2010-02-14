@@ -11,8 +11,8 @@ Version 5.1
 
 NEW FEATURES AND FUNCTIONS:
 
-* It is now possible to define any action for restart timeout rule.
-  Multiple restart timeout rules can by defined too. Example:
+* It is now possible to define any action for the restart timeout rule.
+  Multiple restart timeout rules can also be defined. Example:
       if 3 restarts within 5 cycles then exec "/foo/bar"
       if 8 restarts within 10 cycles then unmonitor
 
@@ -28,26 +28,26 @@ NEW FEATURES AND FUNCTIONS:
     check process radiusd with pidfile /var/run/radiusd.pid
        start program = "/etc/init.d/freeradius start"
        stop program = "/etc/init.d/freeradius stop"
-       if failed host 127.0.0.1 port 2000 type udp protocol radius secret testing1234 then alert
+       if failed 
+          host 127.0.0.1 port 2000 type udp protocol radius secret testing1234 
+       then alert
        if 5 restarts within 5 cycles then timeout
 
-* The HTTP protocol test now supports hostheader option which allows to
+* The HTTP protocol test now supports a hostheader option which allows to
   override Host header in HTTP request. It can be used for example
-  if for testing farm of HTTP servers by IP addresses and set specific
+  to test a farm of HTTP servers by IP addresses and to set specific
   Host header. Thanks to Brady Catherman for patch. Example:
     if failed host 192.168.1.100 protocol http hostheader "example.com" then alert
 
-* When error occurred during Monit command-line execution, report error
-  and exit with 1, so it is possible to react when Monit is used in script.
-  On success 0 is returned as usual. Formerly command-line Monit exited
-  always 0 even if error occurred.
+* If an error occur during Monit command-line execution, report the error
+  and exit with 1, so it is possible to react if Monit is used from a script.
+  On success, 0 is returned as usual. Previously, Monit always exited with
+  0 even if an error occurred.
 
-* Do not require SSL version type when setting SSL check and setting M/Monit
+* Do not require SSL version type when specifying SSL communication with M/Monit
   (SSL version is set to auto).
 
-* Don't block http interface if service is being checked or action performed
-
-* In case that Monit http interface failed to start, provide more details about
+* If the Monit http interface failed to start, provide more details about
   the reason.
 
 BUGFIXES:
@@ -58,14 +58,14 @@ BUGFIXES:
       - Solaris zone
       - Linux Vserver
 
-* Fix #26752: inside Solaris Zone Monit fails to detect children
-  and gets host memory wrong
+* Fix #26752: inside Solaris Zone, Monit failed to detect children
+  and computed host memory wrong
 
-* On Solaris, FreeBSD, NetBSD and OpenBSD Monit no longer needs to run as root user
+* On Solaris, FreeBSD, NetBSD and OpenBSD, Monit no longer needs to run as root user
   in order to be able to watch process resource usage (cpu and memory).
 
-* Send heartbeat to M/Monit even if Monit is busy in long testing cycle to prevent
-  false alerts about non-responsive Monit.
+* Send heartbeat to M/Monit even if Monit is busy in a long testing cycle to prevent
+  false alerts about non-responsive Monit agent.
 
 * Fixed SMTP protocol test which may sometimes incorrectly
   report ESMTP protocol failure. Thanks to Axel Reinhold for
@@ -85,8 +85,8 @@ BUGFIXES:
   not work with "options inet6" in /etc/resolv.conf. Thanks to
   Michael Stapelberg for patch.
 
-* If Monit configuration allowed http interface access for read-only
-  user and it was specified as first allow entry, Monit command line
+* If Monit configuration allowed http interface access for a read-only
+  user and it was specified as the first allow entry, Monit command line
   commands failed because it used the read-only account so commands
   like start, stop, etc. were rejected. Monit will now use full access
   regardless of allow option order. Thanks to Thorsten Kampe for report.
@@ -94,9 +94,9 @@ BUGFIXES:
 * Passive monitoring mode fixed. Thanks to Nelson Vale for report.
 
 * Fixed #27784: wait_start/wait_stop can advance too quickly.
-  Thanks for report to Randy Puro.
+  Thanks to Randy Puro for report.
 
-* Solaris resource usage fix when Monit was compiled with optimizations enabled.
+* Solaris resource usage fixed when Monit was compiled with optimizations enabled.
 
 * Fixed #28369: escape XML properly
 
@@ -104,7 +104,7 @@ BUGFIXES:
   system service with name set to local hostname is added. Thanks to Marcus Muelbuesch
   for report.
 
-* Fix crash when queued event delivery was retried for service which is no longer
+* Fix crash when queued event delivery was retried for service which was no longer
   configured in Monit.
 
 

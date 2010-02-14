@@ -1,9 +1,7 @@
 			    Platform Notes
 			    --------------
 
-This file describes platform specific notes for monit.  In case you
-are looking for precompiled packages for your platform you might want
-to have a look in the PACKAGES file.
+This file describes platform specific notes for Monit. 
 
 Platforms overview in alphabetical order:
 
@@ -16,7 +14,7 @@ Platforms overview in alphabetical order:
 
 Following platforms are not actively maintained because of lack of testing
 machine for these OS's. They may work - its support was added and confirmed
-in particular monit releases by contributors. Possible status reports, bug
+in particular Monit releases by contributors. Possible status reports, bug
 reports, patch contributions or access to such platforms for development is
 welcomed :)
 
@@ -32,12 +30,12 @@ GNU/Linux
 =========
 
 Monit compiles out of the box on Linux.  Some Linux Distributions
-might have monit as a precompiled package (see PACKAGES).
+might have Monit as a precompiled package (see PACKAGES).
 
 In order to be able to use resource support you have to have PROCFS
 support enabled in your kernel.  In case your kernel has fortified
 your proc filesystem, e.g. using the openwall patchset, you might need
-to start monit as the root user. 
+to start Monit as the root user. 
 
 In case a glibc replacement is used one of the following parts may
 apply.
@@ -45,9 +43,9 @@ apply.
 dietlibc
 --------
 
-Since version 4.0 the use of dietlibc is supported by monit.  For SSL
+Since version 4.0 the use of dietlibc is supported by Monit.  For SSL
 support you need to compile the ssl libraries with dietlibc; use the
-"--with-ssl-lib-dir=<path>" option to configure monit.
+"--with-ssl-lib-dir=<path>" option to configure Monit.
 
 A configure for dietlibc might look like this:
 
@@ -75,7 +73,7 @@ A configure for uClibc might look like this:
 Solaris
 =======
 
-64-bit monit is required for Solaris support.
+64-bit Monit is required for Solaris support.
 
 You can use either gcc or Sun Studio for compilation.  
 
@@ -109,7 +107,7 @@ Solaris Nevada:
   NOTE:
   On AMD64 there was problem with flex library bundled with particular
   Solaris Express versions (SUNWflexruntime). You can get following
-  error when trying to start monit:
+  error when trying to start Monit:
 
   -bash-3.2# ./monit
   ld.so.1: monit: fatal: relocation error: R_AMD64_PC32: file
@@ -128,7 +126,7 @@ Set path to the SFW utilities and libraries, for example:
   crle -l /lib:/usr/lib:/usr/sfw/lib               # (32-bit)
   crle -64 -l /lib/64:/usr/lib/64:/usr/sfw/lib/64  # (64-bit)
 
-Configure monit with 64-bit support (examples):
+Configure Monit with 64-bit support (examples):
 
   gcc [sparc]:
   ./configure \
@@ -160,7 +158,7 @@ Configure monit with 64-bit support (examples):
       LDFLAGS='-m64' \
       CC=/opt/SUNWspro/bin/cc
 
-Compile monit with:
+Compile Monit with:
 
   gmake
 

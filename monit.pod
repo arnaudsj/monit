@@ -976,13 +976,14 @@ where a service simply refuses to start or respond over a longer
 period.
 
 The timeout mechanism is based on number if service restarts and
-number of poll-cycles. For example, if a service had I<x> restarts
-within I<y> poll-cycles (where I<x> <= I<y>) then Monit will perform
-custom action (for example unmonitor the service). If a timeout occurs
-Monit will send an alert message if you have register interest for this
-event. 
+number of poll-cycles. For example, if a service had I<x>
+restarts within I<y> poll-cycles (where I<x> <= I<y>) then Monit
+will perform an action (for example unmonitor the service). If a
+timeout occurs Monit will send an alert message if you have
+register interest for this event.
 
-The syntax for the timeout statement is as follows (keywords are in capital):
+The syntax for the timeout statement is as follows (keywords are
+in capital):
 
 =over 4
 
@@ -990,13 +991,14 @@ The syntax for the timeout statement is as follows (keywords are in capital):
 
 =back
 
-Here is an example where Monit will unmonitor the if it was restarted
-2 times within 3 cycles:
+Here is an example where Monit will unmonitor the service if it
+was restarted 2 times within 3 cycles:
 
  if 2 restarts within 3 cycles then unmonitor
 
-To have Monit check the service again after a monitoring was disabled,
-run 'monit monitor <servicename>' from the command line.
+To have Monit check the service again after a monitoring was
+disabled, run 'monit monitor <servicename>' from the command
+line.
 
 Example for setting custom exec on timeout:
 

@@ -28,13 +28,9 @@
  
  - Monit will probably work on most Unix systems. However, Monit is
    tested and known to compile and operate on: Darwin, Linux, FreeBSD,
-   NetBSD, OpenBSD and Solaris. See also the PLATFORMS file.
- 
- - If you are upgrading from a previous Monit version and experience
-   problems with the Monit control file, please consult the UPGRADE.txt
-   file accompanying the software.
- 
- 
+   NetBSD, OpenBSD and Solaris.
+   
+  
  License Notes:
  --------------
  
