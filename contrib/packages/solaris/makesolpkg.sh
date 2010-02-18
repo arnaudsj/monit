@@ -35,7 +35,7 @@ platform=`uname -p`
 release=`uname -r | sed 's/5\./sol/'`
 filename=${name}-${version}-${release}-${platform}-local.pkg
 tmpdir=/tmp/${name}-install
-docs="monitrc CHANGES.txt CONTRIBUTORS COPYING FAQ.txt LICENSE \
+docs="monitrc CHANGES.txt COPYING LICENSE \
       PLATFORMS README README.SSL STATUS UPGRADE.txt \
       doc/* contrib/packages/solaris/init.monit \
       contrib/packages/solaris/README.solaris"

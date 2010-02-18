@@ -31,8 +31,6 @@ PLIST_FILES=		bin/monit \
 			etc/monitrc.sample \
 			etc/rc.d/monit.sh \
 			share/doc/monit/CHANGES.txt \
-			share/doc/monit/CONTRIBUTORS \
-			share/doc/monit/FAQ.txt \
 			share/doc/monit/LICENSE \
 			share/doc/monit/README \
 			share/doc/monit/README.SSL \
@@ -53,8 +51,6 @@ post-install:
 	@${INSTALL_SCRIPT} -m 600 ${WRKDIR}/${DISTNAME}/monitrc ${PREFIX}/etc/monitrc.sample
 	${MKDIR} ${DOCSDIR}
 	@${INSTALL_SCRIPT} -m 644 ${WRKDIR}/${DISTNAME}/CHANGES.txt ${PREFIX}/share/doc/monit/CHANGES.txt
-	@${INSTALL_SCRIPT} -m 644 ${WRKDIR}/${DISTNAME}/CONTRIBUTORS ${PREFIX}/share/doc/monit/CONTRIBUTORS
-	@${INSTALL_SCRIPT} -m 644 ${WRKDIR}/${DISTNAME}/FAQ.txt ${PREFIX}/share/doc/monit/FAQ.txt
 	@${INSTALL_SCRIPT} -m 644 ${WRKDIR}/${DISTNAME}/LICENSE ${PREFIX}/share/doc/monit/LICENSE
 	@${INSTALL_SCRIPT} -m 644 ${WRKDIR}/${DISTNAME}/README ${PREFIX}/share/doc/monit/README
 	@${INSTALL_SCRIPT} -m 644 ${WRKDIR}/${DISTNAME}/README.SSL ${PREFIX}/share/doc/monit/README.SSL

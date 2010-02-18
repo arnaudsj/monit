@@ -51,7 +51,7 @@ fi
 
 %files
 %defattr(-,root,root)
-%doc CHANGES.txt CONTRIBUTORS COPYING FAQ.txt LICENSE README README.SSL
+%doc CHANGES.txt COPYING LICENSE README README.SSL
 %config /etc/monitrc
 %config /etc/init.d/%{name}
 %{_bindir}/%{name}
