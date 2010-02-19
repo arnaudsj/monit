@@ -9,6 +9,10 @@
 
 Version 5.2
 
+BUGFIXES:
+
+* Fix FTP protocol test. Thanks to Axel Reinhold for report.
+
 
 Version 5.1
 
