@@ -1034,9 +1034,9 @@ The 'ELSE IF SUCCEEDED' part is optional, if omitted, Monit will
 send an alert on recovery. The alert is sent only once on each
 state change unless overridden by the 'reminder' alert option.
 
-=over 4
-
 A variable test has this general format:
+
+=over 4
 
 =item  IF CHANGED <TEST> [[<X>] [TIMES WITHIN] <Y> CYCLES] 
        THEN ACTION

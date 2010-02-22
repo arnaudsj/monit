@@ -19,6 +19,8 @@ BUGFIXES:
 * Removed warning about missing system service check. Missing system service
   check is not error and it shouldn't be reported as such.
 
+* Fix manual page formating. Thanks to Stefan Alfredsson for report.
+
 
 Version 5.1
 
