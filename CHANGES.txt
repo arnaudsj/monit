@@ -1,4 +1,4 @@
-                     CHANGES version 5.2
+                     CHANGES version 5.1.1
                                 
            This file summarizes changes made since 3.0
                                 
@@ -7,11 +7,14 @@
           https://savannah.nongnu.org/bugs/?group=monit
 
 
-Version 5.2
+Version 5.1.1
 
 BUGFIXES:
 
 * Fix FTP protocol test. Thanks to Axel Reinhold for report.
+
+* Fix the HTTP protocol test's hostheader option which was added in 5.1.
+  Thanks to Naoya Nakazawa for report.
 
 
 Version 5.1

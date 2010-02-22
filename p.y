@@ -1077,7 +1077,7 @@ request         : /* EMPTY */
                 ;
 
 hostheader      : /* EMPTY */
-                | hostheader STRING {
+                | HOSTHEADER STRING {
                     portset.request_hostheader = $2;
                   }
                 ;
