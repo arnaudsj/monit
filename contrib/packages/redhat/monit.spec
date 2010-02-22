@@ -1,6 +1,6 @@
 Name: monit
 Summary: Process monitor and restart utility
-Version: 5.2
+Version: 5.1.1
 Release: 1
 Source: http://www.mmonit.com/monit/dist/%{name}-%{version}.tar.gz
 Group: Utilities/Console
@@ -59,7 +59,7 @@ fi
 
 %changelog
 * Thu Feb 18 2010 Martin Pala <martinp@tildeslash.com>
-- Upgraded to monit-5.2
+- Upgraded to monit-5.1.1
 
 * Sat Jan 09 2010 Martin Pala <martinp@tildeslash.com>
 - Upgraded to monit-5.1
