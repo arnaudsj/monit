@@ -16,6 +16,8 @@ BUGFIXES:
 * Fix the HTTP protocol test's hostheader option which was added in 5.1.
   Thanks to Naoya Nakazawa for report.
 
+* Removed warning about missing system service check.
+
 
 Version 5.1
 

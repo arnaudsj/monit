@@ -1773,7 +1773,6 @@ int parse(char *controlfile) {
     fclose(yyin);
     /* Add the default general system service if not specified explicitly */
     if (!hassystem) {
-      yywarning2("check system service not defined -- adding virtual service 'check system %s'", Run.localhostname);
       check_name(Run.localhostname);
       createservice(TYPE_SYSTEM, xstrdup(Run.localhostname), xstrdup(""), check_system);
     }
