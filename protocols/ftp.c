@@ -66,8 +66,7 @@ int check_ftp(Socket_T s) {
       return FALSE;
     }
     Util_chomp(buf);
-    buf[4] = 0;
-    if (! strcasecmp(buf, "220 "))
+    if (!strncmp(buf, "220", 3))
       break;
   }
 
