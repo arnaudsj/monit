@@ -185,7 +185,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     } 
 
     pt[i].ppid      = psinfo->pr_ppid;
-    pt[i].starttime = psinfo->pr_start;
+    pt[i].starttime = psinfo->pr_start.tv_sec;
         
     /* If we don't have any light-weight processes (LWP) then we are definitely a zombie */
     if (psinfo->pr_nlwp == 0) {
