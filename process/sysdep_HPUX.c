@@ -200,6 +200,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   for (i = 0; i < treesize; i++) {
     pt[i].pid         = psall[i].pst_pid;
     pt[i].ppid        = psall[i].pst_ppid;
+    pt[i].starttime   = psall[i].pst_start;
     pt[i].time        = get_float_time();
     pt[i].cputime     =  psall[i].pst_utime + psall[i].pst_stime * 10;
     pt[i].cpu_percent = (int)(1000. * psall[i].pst_pctcpu / (float)systeminfo.cpus);
