@@ -113,6 +113,8 @@
 #define MEMBUF   "Buffers:"
 #define MEMCACHE "Cached:"
 
+#define NSEC_PER_SEC    1000000000L
+
 static unsigned long long old_cpu_user     = 0;
 static unsigned long long old_cpu_syst     = 0;
 static unsigned long long old_cpu_wait     = 0;
@@ -168,19 +170,20 @@ int init_process_info_sysdep(void) {
  * @return treesize>0 if succeeded otherwise =0.
  */
 int initprocesstree_sysdep(ProcessTree_T ** reference) {
-  int            i = 0;
-  int            treesize = 0;
-  int            stat_ppid = 0;
-  char          *tmp = NULL;
-  char           buf[4096];
-  char           stat_item_state;
-  long           stat_item_cutime = 0;
-  long           stat_item_cstime = 0;
-  long           stat_item_rss = 0;
-  glob_t         globbuf;
-  unsigned long  stat_item_utime = 0;
-  unsigned long  stat_item_stime = 0;
-  ProcessTree_T *pt = NULL;
+  int                 i = 0;
+  int                 treesize = 0;
+  int                 stat_ppid = 0;
+  char               *tmp = NULL;
+  char                buf[4096];
+  char                stat_item_state;
+  long                stat_item_cutime = 0;
+  long                stat_item_cstime = 0;
+  long                stat_item_rss = 0;
+  glob_t              globbuf;
+  unsigned long       stat_item_utime = 0;
+  unsigned long       stat_item_stime = 0;
+  unsigned long long  stat_item_starttime = 0ULL;
+  ProcessTree_T      *pt = NULL;
 
   ASSERT(reference);
 
