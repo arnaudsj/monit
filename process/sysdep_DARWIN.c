@@ -179,8 +179,9 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
   for (i = 0; i < treesize; i++) {
     mach_port_t task;
 
-    pt[i].pid  = pinfo[i].kp_proc.p_pid;
-    pt[i].ppid = pinfo[i].kp_eproc.e_ppid;
+    pt[i].pid       = pinfo[i].kp_proc.p_pid;
+    pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
+    pt[i].starttime = pinfo[i].kp_proc.p_starttime.tv_sec;
 
     if (pinfo[i].kp_proc.p_stat == SZOMB)
       pt[i].status_flag |= PROCESS_ZOMBIE;

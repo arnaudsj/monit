@@ -145,6 +145,7 @@ int update_process_data(Service_T s, ProcessTree_T *pt, int treesize, pid_t pid)
     /* save the previous ppid and set actual one */
     s->inf->_ppid             = s->inf->ppid;
     s->inf->ppid              = pt[leaf].ppid;
+    s->inf->uptime            = time(NULL) - pt[leaf].starttime;
     s->inf->children          = pt[leaf].children_sum;
     s->inf->mem_kbyte         = pt[leaf].mem_kbyte;
     s->inf->status_flag       = pt[leaf].status_flag;
@@ -162,6 +163,7 @@ int update_process_data(Service_T s, ProcessTree_T *pt, int treesize, pid_t pid)
 
   } else {
     s->inf->ppid              = 0;
+    s->inf->uptime            = 0;
     s->inf->children          = 0;
     s->inf->total_mem_kbyte   = 0;
     s->inf->total_mem_percent = 0;

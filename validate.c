@@ -221,8 +221,6 @@ int check_process(Service_T s) {
   } else
     Event_post(s, EVENT_NONEXIST, STATE_SUCCEEDED, s->action_NONEXIST, "process is running with pid %d", (int)pid);
 
-  s->inf->uptime = Util_getProcessUptime(s->path);
-
   if (Run.doprocess) {
     if (update_process_data(s, ptree, ptreesize, pid)) {
       check_process_state(s);
@@ -232,7 +230,6 @@ int check_process(Service_T s) {
         check_process_resources(s, pr);
     } else
       LogError("'%s' failed to get service data\n", s->name);
-
   }
 
   /* Test each host:port and protocol in the service's portlist */

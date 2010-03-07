@@ -175,12 +175,14 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
    #if (__FreeBSD_version > 500000)
     pt[i].pid       = pinfo[i].ki_pid;
     pt[i].ppid      = pinfo[i].ki_ppid;
+    pt[i].starttime = pinfo[i].ki_start;
     pt[i].cputime   = (long)(pinfo[i].ki_runtime / 100000);
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].ki_rssize * pagesize_kbyte);
     if (pinfo[i].ki_stat == SZOMB)
    #else
     pt[i].pid       = pinfo[i].kp_proc.p_pid;
     pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
+    pt[i].starttime = pinfo[i].kp_eproc.e_stats.p_start;
     pt[i].cputime   = (long)(pinfo[i].kp_proc.p_runtime / 100000);
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].kp_eproc.e_vm.vm_rssize * pagesize_kbyte);
     if (pinfo[i].kp_proc.p_stat == SZOMB)

@@ -394,6 +394,7 @@ typedef struct myprocesstree {
   int  pid;
   int  ppid;
   int  status_flag;
+  time_t  starttime;
   
   int  visited;
   int  children_num;

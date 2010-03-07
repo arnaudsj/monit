@@ -4,13 +4,15 @@
 <head>
 <title>Monit - utility for monitoring services on a Unix system</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:_www@b02.apple.com" />
+<link rev="made" href="mailto:martinpala@trilobite.local" />
 </head>
 
 <body style="background-color: white">
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
@@ -69,6 +71,7 @@
 				<li><a href="#remote_host_ping_test">Remote host ping test</a></li>
 				<li><a href="#examples">Examples</a></li>
 				<li><a href="#testing_the_sip_protocol">Testing the SIP protocol</a></li>
+				<li><a href="#testing_the_radius_protocol">Testing the RADIUS protocol</a></li>
 			</ul>
 
 		</ul>
@@ -107,9 +110,11 @@
 	<li><a href="#copyright">COPYRIGHT</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -137,16 +142,16 @@ on a free-format, token-oriented syntax. Monit logs to syslog or
 to its own log file and notifies you about error conditions via
 customizable alert messages. Monit can perform various TCP/IP
 network checks, protocol checks and can utilize SSL for such
-checks. Monit provides a <code>http(s)</code> interface and you may use a
+checks. Monit provides a http(s) interface and you may use a
 browser to access the Monit program.</p>
 <p>
 </p>
 <hr />
 <h1><a name="general_operation">GENERAL OPERATION</a></h1>
 <p>The behavior of Monit is controlled by command-line options
-<em>and</em> a run control file, <em>~/.monitrc</em>, the syntax of which we
+<em>and</em> a run control file, <em class="file">~/.monitrc</em>, the syntax of which we
 describe in a later section. Command-line options override
-<em>.monitrc</em> declarations.</p>
+<em class="file">.monitrc</em> declarations.</p>
 <p>The following options are recognized by monit. However, it is
 recommended that you set options (when applicable) directly in
 the <em>.monitrc</em> control file.</p>
@@ -186,7 +191,7 @@ action and exit without transforming itself to a daemon.</p>
    Start all services listed in the control file and 
    enable monitoring for them. If the group option is 
    set, only start and enable monitoring of services in
-   the named group (no ``all'' verb is required in this
+   the named group (no &quot;all&quot; verb is required in this
    case).</p>
 <p><strong>start name</strong>
    Start the named service and enable monitoring for 
@@ -196,7 +201,7 @@ action and exit without transforming itself to a daemon.</p>
    Stop all services listed in the control file and 
    disable their monitoring. If the group option is 
    set, only stop and disable monitoring of the services 
-   in the named group (no ``all'' verb is required in this
+   in the named group (no &quot;all&quot; verb is required in this
    case).</p>
 <p><strong>stop name</strong>
    Stop the named service and disable its monitoring. 
@@ -205,14 +210,14 @@ action and exit without transforming itself to a daemon.</p>
 <p><strong>restart all</strong>
    Stop and start <em>all</em> services. If the group option 
    is set, only restart the services in the named group
-   (no ``all'' verb is required in this case).</p>
+   (no &quot;all&quot; verb is required in this case).</p>
 <p><strong>restart name</strong>
    Restart the named service. The name is a service entry 
    name from the monitrc file.</p>
 <p><strong>monitor all</strong>     
    Enable monitoring of all services listed in the
    control file. If the group option is set, only start
-   monitoring of services in the named group (no ``all''
+   monitoring of services in the named group (no &quot;all&quot;
    verb is required in this case).</p>
 <p><strong>monitor name</strong>
    Enable monitoring of the named service.  The name is
@@ -222,7 +227,7 @@ action and exit without transforming itself to a daemon.</p>
 <p><strong>unmonitor all</strong>     
    Disable monitoring of all services listed in the
    control file. If the group option is set, only disable
-   monitoring of services in the named group (no ``all''
+   monitoring of services in the named group (no &quot;all&quot;
    verb is required in this case).</p>
 <p><strong>unmonitor name</strong>
    Disable monitoring of the named service. The name is
@@ -285,17 +290,17 @@ keywords, numbers and strings.</p>
 <p>On a semantic level, the control file consists of three types of
 statements:</p>
 <ol>
-<li><strong><a name="item_global_set_2dstatements">Global set-statements</a></strong>
+<li><strong><a name="global_set_statements" class="item">Global set-statements</a></strong>
 
 <p>A global set-statement starts with the keyword <em>set</em> and the
 item to configure.</p>
 </li>
-<li><strong><a name="item_global_include_2dstatement">Global include-statement</a></strong>
+<li><strong><a name="global_include_statement" class="item">Global include-statement</a></strong>
 
 <p>The include statement consists of the keyword <em>include</em> and
 a glob string.</p>
 </li>
-<li><strong><a name="item_one_or_more_service_entry_statements_2e">One or more service entry statements.</a></strong>
+<li><strong><a name="one_or_more_service_entry_statements" class="item">One or more service entry statements.</a></strong>
 
 <p>A service entry starts with the keyword <em>check</em> followed by the
 service type.</p>
@@ -381,7 +386,7 @@ service and then goes to sleep for the given poll interval.</p>
 <p>Simply invoking</p>
 <pre>
               Monit -d 300</pre>
-<p>will poll all services described in your <em>~/.monitrc</em> file every
+<p>will poll all services described in your <em class="file">~/.monitrc</em> file every
 5 minutes.</p>
 <p>It is strongly recommended to set the poll interval in your
 ~/.monitrc file instead, by using <em>set daemon <strong>n</strong></em>, where <strong>n</strong>
@@ -450,11 +455,11 @@ statements can be placed at virtually any spot. The syntax is the
 following:</p>
 <pre>
   INCLUDE globstring</pre>
-<p>The globstring is any kind of string as defined in glob(7).
+<p>The globstring is any kind of string as defined in <code>glob(7)</code>.
 Thus, you can refer to a single file or you can load several
 files at once.  In case you want to use whitespace in your string
 the globstring need to be embedded into quotes (') or double
-quotes (``). For example,</p>
+quotes (&quot;). For example,</p>
 <pre>
  INCLUDE &quot;/etc/monit/Monit configuration files/printer.*.monitrc&quot;</pre>
 <p>loads any file matching the single globstring.  If the globstring
@@ -489,6 +494,11 @@ group of services, like so:</p>
 <p>Note:
 the <em>status</em> and <em>summary</em> commands don't support the -g
 option and will print the state of all services.</p>
+<p>Service can be added to multiple groups by adding group statement
+multiple times:</p>
+<pre>
+  group www
+  group filesystem</pre>
 <p>
 </p>
 <hr />
@@ -587,7 +597,7 @@ global addresses in case of a conflict. Finally, you may choose
 to only use a global alert list (recommended), a local per
 service list or both.</p>
 <p>It is also possible to disable the global alerts locally for
-particular <code>service(s)</code> and recipients.</p>
+particular service(s) and recipients.</p>
 <p>
 </p>
 <h2><a name="setting_a_global_alert_statement">Setting a global alert statement</a></h2>
@@ -596,8 +606,8 @@ alert to all recipients in the global list who has registered
 interest for the event type. Here is the syntax for the global
 alert statement:</p>
 <dl>
-<dt><strong><a name="item_set_alert_mail_2daddress__5b__5bnot_5d__7bevents_7">SET ALERT mail-address [ [NOT] {events}] [MAIL-FORMAT 
-          {mail-format}] [REMINDER number]</a></strong>
+<dt><strong><a name="set_alert_mail_address_not_events_mail_format_mail_format_reminder_number" class="item">SET ALERT mail-address [ [NOT] {events}] [MAIL-FORMAT 
+          {mail-format}] [REMINDER number]</a></strong></dt>
 
 </dl>
 <p>Simply using the following in the global section of monitrc:</p>
@@ -620,13 +630,13 @@ few.</p>
 <h2><a name="setting_a_local_alert_statement">Setting a local alert statement</a></h2>
 <p>Each service can also have its own recipient list.</p>
 <dl>
-<dt><strong><a name="item_alert_mail_2daddress__5b__5bnot_5d__7bevents_7d_5d">ALERT mail-address [ [NOT] {events}] [MAIL-FORMAT 
-           {mail-format}] [REMINDER number]</a></strong>
+<dt><strong><a name="alert_mail_address_not_events_mail_format_mail_format_reminder_number" class="item">ALERT mail-address [ [NOT] {events}] [MAIL-FORMAT 
+           {mail-format}] [REMINDER number]</a></strong></dt>
 
 </dl>
 <p>or</p>
 <dl>
-<dt><strong><a name="item_noalert_mail_2daddress">NOALERT mail-address</a></strong>
+<dt><strong><a name="noalert_mail_address" class="item">NOALERT mail-address</a></strong></dt>
 
 </dl>
 <p>If you only want an alert message sent for certain events and for
@@ -759,7 +769,7 @@ address Monit is using you can do:</p>
 variables were used. If used, they will be substituted and
 expanded into the text with these values:</p>
 <ul>
-<li><strong><a name="item__event"><em>$EVENT</em></a></strong>
+<li><strong><a name="_event" class="item"><em>$EVENT</em></a></strong>
 
 <pre>
  A string describing the event that occurred. The values are
@@ -787,19 +797,23 @@ expanded into the text with these values:</p>
  TIMEOUT   | &quot;Timeout&quot;                | &quot;Timeout recovery&quot;          
  TIMESTAMP | &quot;Timestamp failed&quot;       | &quot;Timestamp succeeded&quot;       
  UID       | &quot;UID failed&quot;             | &quot;UID succeeded&quot;</pre>
-<li><strong><a name="item__service"><em>$SERVICE</em></a></strong>
+</li>
+<li><strong><a name="_service" class="item"><em>$SERVICE</em></a></strong>
 
 <pre>
  The service entry name in monitrc</pre>
-<li><strong><a name="item__date"><em>$DATE</em></a></strong>
+</li>
+<li><strong><a name="_date" class="item"><em>$DATE</em></a></strong>
 
 <pre>
  The current time and date (RFC 822 date style).</pre>
-<li><strong><a name="item__host"><em>$HOST</em></a></strong>
+</li>
+<li><strong><a name="_host" class="item"><em>$HOST</em></a></strong>
 
 <pre>
  The name of the host Monit is running on</pre>
-<li><strong><a name="item__action"><em>$ACTION</em></a></strong>
+</li>
+<li><strong><a name="_action" class="item"><em>$ACTION</em></a></strong>
 
 <pre>
  The name of the action which was done. Action names are fixed
@@ -814,10 +828,12 @@ expanded into the text with these values:</p>
  START    | &quot;start&quot;
  STOP     | &quot;stop&quot;
  UNMONITOR| &quot;unmonitor&quot;</pre>
-<li><strong><a name="item__description"><em>$DESCRIPTION</em></a></strong>
+</li>
+<li><strong><a name="_description" class="item"><em>$DESCRIPTION</em></a></strong>
 
 <pre>
  The description of the error condition</pre>
+</li>
 </ul>
 <p>
 </p>
@@ -825,7 +841,7 @@ expanded into the text with these values:</p>
 <p>It is possible to set a standard mail format with the following
 global set-statement (keywords are in capital):</p>
 <dl>
-<dt><strong><a name="item_set_mail_2dformat__7bmail_2dformat_7d">SET MAIL-FORMAT {mail-format}</a></strong>
+<dt><strong><a name="set_mail_format_mail_format" class="item">SET MAIL-FORMAT {mail-format}</a></strong></dt>
 
 </dl>
 <p>Format set with this statement will apply to every alert
@@ -843,7 +859,7 @@ more then once if a service remains in a failed state, you can
 use the reminder option to the alert statement (keywords are in
 capital):</p>
 <dl>
-<dt><strong><a name="item_alert__2e_2e_2e__5bwith_5d_reminder__5bon_5d_numbe">ALERT ... [WITH] REMINDER [ON] number [CYCLES]</a></strong>
+<dt><strong><a name="alert_with_reminder_on_number_cycles" class="item">ALERT ... [WITH] REMINDER [ON] number [CYCLES]</a></strong></dt>
 
 </dl>
 <p>For example if you want to be notified each tenth cycle if a
@@ -887,9 +903,9 @@ for setting several mail servers:</p>
      username &quot;Rabbi&quot; password &quot;Loewe&quot; using tlsv1, localhost
      with timeout 15 seconds</pre>
 <p>Here Monit will first try to connect to the server
-``mail.tildeslash.com'', if this server is down Monit will try
-``mail.foo.bar'' on port 10025 using the given credentials via tls
-and finally ``localhost''. We also set an explicit connect and read
+&quot;mail.tildeslash.com&quot;, if this server is down Monit will try
+&quot;mail.foo.bar&quot; on port 10025 using the given credentials via tls
+and finally &quot;localhost&quot;. We also set an explicit connect and read
 timeout; If Monit cannot connect to the first SMTP server in the
 list within 15 seconds it will try the next server and so on. The
 <em>set mailserver ..</em> statement is optional and if not defined
@@ -948,36 +964,32 @@ event-files, Monit should be stopped before the removal.</p>
 <h1><a name="service_timeout">SERVICE TIMEOUT</a></h1>
 <p><strong>monit</strong> provides a service timeout mechanism for situations
 where a service simply refuses to start or respond over a longer
-period. In cases like this, and particularly if monit's poll-cycle
-is low, Monit will simply increase the machine load by trying to
-restart the service.</p>
-<p>The timeout mechanism Monit provides is based on two variables,
-i.e. the number the service has been started and the number of
-poll-cycles. For example, if a service had <em>x</em> restarts within
-<em>y</em> poll-cycles (where <em>x</em> &lt;= <em>y</em>) then Monit will timeout and
-not (re)start the service on subsequent cycles until the service
-is manually re-registered.. If a timeout occurs Monit will send
-you an alert message if you have register interest for this event.</p>
-<p>The syntax for the timeout statement is as follows (keywords
-are in capital):</p>
+period.</p>
+<p>The timeout mechanism is based on number if service restarts and
+number of poll-cycles. For example, if a service had <em>x</em>
+restarts within <em>y</em> poll-cycles (where <em>x</em> &lt;= <em>y</em>) then Monit
+will perform an action (for example unmonitor the service). If a
+timeout occurs Monit will send an alert message if you have
+register interest for this event.</p>
+<p>The syntax for the timeout statement is as follows (keywords are
+in capital):</p>
 <dl>
-<dt><strong><a name="item_cycle">IF NUMBER RESTART NUMBER <code>CYCLE(S)</code> THEN TIMEOUT</a></strong>
+<dt><strong><a name="cycle" class="item">IF &lt;number&gt; RESTART &lt;number&gt; CYCLE(S) THEN &lt;action&gt;</a></strong></dt>
 
 </dl>
-<p>Where the first number is the number of service restarts and the
-second, the number of poll-cycles. If the number of cycles was
-reached without a timeout, the service start-counter is reset to
-zero. This provides some granularity to catch exceptional cases
-and do a service timeout, but let occasional service start and
-restarts happen without having an accumulated timeout.</p>
-<p>Here is an example where Monit will timeout (not check the
-service) if the service was restarted 2 times within 3 cycles:</p>
+<p>Here is an example where Monit will unmonitor the service if it
+was restarted 2 times within 3 cycles:</p>
 <pre>
- if 2 restarts within 3 cycles then timeout</pre>
-<p>To have Monit check the service again after a timeout, run 'monit
-monitor service' from the command line. This will remove the
-timeout lock in the daemon and make the daemon start and check
-the service again.</p>
+ if 2 restarts within 3 cycles then unmonitor</pre>
+<p>To have Monit check the service again after a monitoring was
+disabled, run 'monit monitor &lt;servicename&gt;' from the command
+line.</p>
+<p>Example for setting custom exec on timeout:</p>
+<pre>
+ if 5 restarts within 5 cycles then exec &quot;/foo/bar&quot;</pre>
+<p>Example for stopping the service:</p>
+<pre>
+ if 7 restarts within 10 cycles then stop</pre>
 <p>
 </p>
 <hr />
@@ -988,9 +1000,9 @@ constant tests. That is, the condition we test is either constant
 e.g. a number or it can vary.</p>
 <p>A constant test has this general format:</p>
 <dl>
-<dt><strong><a name="item_if__3ctest_3e__5b_5b_3cx_3e_5d__5btimes_within_5d_">IF &lt;TEST&gt; [[&lt;X&gt;] [TIMES WITHIN] &lt;Y&gt; CYCLES] THEN ACTION
+<dt><strong><a name="if_test_x_times_within_y_cycles_then_action_else_if_succeeded_x_times_within_y_cycles_then_action" class="item">IF &lt;TEST&gt; [[&lt;X&gt;] [TIMES WITHIN] &lt;Y&gt; CYCLES] THEN ACTION
        [ELSE IF SUCCEEDED [[&lt;X&gt;] [TIMES WITHIN] &lt;Y&gt; CYCLES] 
-       THEN ACTION]</a></strong>
+       THEN ACTION]</a></strong></dt>
 
 </dl>
 <p>If the &lt;TEST&gt; condition should evaluate to true, then the
@@ -1002,8 +1014,8 @@ send an alert on recovery. The alert is sent only once on each
 state change unless overridden by the 'reminder' alert option.</p>
 <p>A variable test has this general format:</p>
 <dl>
-<dt><strong><a name="item_if_changed__3ctest_3e__5b_5b_3cx_3e_5d__5btimes_wi">IF CHANGED &lt;TEST&gt; [[&lt;X&gt;] [TIMES WITHIN] &lt;Y&gt; CYCLES] 
-       THEN ACTION</a></strong>
+<dt><strong><a name="if_changed_test_x_times_within_y_cycles_then_action" class="item">IF CHANGED &lt;TEST&gt; [[&lt;X&gt;] [TIMES WITHIN] &lt;Y&gt; CYCLES] 
+       THEN ACTION</a></strong></dt>
 
 </dl>
 <p>If the &lt;TEST&gt; should evaluate to true, then the selected action
@@ -1016,7 +1028,7 @@ for example to reload monitored process after its configuration
 file was changed. Variable tests are supported for 'checksum',
 'size', 'pid, 'ppid' and 'timestamp' tests only.</p>
 <dl>
-<dt><strong><a name="item__2e_2e_2e__5b_5b_3cx_3e_5d__5btimes_within_5d__3cy">... [[&lt;X&gt;] [TIMES WITHIN] &lt;Y&gt; CYCLES] ...</a></strong>
+<dt><strong><a name="x_times_within_y_cycles" class="item">... [[&lt;X&gt;] [TIMES WITHIN] &lt;Y&gt; CYCLES] ...</a></strong></dt>
 
 </dl>
 <p>If a test match, its action is executed at once. This behaviour
@@ -1107,17 +1119,17 @@ under high load.</p>
 testing is as follows (keywords are in capital and optional
 statements in [brackets]),</p>
 <dl>
-<dt><strong><a name="item_if_resource_operator_value__5b_5b_3cx_3e_5d__3cy_3">IF resource operator value [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+<dt><strong><a name="if_resource_operator_value_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF resource operator value [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
-<p><em>resource</em> is a choice of ``CPU'', ``TOTALCPU'',
-``CPU([user|system|wait])'', ``MEMORY'', ``CHILDREN'', ``TOTALMEMORY'',
-``LOADAVG([1min|5min|15min])''. Some resource tests can be used
+<p><em>resource</em> is a choice of &quot;CPU&quot;, &quot;TOTALCPU&quot;,
+&quot;CPU([user|system|wait])&quot;, &quot;MEMORY&quot;, &quot;CHILDREN&quot;, &quot;TOTALMEMORY&quot;,
+&quot;LOADAVG([1min|5min|15min])&quot;. Some resource tests can be used
 inside a check system entry, some in a check process entry and
 some in both:</p>
 <p>System only resource tests:</p>
-<p><code>CPU([user|system|wait])</code> is the percent of time the system spend
+<p>CPU([user|system|wait]) is the percent of time the system spend
 in user or system/kernel space. Some systems such as linux 2.6
 supports a 'wait' indicator as well.</p>
 <p>Process only resource tests:</p>
@@ -1133,19 +1145,19 @@ processes in either percent or as an amount (Byte, kB, MB, GB).</p>
 <p>MEMORY is the memory usage of the system or of a process (without
 children) in either percent (of the systems total) or as an
 amount (Byte, kB, MB, GB).</p>
-<p><code>LOADAVG([1min|5min|15min])</code> refers to the system's load average.
+<p>LOADAVG([1min|5min|15min]) refers to the system's load average.
 The load average is the number of processes in the system run
 queue, averaged over the specified time period.</p>
-<p><em>operator</em> is a choice of ``&lt;'', ``&gt;'', ``!='', ``=='' in C notation,
-``gt'', ``lt'', ``eq'', ``ne'' in shell sh notation and ``greater'',
-``less'', ``equal'', ``notequal'' in human readable form (if not
+<p><em>operator</em> is a choice of &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;!=&quot;, &quot;==&quot; in C notation,
+&quot;gt&quot;, &quot;lt&quot;, &quot;eq&quot;, &quot;ne&quot; in shell sh notation and &quot;greater&quot;,
+&quot;less&quot;, &quot;equal&quot;, &quot;notequal&quot; in human readable form (if not
 specified, default is EQUAL).</p>
 <p><em>value</em> is either an integer or a real number (except for
 CHILDREN). For CPU, TOTALCPU, MEMORY and TOTALMEMORY you need to
-specify a <em>unit</em>. This could be ``%'' or if applicable ``B'' (Byte),
-``kB'' (1024 Byte), ``MB'' (1024 KiloByte) or ``GB'' (1024 MegaByte).</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+specify a <em>unit</em>. This could be &quot;%&quot; or if applicable &quot;B&quot; (Byte),
+&quot;kB&quot; (1024 Byte), &quot;MB&quot; (1024 KiloByte) or &quot;GB&quot; (1024 MegaByte).</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>To calculate the cycles, a counter is raised whenever the
 expression above is true and it is lowered whenever it is false
 (but not below 0). All counters are reset in case of a restart.</p>
@@ -1164,16 +1176,16 @@ a md5 or sha1 checksum for a file.</p>
 <p>The checksum test in constant form is used to verify that a
 file does not change. Syntax (keywords are in capital):</p>
 <dl>
-<dt><strong><a name="item_if_failed__5bmd5_7csha1_5d_checksum__5bexpect_chec">IF FAILED [MD5|SHA1] CHECKSUM [EXPECT checksum] 
+<dt><strong><a name="if_failed_md5_sha1_checksum_expect_checksum_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED [MD5|SHA1] CHECKSUM [EXPECT checksum] 
          [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p>The checksum test in variable form is used to watch for
 file changes. Syntax (keywords are in capital):</p>
 <dl>
-<dt><strong><a name="item_if_changed__5bmd5_7csha1_5d_checksum__5b_5b_3cx_3e">IF CHANGED [MD5|SHA1] CHECKSUM [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
-      THEN action</a></strong>
+<dt><strong><a name="if_changed_md5_sha1_checksum_x_y_cycles_then_action" class="item">IF CHANGED [MD5|SHA1] CHECKSUM [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
+      THEN action</a></strong></dt>
 
 </dl>
 <p>The choice of MD5 or SHA1 is optional. MD5 features a 256 bit 
@@ -1191,8 +1203,8 @@ the file, but instead use the string you submit. For example:</p>
 <p>You can, for example, use the GNU utility <em>md5sum(1)</em> or 
 <em>sha1sum(1)</em> to create a checksum string for a file and 
 use this string in the expect-statement.</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>The checksum statement in variable form may be used to check a
 file for changes and if changed, do a specified action. For
 instance to reload a server if its configuration file was
@@ -1217,27 +1229,27 @@ directory service entry.</p>
 <p>The timestamp test in constant form is used to verify various
 timestamp conditions. Syntax (keywords are in capital):</p>
 <dl>
-<dt><strong><a name="item_if_timestamp__5b_5boperator_5d_value__5bunit_5d_5d">IF TIMESTAMP [[operator] value [unit]] [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
+<dt><strong><a name="if_timestamp_operator_value_unit_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF TIMESTAMP [[operator] value [unit]] [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
       THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p>The timestamp statement in variable form is simply to test an
 existing file or directory for timestamp changes and if changed,
 execute an action. Syntax (keywords are in capital):</p>
 <dl>
-<dt><strong><a name="item_if_changed_timestamp__5b_5b_3cx_3e_5d__3cy_3e_cycl">IF CHANGED TIMESTAMP [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong>
+<dt><strong><a name="if_changed_timestamp_x_y_cycles_then_action" class="item">IF CHANGED TIMESTAMP [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong></dt>
 
 </dl>
-<p><em>operator</em> is a choice of ``&lt;'', ``&gt;'', ``!='', ``=='' in C notation,
-``GT'', ``LT'', ``EQ'', ``NE'' in shell sh notation and ``GREATER'',
-``LESS'', ``EQUAL'', ``NOTEQUAL'' in human readable form (if not
+<p><em>operator</em> is a choice of &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;!=&quot;, &quot;==&quot; in C notation,
+&quot;GT&quot;, &quot;LT&quot;, &quot;EQ&quot;, &quot;NE&quot; in shell sh notation and &quot;GREATER&quot;,
+&quot;LESS&quot;, &quot;EQUAL&quot;, &quot;NOTEQUAL&quot; in human readable form (if not
 specified, default is EQUAL).</p>
 <p><em>value</em> is a time watermark.</p>
-<p><em>unit</em> is either ``SECOND'', ``MINUTE'', ``HOUR'' or ``DAY'' (it is also
-possible to use ``SECONDS'', ``MINUTES'', ``HOURS'', or ``DAYS'').</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>unit</em> is either &quot;SECOND&quot;, &quot;MINUTE&quot;, &quot;HOUR&quot; or &quot;DAY&quot; (it is also
+possible to use &quot;SECONDS&quot;, &quot;MINUTES&quot;, &quot;HOURS&quot;, or &quot;DAYS&quot;).</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>The variable timestamp statement is useful for checking a file
 for changes and then execute an action. This version was written
 particularly with configuration files in mind. For instance, if
@@ -1293,28 +1305,28 @@ file.</p>
 <p>The size test in constant form is used to verify various size
 conditions. Syntax (keywords are in capital):</p>
 <dl>
-<dt><strong><a name="item_if_size__5b_5boperator_5d_value__5bunit_5d_5d__5b_">IF SIZE [[operator] value [unit]] [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
+<dt><strong><a name="if_size_operator_value_unit_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF SIZE [[operator] value [unit]] [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
       THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p>The size statement in variable form is simply to test an existing
 file for size changes and if changed, execute an action. Syntax
 (keywords are in capital):</p>
 <dl>
-<dt><strong><a name="item_if_changed_size__5b_5b_3cx_3e_5d__3cy_3e_cycles_5d">IF CHANGED SIZE [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong>
+<dt><strong><a name="if_changed_size_x_y_cycles_then_action" class="item">IF CHANGED SIZE [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong></dt>
 
 </dl>
-<p><em>operator</em> is a choice of ``&lt;'', ``&gt;'', ``!='', ``=='' in C notation,
-``GT'', ``LT'', ``EQ'', ``NE'' in shell sh notation and ``GREATER'',
-``LESS'', ``EQUAL'', ``NOTEQUAL'' in human readable form (if not
+<p><em>operator</em> is a choice of &quot;&lt;&quot;, &quot;&gt;&quot;, &quot;!=&quot;, &quot;==&quot; in C notation,
+&quot;GT&quot;, &quot;LT&quot;, &quot;EQ&quot;, &quot;NE&quot; in shell sh notation and &quot;GREATER&quot;,
+&quot;LESS&quot;, &quot;EQUAL&quot;, &quot;NOTEQUAL&quot; in human readable form (if not
 specified, default is EQUAL).</p>
 <p><em>value</em> is a size watermark.</p>
-<p><em>unit</em> is a choice of ``B'',``KB'',``MB'',``GB'' or long alternatives
-``byte'', ``kilobyte'', ``megabyte'', ``gigabyte''. If it is not
-specified, ``byte'' unit is assumed by default.</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>unit</em> is a choice of &quot;B&quot;,&quot;KB&quot;,&quot;MB&quot;,&quot;GB&quot; or long alternatives
+&quot;byte&quot;, &quot;kilobyte&quot;, &quot;megabyte&quot;, &quot;gigabyte&quot;. If it is not
+specified, &quot;byte&quot; unit is assumed by default.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>The variable size test form is useful for checking a file for
 changes and send an alert or execute an action. Monit will
 register the size of the file at startup and monitor the file for
@@ -1326,7 +1338,7 @@ checks, for instance:</p>
 <pre>
  check file su with path /bin/su
        if changed size then exec &quot;/sbin/ifconfig eth0 down&quot;</pre>
-<p>which will ``cut the cable'' and stop a possible intruder from
+<p>which will &quot;cut the cable&quot; and stop a possible intruder from
 compromising the system further. This test is just one of many
 you may use to increase the security awareness on a system. If
 you plan to use Monit for security reasons we recommend that you
@@ -1350,7 +1362,7 @@ beyond a specified threshold.</p>
  /bin/mv $1 $1.`date +%y-%m-%d`
  /usr/bin/pkill -HUP $2</pre>
 <p>Or you may use this statement to trigger the <code>logrotate(8)</code>
-program, to do an ``emergency'' rotate. Or to send an alert if a
+program, to do an &quot;emergency&quot; rotate. Or to send an alert if a
 file becomes a known bottleneck if it grows behind a certain size
 because of limits in a database engine:</p>
 <pre>
@@ -1372,15 +1384,15 @@ patterns. If a pattern match, Monit defaults to raise an alert,
 other actions are also possible.</p>
 <p>The syntax (keywords in capital) for using this test is:</p>
 <dl>
-<dt><strong><a name="item_if__5bnot_5d_match__7bregex_7cpath_7d__5b_5b_3cx_3">IF [NOT] MATCH {regex|path} [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong>
+<dt><strong><a name="if_not_match_regex_path_x_y_cycles_then_action" class="item">IF [NOT] MATCH {regex|path} [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong></dt>
 
 </dl>
 <p><em>regex</em> is a string containing the extended regular expression.
-See also regex(7).</p>
+See also <code>regex(7)</code>.</p>
 <p><em>path</em> is an absolute path to a file containing extended
-regular expression on every line. See also regex(7).</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+regular expression on every line. See also <code>regex(7)</code>.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>You can use the <em>NOT</em> statement to invert a match.</p>
 <p>The content is only being checked every cycle. If content is
 being added and removed between two checks they are unnoticed.</p>
@@ -1393,7 +1405,7 @@ lines are being ignored until they have been completed with this
 character. Also note that only the first 511 characters of a line
 are inspected.</p>
 <dl>
-<dt><strong><a name="item_ignore__5bnot_5d_match__7bregex_7cpath_7d">IGNORE [NOT] MATCH {regex|path}</a></strong>
+<dt><strong><a name="ignore_not_match_regex_path" class="item">IGNORE [NOT] MATCH {regex|path}</a></strong></dt>
 
 </dl>
 <p>Lines matching an <em>IGNORE</em> are not inspected during later 
@@ -1425,11 +1437,11 @@ NOSUID flags which should work on all platforms. Some platforms
 (such as FreeBSD) has additonal flags.</p>
 <p>The syntax for the fsflags statement is:</p>
 <dl>
-<dt><strong><a name="item_if_changed_fsflags__5b_5b_3cx_3e_5d__3cy_3e_cycles">IF CHANGED FSFLAGS [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong>
+<dt><strong><a name="if_changed_fsflags_x_y_cycles_then_action" class="item">IF CHANGED FSFLAGS [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong></dt>
 
 </dl>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>Example:</p>
 <pre>
  check filesystem rootfs with path /
@@ -1452,19 +1464,19 @@ solaris 10% of the blocks are reserved. You can also use tunefs
 on solaris to change values on a live filesystem.</p>
 <p>The full syntax for the space statement is:</p>
 <dl>
-<dt><strong><a name="item_if_space_operator_value_unit__5b_5b_3cx_3e_5d__3cy">IF SPACE operator value unit [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+<dt><strong><a name="if_space_operator_value_unit_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF SPACE operator value unit [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
-<p><em>operator</em> is a choice of ``&lt;'',``&gt;'',``!='',``=='' in c notation, ``gt'',
-``lt'', ``eq'', ``ne'' in shell sh notation and ``greater'', ``less'',
-``equal'', ``notequal'' in human readable form (if not specified,
+<p><em>operator</em> is a choice of &quot;&lt;&quot;,&quot;&gt;&quot;,&quot;!=&quot;,&quot;==&quot; in c notation, &quot;gt&quot;,
+&quot;lt&quot;, &quot;eq&quot;, &quot;ne&quot; in shell sh notation and &quot;greater&quot;, &quot;less&quot;,
+&quot;equal&quot;, &quot;notequal&quot; in human readable form (if not specified,
 default is EQUAL).</p>
-<p><em>unit</em> is a choice of ``B'',``KB'',``MB'',``GB'', ``%'' or long
-alternatives ``byte'', ``kilobyte'', ``megabyte'', ``gigabyte'',
-``percent''.</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>unit</em> is a choice of &quot;B&quot;,&quot;KB&quot;,&quot;MB&quot;,&quot;GB&quot;, &quot;%&quot; or long
+alternatives &quot;byte&quot;, &quot;kilobyte&quot;, &quot;megabyte&quot;, &quot;gigabyte&quot;,
+&quot;percent&quot;.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>
 </p>
 <h2><a name="inode_testing">INODE TESTING</a></h2>
@@ -1478,20 +1490,20 @@ start methods is not defined, Monit will just send an error
 alert.</p>
 <p>The syntax for the inode statement is:</p>
 <dl>
-<dt><strong><a name="item_inode">IF <code>INODE(S)</code> operator value [unit] [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
+<dt><strong><a name="inode" class="item">IF INODE(S) operator value [unit] [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
       THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
-<p><em>operator</em> is a choice of ``&lt;'',``&gt;'',``!='',``=='' in c notation, ``gt'',
-``lt'', ``eq'', ``ne'' in shell sh notation and ``greater'', ``less'',
-``equal'', ``notequal'' in human readable form (if not specified,
+<p><em>operator</em> is a choice of &quot;&lt;&quot;,&quot;&gt;&quot;,&quot;!=&quot;,&quot;==&quot; in c notation, &quot;gt&quot;,
+&quot;lt&quot;, &quot;eq&quot;, &quot;ne&quot; in shell sh notation and &quot;greater&quot;, &quot;less&quot;,
+&quot;equal&quot;, &quot;notequal&quot; in human readable form (if not specified,
 default is EQUAL).</p>
 <p><em>unit</em> is optional. If not specified, the value is an absolute
-count of inodes. You can use the ``%'' character or the longer
-alternative ``percent'' as a unit.</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+count of inodes. You can use the &quot;%&quot; character or the longer
+alternative &quot;percent&quot; as a unit.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>
 </p>
 <h2><a name="permission_testing">PERMISSION TESTING</a></h2>
@@ -1500,17 +1512,17 @@ only be used within a file, fifo, directory or filesystem service
 entry in the Monit control file.</p>
 <p>The syntax for the permission statement is:</p>
 <dl>
-<dt><strong><a name="item_perm">IF FAILED <code>PERM(ISSION)</code> octalnumber [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
+<dt><strong><a name="perm" class="item">IF FAILED PERM(ISSION) octalnumber [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
       THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p><em>octalnumber</em> defines permissions for a file, a directory or a
 filesystem as four octal digits (0-7). Valid range: 0000 - 7777 (you
 can omit the leading zeros, Monit will add the zeros to the left
-thus for example ``640'' is valid value and matches ``0640'').</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+thus for example &quot;640&quot; is valid value and matches &quot;0640&quot;).</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>The web interface will show a permission warning if the test
 failed.</p>
 <p>We recommend that you use the UNMONITOR action in a permission
@@ -1531,13 +1543,13 @@ test may only be used within a file, fifo, directory or
 filesystem service entry in the Monit control file.</p>
 <p>The syntax for the uid statement is:</p>
 <dl>
-<dt><strong><a name="item_if_failed_uid_user__5b_5b_3cx_3e_5d__3cy_3e_cycles">IF FAILED UID user [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+<dt><strong><a name="if_failed_uid_user_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED UID user [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p><em>user</em> defines a user id either in numeric or in string form.</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>The web interface will show a uid warning if the test should
 fail.</p>
 <p>We recommend that you use the UNMONITOR action in a uid
@@ -1558,13 +1570,13 @@ test may only be used within a file, fifo, directory or
 filesystem service entry in the Monit control file.</p>
 <p>The syntax for the gid statement is:</p>
 <dl>
-<dt><strong><a name="item_if_failed_gid_user__5b_5b_3cx_3e_5d__3cy_3e_cycles">IF FAILED GID user [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+<dt><strong><a name="if_failed_gid_user_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED GID user [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p><em>user</em> defines a group id either in numeric or in string form.</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>The web interface will show a gid warning if the test should
 fail.</p>
 <p>We recommend that you use the UNMONITOR action in a gid
@@ -1585,11 +1597,11 @@ process for changes. This test is implicit and Monit will send a
 alert in the case of failure by default.</p>
 <p>The syntax for the pid statement is:</p>
 <dl>
-<dt><strong><a name="item_if_changed_pid__5b_5b_3cx_3e_5d__3cy_3e_cycles_5d_">IF CHANGED PID [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong>
+<dt><strong><a name="if_changed_pid_x_y_cycles_then_action" class="item">IF CHANGED PID [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong></dt>
 
 </dl>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>This test is useful to detect possible process restarts which has
 occurred in the timeframe between two Monit testing cycles. In
 the case that the restart was fast and the process provides
@@ -1615,11 +1627,11 @@ monitoring.</p>
 will send alert in the case of failure by default.</p>
 <p>The syntax for the ppid statement is:</p>
 <dl>
-<dt><strong><a name="item_if_changed_ppid__5b_5b_3cx_3e_5d__3cy_3e_cycles_5d">IF CHANGED PPID [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong>
+<dt><strong><a name="if_changed_ppid_x_y_cycles_then_action" class="item">IF CHANGED PPID [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action</a></strong></dt>
 
 </dl>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>This test is useful for detecting changes of a process parent.</p>
 <p>Example:</p>
 <pre>
@@ -1642,18 +1654,18 @@ openssl, then ssl based network services can also be tested.</p>
 as follows (keywords are in capital and optional statements in
 [brackets]),</p>
 <dl>
-<dt><strong><a name="item_if_failed__5bhost_5d_port__5btype_5d__5bprotocol_7">IF FAILED [host] port [type] 
+<dt><strong><a name="if_failed_host_port_type_protocol_send_expect_timeout_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED [host] port [type] 
 	 [protocol|{send/expect}+] [timeout] [[&lt;X&gt;] &lt;Y&gt; CYCLES]
       THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p>or for Unix sockets,</p>
 <dl>
-<dt><strong><a name="item_if_failed__5bunixsocket_5d__5btype_5d__5bprotocol_">IF FAILED [unixsocket] [type] 
+<dt><strong><a name="if_failed_unixsocket_type_protocol_send_expect_timeout_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED [unixsocket] [type] 
           [protocol|{send/expect}+] [timeout] [[&lt;X&gt;] &lt;Y&gt; CYCLES]
        THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p><strong>host:HOST hostname</strong>. Optionally specify the host to connect to.
@@ -1690,6 +1702,7 @@ moment Monit knows how to speak:
  <em>DNS</em>
  <em>DWP</em>
  <em>FTP</em>
+ <em>GPS</em>
  <em>HTTP</em>
  <em>IMAP</em>
  <em>CLAMAV</em>
@@ -1701,6 +1714,7 @@ moment Monit knows how to speak:
  <em>NTP3</em>
  <em>POP</em>
  <em>POSTFIX-POLICY</em>
+ <em>RADIUS</em>
  <em>RDATE</em>
  <em>RSYNC</em>
  <em>SIP</em>
@@ -1725,10 +1739,21 @@ port. This default test is in most cases more than good enough to
 deduce if the server behind the port is up or not.</p>
 <p>The protocol statement is:</p>
 <pre>
- [PROTO(COL) {name} [REQUEST {&quot;/path&quot;} [with CHECKSUM checksum]]</pre>
-<p>As you can see, you may specify a request after the protocol, at
-the moment only the HTTP protocol supports the request option.
-See also below for an example.</p>
+ PROTO(COL) {name}</pre>
+<p>HTTP protocol supports additional options:
+ o REQUEST
+ o HOSTHEADER
+ o CHECKSUM</p>
+<pre>
+ PROTO(COL) HTTP [REQUEST {&quot;/path&quot;} [with HOSTHEADER &quot;string&quot;] [with CHECKSUM checksum]</pre>
+<p>When the Host header option is not specified, for HTTP protocol, by default
+the content of host option which specifies the target host to connect to is used.
+The Host header can be used when you need to test</p>
+<p>Examples:</p>
+<pre>
+  if failed host 192.168.1.100 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
+  if failed host 192.168.1.101 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
+  if failed host 192.168.1.102 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert</pre>
 <p>In addition to the standard protocols, the <em>APACHE-STATUS</em>
 protocol is a test of a specific server type, rather than a
 generic protocol. Server performance is examined using the status
@@ -1774,7 +1799,7 @@ section.</p>
 <p>Obviously, do not use this test unless the httpd server you are
 testing is Apache Httpd and mod_status is activated on the
 server.</p>
-<p><strong>send/expect: {SEND|EXPECT} ``string'' ...</strong>. If Monit does not
+<p><strong>send/expect: {SEND|EXPECT} &quot;string&quot; ...</strong>. If Monit does not
 support the protocol spoken by the server, you can write your own
 protocol-test using <em>send</em> and <em>expect</em> strings. The <em>SEND</em>
 statement sends a string to the server port and the <em>EXPECT</em>
@@ -1792,7 +1817,7 @@ the protocol expect such characters to terminate a string (most
 text based protocols used over Internet does). Likewise monit
 will read up to 256 bytes from the server and use this string
 when comparing the expect string. If the server sends strings
-terminated by CRLF, (i.e. ``\r\n'') you <em>may</em> remember to add the
+terminated by CRLF, (i.e. &quot;\r\n&quot;) you <em>may</em> remember to add the
 same terminating characters to the string you expect from the
 server.</p>
 <p>As mentioned above, Monit limits the expect input to 255 bytes.
@@ -1805,9 +1830,9 @@ the top of the Monit configuration file:</p>
  set expectbuffer 10 kb</pre>
 <p>Note, if you want to test the number of bytes returned from the
 server you need to work around a bound check limit in POSIX
-regex. You cannot use something like expect ``.{5000}'' as the max
+regex. You cannot use something like expect &quot;.{5000}&quot; as the max
 number in a boundary check usually is {255}. However this should
-work, expect ``(.{250}){20}''</p>
+work, expect &quot;(.{250}){20}&quot;</p>
 <p>You can use non-printable characters in a send string if needed.
 Use the hex notation, \0xHEXHEX to send any char in the range
 \0x00-\0xFF, that is, 0-255 in decimal. This may be useful when
@@ -1823,8 +1848,8 @@ connect and read timeout for the connection. If Monit cannot
 connect to the server within this time it will assume that the
 connection failed and execute the specified action. The default
 connect timeout is 5 seconds.</p>
-<p><em>action</em> is a choice of ``ALERT'', ``RESTART'', ``START'', ``STOP'',
-``EXEC'', ``MONITOR'' or ``UNMONITOR''.</p>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>
 </p>
 <h4><a name="connection_testing_using_the_url_notation">Connection testing using the URL notation</a></h4>
@@ -1839,8 +1864,8 @@ in capital and optional statements in [brackets]):</p>
      [TIMEOUT number SECONDS] [[&lt;X&gt;] &lt;Y&gt; CYCLES] 
      THEN action
      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</pre>
-<p>Where URL-spec is an URL on the standard form as specified in RFC
-2396:</p>
+<p>Where URL-spec is an URL on the standard form as specified in <a href="http://www.ietf.org/rfc/rfc2396.txt" class="rfc">RFC
+2396</a>:</p>
 <pre>
  &lt;protocol&gt;://&lt;authority&gt;&lt;path&gt;?&lt;query&gt;</pre>
 <p>Here is an example of an URL where all components are used:</p>
@@ -1863,7 +1888,7 @@ server and download this amount before testing the content. That
 is, if the content-length is more than 1Mb or this header is not
 set by the server Monit will default to download up to 1 Mb and
 not more.</p>
-<p>Only the <code>http(s)</code> protocol is supported in an URL statement. If
+<p>Only the http(s) protocol is supported in an URL statement. If
 the protocol is <strong>https</strong> Monit will use SSL when connecting to
 the server.</p>
 <p>
@@ -1974,6 +1999,11 @@ the http server. The string will be URL encoded by Monit before
 it sends the request to the http server, so it's okay to use URL
 unsafe characters in the request. If the request statement isn't
 specified, the default web server page will be requested.</p>
+<p>You can override default Host header in HTTP request:</p>
+<pre>
+ if failed host 192.168.1.100 port 80 protocol http 
+    hostheader &quot;example.com&quot;
+ then alert</pre>
 <p>You can also test the checksum for documents returned by a http
 server.  You can use either MD5 sums:</p>
 <pre>
@@ -2009,7 +2039,7 @@ set a longer timeout than the default 5 seconds.</p>
 <p>As mentioned above, if the server protocol is not supported by
 Monit you can write your own protocol test using send/expect
 strings. Here we show a protocol test using send/expect for an
-imaginary ``Ali Baba and the Forty Thieves'' protocol:</p>
+imaginary &quot;Ali Baba and the Forty Thieves&quot; protocol:</p>
 <pre>
  if failed host cave.persia.ir port 4040
     send &quot;Open, Sesame!\r\n&quot;
@@ -2066,10 +2096,10 @@ as Asterisk and FreeSWITCH.</p>
 <p>The SIP test is similar to the other protocol tests, but in
 addition allows extra optional parameters.</p>
 <dl>
-<dt><strong><a name="item_if_failed__5bhost_5d__5bport_5d__5btype_5d_protoco">IF FAILED [host] [port] [type] PROTOCOL sip 
+<dt><strong><a name="if_failed_host_port_type_protocol_sip_and_target_valid_uri_and_maxforward_n_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED [host] [port] [type] PROTOCOL sip 
         [AND] [TARGET valid@uri] [AND] [MAXFORWARD n]
        THEN action
-      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong>
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
 <p>TARGET : 
@@ -2098,6 +2128,25 @@ the connection type.</pre>
 <p>For more examples, see the example section below.</p>
 <p>
 </p>
+<h4><a name="testing_the_radius_protocol">Testing the RADIUS protocol</a></h4>
+<p>The SIP test is similar to the other protocol tests, but in
+addition allows extra optional parameters.</p>
+<dl>
+<dt><strong><a name="if_failed_host_port_type_protocol_radius_secret_string_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED [host] [port] [type] PROTOCOL radius [SECRET string] THEN action
+       [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
+
+</dl>
+<p>SECRET:
+you may specify an alternative secret, default is &quot;testing123&quot;.</p>
+<p>RADIUS example:</p>
+<pre>
+ check process radiusd with pidfile /var/run/radiusd.pid
+       start program = &quot;/etc/init.d/freeradius start&quot;
+       stop program = &quot;/etc/init.d/freeradius stop&quot;
+       if failed host 127.0.0.1 port 1812 type udp protocol radius secret testing123 then alert
+       if 5 restarts within 5 cycles then timeout</pre>
+<p>
+</p>
 <hr />
 <h1><a name="monit_httpd">MONIT HTTPD</a></h1>
 <p>If specified in the control file, Monit will start a Monit daemon
@@ -2108,7 +2157,7 @@ you can view the content of this logfile in a Browser.</p>
 <p>The control file statement for starting a Monit daemon with http
 support is a global set-statement:</p>
 <dl>
-<dt><strong><a name="item_set_httpd_port_2812">set httpd port 2812</a></strong>
+<dt><strong><a name="set_httpd_port_2812" class="item">set httpd port 2812</a></strong></dt>
 
 </dl>
 <p>And you can use this URL, <em><a href="http://localhost:2812/">http://localhost:2812/</a></em>, to access
@@ -2165,7 +2214,7 @@ pages.</p>
 report its name (e.g. 'monit' instead of for example 'monit
 4.2'). By default the version signature is enabled. It is worth
 to stress that this option provides no security advantage and 
-falls into the ``security through obscurity'' category.</p>
+falls into the &quot;security through obscurity&quot; category.</p>
 <p>If you remove the httpd statement from the config file, monit
 will stop the httpd server on configuration reload. Likewise if
 you change the port number, Monit will restart the http server
@@ -2223,7 +2272,7 @@ the server are logged with their ip-address.</p>
 </p>
 <h4><a name="basic_authentication">Basic Authentication</a></h4>
 <p>This authentication schema is HTTP specific and described in more
-detail in RFC 2617.</p>
+detail in <a href="http://www.ietf.org/rfc/rfc2617.txt" class="rfc">RFC 2617</a>.</p>
 <p>In short; a server challenge a client (e.g. a Browser) to send
 authentication information (username and password) and if
 accepted, the server will allow the client access to the
@@ -2257,7 +2306,7 @@ Example Monit PAM for Mac OS X - /etc/pam.d/monit:</p>
 authenticated using via PAM to access the http interface:</p>
 <pre>
   set httpd port 2812 allow @admin</pre>
-<p>Alternatively you can use files in ``htpasswd'' format (one
+<p>Alternatively you can use files in &quot;htpasswd&quot; format (one
 user:passwd entry per line), like so: <em>allow
 [cleartext|crypt|md5] /path [users]</em>. By default cleartext
 passwords are read. In case the passwords are digested it is
@@ -2319,7 +2368,7 @@ services. The dependency statement may be used within any service
 entries in the Monit control file.</p>
 <p>The syntax for the depend statement is simply:</p>
 <dl>
-<dt><strong><a name="item_depends_on_service_5b_2c_service__5b_2c_2e_2e_2e_5">DEPENDS on service[, service [,...]]</a></strong>
+<dt><strong><a name="depends_on_service_service" class="item">DEPENDS on service[, service [,...]]</a></strong></dt>
 
 </dl>
 <p>Where <strong>service</strong> is a service entry name, for instance <strong>apache</strong>
@@ -2379,14 +2428,13 @@ depend statement.</p>
 <p>Here we describe how Monit will function with the above
 dependencies:</p>
 <dl>
-<dt><strong><a name="item_if_no_servers_are_running">If no servers are running</a></strong>
+<dt><strong><a name="if_no_servers_are_running" class="item">If no servers are running</a></strong></dt>
 
 <dd>
 <p>Monit will start the servers in the following order: <em>d</em>, <em>c</em>,
 <em>b</em>, <em>a</em></p>
 </dd>
-</li>
-<dt><strong><a name="item_if_all_servers_are_running">If all servers are running</a></strong>
+<dt><strong><a name="if_all_servers_are_running" class="item">If all servers are running</a></strong></dt>
 
 <dd>
 <p>When you run 'Monit stop all' this is the stop order: <em>a</em>, <em>b</em>,
@@ -2394,46 +2442,38 @@ dependencies:</p>
 are also stopped because they depend on <em>d</em> and finally <em>d</em> is
 stopped.</p>
 </dd>
-</li>
-<dt><strong><a name="item_if_a_does_not_run">If <em>a</em> does not run</a></strong>
+<dt><strong><a name="if_a_does_not_run" class="item">If <em>a</em> does not run</a></strong></dt>
 
 <dd>
 <p>When Monit runs it will start <em>a</em></p>
 </dd>
-</li>
-<dt><strong><a name="item_if_b_does_not_run">If <em>b</em> does not run</a></strong>
+<dt><strong><a name="if_b_does_not_run" class="item">If <em>b</em> does not run</a></strong></dt>
 
 <dd>
 <p>When Monit runs it will first stop <em>a</em> then start <em>b</em> and
 finally start <em>a</em> again.</p>
 </dd>
-</li>
-<dt><strong><a name="item_if_c_does_not_run">If <em>c</em> does not run</a></strong>
+<dt><strong><a name="if_c_does_not_run" class="item">If <em>c</em> does not run</a></strong></dt>
 
 <dd>
 <p>When Monit runs it will first stop <em>a</em> and <em>b</em> then start <em>c</em>
 and finally start <em>b</em> then <em>a</em>.</p>
 </dd>
-</li>
-<dt><strong><a name="item_if_d_does_not_run">If <em>d</em> does not run</a></strong>
+<dt><strong><a name="if_d_does_not_run" class="item">If <em>d</em> does not run</a></strong></dt>
 
 <dd>
 <p>When Monit runs it will first stop <em>a</em>, <em>b</em> and <em>c</em> then start
 <em>d</em> and finally start <em>c</em>, <em>b</em> then <em>a</em>.</p>
 </dd>
-</li>
-<dt><strong><a name="item_if_the_control_file_contains_a_depend_loop_2e">If the control file contains a depend loop.</a></strong>
+<dt><strong><a name="if_the_control_file_contains_a_depend_loop" class="item">If the control file contains a depend loop.</a></strong></dt>
 
 <dd>
 <p>A depend loop is for example; a-&gt;b and b-&gt;a or a-&gt;b-&gt;c-&gt;a.</p>
-</dd>
-<dd>
 <p>When Monit starts it will check for such loops and complain and
 exit if a loop was found. It will also exit with a complaint if a
 depend statement was used that does not point to a service in the
 control file.</p>
 </dd>
-</li>
 </dl>
 <p>
 </p>
@@ -2461,12 +2501,12 @@ containing characters and/or numbers.</p>
 <p>On a semantic level, the control file consists of two types of
 entries:</p>
 <ol>
-<li><strong>Global set-statements</strong>
+<li><strong><a name="global_set_statements2" class="item">Global set-statements</a></strong>
 
 <p>A global set-statement starts with the keyword <em>set</em> and the
 item to configure.</p>
 </li>
-<li><strong>One or more service entry statements.</strong>
+<li><strong><a name="one_or_more_service_entry_statements2" class="item">One or more service entry statements.</a></strong>
 
 <p>Each service entry consists of the keywords `check', followed by
 the service type. Each entry requires a &lt;unique&gt; descriptive
@@ -2477,7 +2517,7 @@ with the user.</p>
 </ol>
 <p>Currently, six types of check statements are supported:</p>
 <ol>
-<li><strong><a name="item_check_process__3cunique_name_3e_pidfile__3cpath_3e">CHECK PROCESS &lt;unique name&gt; PIDFILE &lt;path&gt;</a></strong>
+<li><strong><a name="check_process_unique_name_pidfile_path" class="item">CHECK PROCESS &lt;unique name&gt; PIDFILE &lt;path&gt;</a></strong>
 
 <p>&lt;path&gt; is the absolute path to the program's pidfile. If the
 pidfile does not exist or does not contain the pid number of a
@@ -2485,7 +2525,7 @@ running process, Monit will call the entry's start method if
 defined, If Monit runs in passive mode or the start methods is
 not defined, Monit will just send alerts on errors.</p>
 </li>
-<li><strong><a name="item_check_file__3cunique_name_3e_path__3cpath_3e">CHECK FILE &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
+<li><strong><a name="check_file_unique_name_path_path" class="item">CHECK FILE &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
 
 <p>&lt;path&gt; is the absolute path to the file. If the file does not
 exist or disappeared, Monit will call the entry's start method if
@@ -2494,7 +2534,7 @@ instance a directory), Monit will disable monitoring of this
 entry. If Monit runs in passive mode or the start methods is not
 defined, Monit will just send alerts on errors.</p>
 </li>
-<li><strong><a name="item_check_fifo__3cunique_name_3e_path__3cpath_3e">CHECK FIFO &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
+<li><strong><a name="check_fifo_unique_name_path_path" class="item">CHECK FIFO &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
 
 <p>&lt;path&gt; is the absolute path to the fifo. If the fifo does not
 exist or disappeared, Monit will call the entry's start method if
@@ -2503,7 +2543,7 @@ instance a directory), Monit will disable monitoring of this
 entry. If Monit runs in passive mode or the start methods is not
 defined, Monit will just send alerts on errors.</p>
 </li>
-<li><strong><a name="item_check_filesystem__3cunique_name_3e_path__3cpath_3e">CHECK FILESYSTEM &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
+<li><strong><a name="check_filesystem_unique_name_path_path" class="item">CHECK FILESYSTEM &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
 
 <p>&lt;path&gt; is the path to the filesystem block special device, mount point,
 file or a directory which is part of a filesystem. It is
@@ -2518,7 +2558,7 @@ Monit will disable monitoring of this entry. If Monit runs in
 passive mode or the start methods is not defined, Monit will just
 send alerts on errors.</p>
 </li>
-<li><strong><a name="item_check_directory__3cunique_name_3e_path__3cpath_3e">CHECK DIRECTORY &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
+<li><strong><a name="check_directory_unique_name_path_path" class="item">CHECK DIRECTORY &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
 
 <p>&lt;path&gt; is the absolute path to the directory. If the directory
 does not exist or disappeared, Monit will call the entry's start
@@ -2527,13 +2567,13 @@ will disable monitoring of this entry. If Monit runs in passive
 mode or the start methods is not defined, Monit will just send
 alerts on errors.</p>
 </li>
-<li><strong><a name="item_check_host__3cunique_name_3e_address__3chost_addre">CHECK HOST &lt;unique name&gt; ADDRESS &lt;host address&gt;</a></strong>
+<li><strong><a name="check_host_unique_name_address_host_address" class="item">CHECK HOST &lt;unique name&gt; ADDRESS &lt;host address&gt;</a></strong>
 
 <p>The host address can be specified as a hostname string or as an
 ip-address string on a dotted decimal format. Such as,
-tildeslash.com or ``64.87.72.95''.</p>
+tildeslash.com or &quot;64.87.72.95&quot;.</p>
 </li>
-<li><strong><a name="item_check_system__3cunique_name_3e">CHECK SYSTEM &lt;unique name&gt;</a></strong>
+<li><strong><a name="check_system_unique_name" class="item">CHECK SYSTEM &lt;unique name&gt;</a></strong>
 
 <p>The system name is usualy hostname, but any descriptive name can be
 used. This test allows to check general system resources such as
@@ -2794,7 +2834,8 @@ insensitive.</p>
 <em>process</em>, <em>file</em>, <em>directory</em>, <em>filesystem</em>, <em>size</em>, <em>action</em>,
 <em>unmonitor</em>, <em>rdate</em>, <em>rsync</em>, <em>data</em>, <em>invalid</em>, <em>exec</em>,
 <em>nonexist</em>, <em>policy</em>, <em>reminder</em>, <em>instance</em>, <em>eventqueue</em>,
-<em>basedir</em>, <em>slot(s)</em>, <em>system</em>, <em>idfile</em> and <em>failed</em></p>
+<em>basedir</em>, <em>slot(s)</em>, <em>system</em>, <em>idfile</em>, <em>gps</em>, <em>radius</em>,
+<em>secret</em>, <em>target</em>, <em>maxforward</em>, <em>hostheader</em> and <em>failed</em></p>
 <p>And here is a complete list of <strong>noise keywords</strong> ignored by
 monit:</p>
 <p><em>is</em>, <em>as</em>, <em>are</em>, <em>on(ly)</em>, <em>with(in)</em>, <em>and</em>, <em>has</em>,
@@ -3179,34 +3220,34 @@ is not important.</p>
 </p>
 <hr />
 <h1><a name="files">FILES</a></h1>
-<p><em>~/.monitrc</em>  
+<p><em class="file">~/.monitrc</em>  
    Default run control file</p>
-<p><em>/etc/monitrc</em>
+<p><em class="file">/etc/monitrc</em>
    If the control file is not found in the default 
-   location and /etc contains a <em>monitrc</em> file, this
+   location and /etc contains a <em class="file">monitrc</em> file, this
    file will be used instead.</p>
-<p><em>./monitrc</em>  
+<p><em class="file">./monitrc</em>  
    If the control file is not found in either of the
    previous two locations, and the current working 
-   directory contains a <em>monitrc</em> file, this file is 
+   directory contains a <em class="file">monitrc</em> file, this file is 
    used instead.</p>
-<p><em>~/.monit.pid</em>
+<p><em class="file">~/.monit.pid</em>
    Lock file to help prevent concurrent runs (non-root
    mode).</p>
-<p><em>/var/run/monit.pid</em>
+<p><em class="file">/var/run/monit.pid</em>
    Lock file to help prevent concurrent runs (root mode,
    Linux systems).</p>
-<p><em>/etc/monit.pid</em>
+<p><em class="file">/etc/monit.pid</em>
    Lock file to help prevent concurrent runs (root mode,
    systems without /var/run).</p>
-<p><em>~/.monit.state</em>  
+<p><em class="file">~/.monit.state</em>  
    Monit save its state to this file and utilize 
    information found in this file to recover from 
    a crash. This is a binary file and its content is 
    only of interest to monit. You may set the location
    of this file in the Monit control file or by using 
    the -s switch when Monit is started.</p>
-<p><em>~/.monit.id</em>  
+<p><em class="file">~/.monit.id</em>  
     Monit save its unique id to this file.</p>
 <p>
 </p>
@@ -3217,70 +3258,61 @@ execute a script or a program Monit will set several environment
 variables which can be utilized by the executable. The following
 and <em>only</em> the following environment variables are available:</p>
 <dl>
-<dt><strong><a name="item_monit_event">MONIT_EVENT</a></strong>
+<dt><strong><a name="monit_event" class="item">MONIT_EVENT</a></strong></dt>
 
 <dd>
 <p>The event that occurred on the service</p>
 </dd>
-</li>
-<dt><strong><a name="item_monit_description">MONIT_DESCRIPTION</a></strong>
+<dt><strong><a name="monit_description" class="item">MONIT_DESCRIPTION</a></strong></dt>
 
 <dd>
 <p>A description of the error condition</p>
 </dd>
-</li>
-<dt><strong><a name="item_monit_service">MONIT_SERVICE</a></strong>
+<dt><strong><a name="monit_service" class="item">MONIT_SERVICE</a></strong></dt>
 
 <dd>
 <p>The name of the service (from monitrc) on which the event
 occurred.</p>
 </dd>
-</li>
-<dt><strong><a name="item_monit_date">MONIT_DATE</a></strong>
+<dt><strong><a name="monit_date" class="item">MONIT_DATE</a></strong></dt>
 
 <dd>
 <p>The time and date (rfc 822 style) the event occurred</p>
 </dd>
-</li>
-<dt><strong><a name="item_monit_host">MONIT_HOST</a></strong>
+<dt><strong><a name="monit_host" class="item">MONIT_HOST</a></strong></dt>
 
 <dd>
 <p>The host the event occurred on</p>
 </dd>
-</li>
 </dl>
 <p>The following environment variables are only available for
 process service entries:</p>
 <dl>
-<dt><strong><a name="item_monit_process_pid">MONIT_PROCESS_PID</a></strong>
+<dt><strong><a name="monit_process_pid" class="item">MONIT_PROCESS_PID</a></strong></dt>
 
 <dd>
 <p>The process pid. This may be 0 if the process was (re)started,</p>
 </dd>
-</li>
-<dt><strong><a name="item_monit_process_memory">MONIT_PROCESS_MEMORY</a></strong>
+<dt><strong><a name="monit_process_memory" class="item">MONIT_PROCESS_MEMORY</a></strong></dt>
 
 <dd>
 <p>Process memory. This may be 0 if the process was (re)started,</p>
 </dd>
-</li>
-<dt><strong><a name="item_monit_process_children">MONIT_PROCESS_CHILDREN</a></strong>
+<dt><strong><a name="monit_process_children" class="item">MONIT_PROCESS_CHILDREN</a></strong></dt>
 
 <dd>
 <p>Process children. This may be 0 if the process was (re)started,</p>
 </dd>
-</li>
-<dt><strong><a name="item_monit_process_cpu_percent">MONIT_PROCESS_CPU_PERCENT</a></strong>
+<dt><strong><a name="monit_process_cpu_percent" class="item">MONIT_PROCESS_CPU_PERCENT</a></strong></dt>
 
 <dd>
 <p>Process cpu%. This may be 0 if the process was (re)started,</p>
 </dd>
-</li>
 </dl>
 <p>In addition the following spartan PATH environment variable is
 available:</p>
 <dl>
-<dt><strong><a name="item_path_3d_2fbin_3a_2fusr_2fbin_3a_2fsbin_3a_2fusr_2f">PATH=/bin:/usr/bin:/sbin:/usr/sbin</a></strong>
+<dt><strong><a name="path_bin_usr_bin_sbin_usr_sbin" class="item">PATH=/bin:/usr/bin:/sbin:/usr/sbin</a></strong></dt>
 
 </dl>
 <p>Scripts or programs that depends on other environment variables
@@ -3335,8 +3367,8 @@ MERCHANTABILITY or FITNESS for a particular purpose.</p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p>GNU text utilities; md5sum(1); sha1sum(1); openssl(1); glob(7);
-regex(7); <em><a href="http://mmonit.com/">http://mmonit.com/</a></em></p>
+<p>GNU text utilities; md5sum(1); sha1sum(1); <code>openssl(1)</code>; <code>glob(7)</code>;
+<code>regex(7)</code>; <em><a href="http://mmonit.com/">http://mmonit.com/</a></em></p>
 
 </body>
 

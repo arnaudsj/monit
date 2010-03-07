@@ -218,7 +218,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     if (sscanf(tmp,
          "%c %d %*d %*d %*d %*d %*u %*u"
          "%*u %*u %*u %lu %lu %ld %ld %*d %*d %*d "
-         "%*d %*u %*u %ld %*u %*u %*u %*u %*u "
+         "%*u %llu %*u %ld %*u %*u %*u %*u %*u "
          "%*u %*u %*u %*u %*u %*u %*u %*u %*d %*d\n",
          &stat_item_state,
          &stat_ppid,
@@ -226,14 +226,14 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
          &stat_item_stime,
          &stat_item_cutime,
          &stat_item_cstime,
-         &stat_item_rss) != 7) {
+         &stat_item_starttime,
+         &stat_item_rss) != 8) {
       DEBUG("system statistic error -- file /proc/%d/stat parse error\n", pt[i].pid);
       continue;
     }
     
-    /* abs to please the compiler... we dont want to shift negatively.
-     * why doesn't C understand this??? */
-    pt[i].ppid = stat_ppid;
+    pt[i].ppid      = stat_ppid;
+    pt[i].starttime = (time_t)(stat_item_starttime / NSEC_PER_SEC); //FIXME: unlike other platforms it seems that this is not time abstime from epoch but product of nsec_to_clock_t() ... check and fix
   
     /* jiffies -> seconds = 1 / HZ
      * HZ is defined in "asm/param.h"  and it is usually 1/100s but on
