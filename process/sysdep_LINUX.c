@@ -122,6 +122,28 @@ static unsigned long long old_cpu_total    = 0;
 static int                page_shift_to_kb = 0;
 
 
+/**
+ * Get system start time
+ * @return seconds since unix epoch
+ */
+static time_t get_starttime() {
+  char   buf[1024];
+  double up = 0;
+
+  if (! read_proc_file(buf, 1024, "uptime", -1)) {
+    LogError("system statistic error -- cannot get system uptime\n");
+    return 0;
+  }
+
+  if (sscanf(buf, "%lf", &up) != 1) {
+    LogError("system statistic error -- invalid uptime\n");
+    return 0;
+  }
+
+  return time(NULL) - (time_t)up;
+}
+  
+
 /* ------------------------------------------------------------------ Public */
 
 
@@ -131,7 +153,7 @@ int init_process_info_sysdep(void) {
   long  page_size;
   int   page_shift;  
 
-  if (! read_proc_file(buf, 1024, "meminfo", -1)) 
+  if (! read_proc_file(buf, sizeof(buf), "meminfo", -1)) 
     return FALSE;
   if (! (ptr = strstr(buf, MEMTOTAL))) {
     DEBUG("system statistic error -- cannot get real memory amount\n");
@@ -174,7 +196,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   int                 treesize = 0;
   int                 stat_ppid = 0;
   char               *tmp = NULL;
-  char                buf[4096];
+  char                buf[1024];
   char                stat_item_state;
   long                stat_item_cutime = 0;
   long                stat_item_cstime = 0;
@@ -201,7 +223,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   for (i = 0; i < treesize; i++) {
     pt[i].pid = atoi(globbuf.gl_pathv[i] + strlen("/proc/"));
     
-    if (!read_proc_file(buf, 4096, "stat", pt[i].pid)) {
+    if (!read_proc_file(buf, sizeof(buf), "stat", pt[i].pid)) {
       DEBUG("system statistic error -- cannot read /proc/%d/stat\n", pt[i].pid);
       continue;
     }
@@ -236,7 +258,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     }
     
     pt[i].ppid      = stat_ppid;
-    pt[i].starttime = (time_t)(stat_item_starttime / NSEC_PER_SEC); //FIXME: unlike other platforms it seems that this is not time abstime from epoch but product of nsec_to_clock_t() ... check and fix
+    pt[i].starttime = get_starttime() + (time_t)(stat_item_starttime / HZ);
   
     /* jiffies -> seconds = 1 / HZ
      * HZ is defined in "asm/param.h"  and it is usually 1/100s but on
@@ -395,4 +417,5 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
   si->total_cpu_wait_percent = 0;
   return FALSE;
 }
+
 

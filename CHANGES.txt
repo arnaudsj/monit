@@ -11,6 +11,11 @@ Version 5.1.2
 
 BUGFIXES:
 
+* Show real process uptime - formerly the presented uptime was
+  based on create timestamp of process' pidfile which provides invalid
+  uptime if the pidfile is replaced. This does for example apache when
+  it is reloaded. Thanks to Nima Chavooshi for report.
+
 
 Version 5.1.1
 
