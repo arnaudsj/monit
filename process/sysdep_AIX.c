@@ -221,6 +221,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     pt[i].mem_kbyte   = 0;
     pt[i].pid         = procs[i].pi_pid;
     pt[i].ppid        = procs[i].pi_ppid;
+    pt[i].starttime   = procs[i].pi_start;
 
     if (procs[i].pi_state == SZOMB) {
       pt[i].status_flag |= PROCESS_ZOMBIE;
