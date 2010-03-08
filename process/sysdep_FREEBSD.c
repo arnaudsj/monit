@@ -227,7 +227,7 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
 
   /* Memory */
   memset(mib, 0, sizeof(mib));
-  mib[0] = CTL_VM
+  mib[0] = CTL_VM;
   mib[1] = VM_METER;
   len    = sizeof(struct vmtotal);
   if (sysctl(mib, 2, &vm, &len, NULL, 0) == -1) {
@@ -239,8 +239,8 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   /* Swap */
 #if (__FreeBSD_version > 500000)
   memset(mib, 0, sizeof(mib));
-  len = sizeof(mib) / sizeof(mib[0]);
-  if (sysctlnametomib("vm.swap_info", mib, &len) == -1) {
+  miblen = sizeof(mib) / sizeof(mib[0]);
+  if (sysctlnametomib("vm.swap_info", mib, &miblen) == -1) {
     LogError("system statistic error -- cannot get swap usage: %s\n", STRERROR);
     si->swap_kbyte_max = 0;
     return FALSE;
