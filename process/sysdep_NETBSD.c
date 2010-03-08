@@ -209,7 +209,7 @@ int getloadavg_sysdep (double *loadv, int nelem) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-  int            mib[2]
+  int            mib[2];
   size_t         len;
   struct vmtotal vm;
   struct uvmexp  vmexp;
