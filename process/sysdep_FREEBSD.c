@@ -216,14 +216,17 @@ int getloadavg_sysdep(double *loadv, int nelem) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-  int                n = 0;
   int                mib[16];
-  int                pagesize = getpagesize();
-  size_t             len, miblen;
+  size_t             len;
   struct vmtotal     vm;
+#if (__FreeBSD_version > 500000)
+  int                n = 0;
+  int                pagesize = getpagesize();
+  size_t             miblen;
   struct xswdev      xsw;
   unsigned long long total = 0ULL;
   unsigned long long used  = 0ULL;
+#endif
 
   /* Memory */
   memset(mib, 0, sizeof(mib));
