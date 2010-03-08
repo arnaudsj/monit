@@ -88,6 +88,10 @@
 #include <kstat.h>
 #endif
 
+#ifdef HAVE_SYS_SWAP_H
+#include <sys/swap.h>
+#endif
+
 #include <sys/sysinfo.h>
 
 #include "monitor.h"
@@ -112,6 +116,8 @@ static long   old_cpu_user=0;
 static long   old_cpu_syst=0;
 static long   old_cpu_wait=0;
 static long   old_total=0;
+
+#define MAXSTRSIZE 80
 
 #ifndef LOG1024
 #define LOG1024         10
