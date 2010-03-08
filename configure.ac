@@ -135,7 +135,6 @@ AC_CHECK_HEADERS([ \
 	sys/resource.h \
 	sys/statfs.h \
 	sys/statvfs.h \
-        sys/swap.h \
 	sys/systemcfg.h \
 	sys/time.h \
 	sys/tree.h \
@@ -196,6 +195,7 @@ AC_CHECK_HEADERS([ \
         sys/sysctl.h \
         sys/mount.h \
         sys/proc.h \
+        sys/swap.h \
         sys/user.h \
         ],
         [],
