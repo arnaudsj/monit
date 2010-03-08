@@ -307,6 +307,8 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   unsigned long  mem_free;
   unsigned long  buffers;
   unsigned long  cached;
+  unsigned long  swap_total;
+  unsigned long  swap_free;
   
   /* Memory */
 
