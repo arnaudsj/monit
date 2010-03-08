@@ -172,21 +172,21 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
   for (i = 0; i < treesize; i++) {
-   #if (__FreeBSD_version > 500000)
+#if (__FreeBSD_version > 500000)
     pt[i].pid       = pinfo[i].ki_pid;
     pt[i].ppid      = pinfo[i].ki_ppid;
     pt[i].starttime = pinfo[i].ki_start.tv_sec;
     pt[i].cputime   = (long)(pinfo[i].ki_runtime / 100000);
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].ki_rssize * pagesize_kbyte);
     if (pinfo[i].ki_stat == SZOMB)
-   #else
+#else
     pt[i].pid       = pinfo[i].kp_proc.p_pid;
     pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
     pt[i].starttime = pinfo[i].kp_eproc.e_stats.p_start.tv_sec;
     pt[i].cputime   = (long)(pinfo[i].kp_proc.p_runtime / 100000);
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].kp_eproc.e_vm.vm_rssize * pagesize_kbyte);
     if (pinfo[i].kp_proc.p_stat == SZOMB)
-   #endif
+#endif
       pt[i].status_flag |= PROCESS_ZOMBIE;
     pt[i].cpu_percent = 0;
     pt[i].time = get_float_time();
@@ -216,16 +216,57 @@ int getloadavg_sysdep(double *loadv, int nelem) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-  int            mib[] = {CTL_VM, VM_METER};
-  size_t         len   = sizeof(struct vmtotal);
-  struct vmtotal vm;
+  int                n = 0;
+  int                mib[16];
+  int                pagesize = getpagesize();
+  size_t             len, miblen;
+  struct vmtotal     vm;
+  struct xswdev      xsw;
+  unsigned long long total = 0ULL;
+  unsigned long long used  = 0ULL;
 
+  /* Memory */
+  memset(mib, 0, sizeof(mib));
+  mib[0] = CTL_VM
+  mib[1] = VM_METER;
+  len    = sizeof(struct vmtotal);
   if (sysctl(mib, 2, &vm, &len, NULL, 0) == -1) {
     LogError("system statistic error -- cannot get real memory usage: %s\n", STRERROR);
     return FALSE;
   }
-
   si->total_mem_kbyte = (unsigned long)(vm.t_arm * pagesize_kbyte);
+
+  /* Swap */
+#if (__FreeBSD_version > 500000)
+  memset(mib, 0, sizeof(mib));
+  len = sizeof(mib) / sizeof(mib[0]);
+  if (sysctlnametomib("vm.swap_info", mib, &len) == -1) {
+    LogError("system statistic error -- cannot get swap usage: %s\n", STRERROR);
+    si->swap_kbyte_max = 0;
+    return FALSE;
+  }
+  while (TRUE) {
+    mib[miblen] = n;
+    len = sizeof(struct xswdev);
+    if (sysctl(mib, miblen + 1, &xsw, &len, NULL, 0) == -1)
+      break;
+    if (xsw.xsw_version != XSWDEV_VERSION) {
+      LogError("system statistic error -- cannot get swap usage: xswdev version mismatch\n");
+      si->swap_kbyte_max = 0;
+      return FALSE;
+    }
+    total += xsw.xsw_nblks;
+    used  += xsw.xsw_used;
+    n++;
+  }
+  si->swap_kbyte_max   = (unsigned long)(double)total * (double)pagesize / 1024.;
+  si->total_swap_kbyte = (unsigned long)(double)used  * (double)pagesize / 1024.;
+#else
+  /* Not implemented - FreeBSD <= 5.x doesn't have vm.swap_info MIB and uses kvm instead. As such FreeBSD version is obsolete, no need to implement unless somebody will ask for it. */
+  DEBUG("system statistic -- swap usage monitoring not implemented in FreeBSD <= 5.x\n");
+  si->swap_kbyte_max = 0;
+#endif
+
   return TRUE;
 }
 

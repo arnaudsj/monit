@@ -874,7 +874,8 @@ static void do_home_system(HttpRequest req, HttpResponse res) {
     out_print(res,
       "<td align=\"right\"><h3><b>Load</b></h3></td>"
       "<td align=\"right\"><h3><b>CPU</b></h3></td>"
-      "<td align=\"right\"><h3><b>Memory</b></h3></td>");
+      "<td align=\"right\"><h3><b>Memory</b></h3></td>"
+      "<td align=\"right\"><h3><b>Swap</b></h3></td>");
   }
 
   out_print(res,
@@ -895,13 +896,15 @@ static void do_home_system(HttpRequest req, HttpResponse res) {
       ",&nbsp;%.1f%%wa"
     #endif
       "</td>"
+      "<td align=\"right\" width=\"20%%\">%.1f%% [%ld&nbsp;kB]</td>"
       "<td align=\"right\" width=\"20%%\">%.1f%% [%ld&nbsp;kB]</td>",
       systeminfo.loadavg[0], systeminfo.loadavg[1], systeminfo.loadavg[2],
       systeminfo.total_cpu_user_percent/10., systeminfo.total_cpu_syst_percent/10.,
     #ifdef HAVE_CPU_WAIT
       systeminfo.total_cpu_wait_percent/10.,
     #endif
-      systeminfo.total_mem_percent/10., systeminfo.total_mem_kbyte);
+      systeminfo.total_mem_percent/10., systeminfo.total_mem_kbyte,
+      systeminfo.total_swap_percent/10., systeminfo.total_swap_kbyte);
   }
 
   out_print(res,
@@ -1929,6 +1932,27 @@ static void print_service_rules_resource(HttpResponse res, Service_T s) {
 	  q->limit,
           ratio1, a->failed->description,
           ratio2, a->succeeded->description);
+
+      case RESOURCE_ID_SWAP_PERCENT: 
+	  
+	out_print(res,"<tr><td>Swap usage limit</td>"
+	  "<td>If %s %.1f%% %s then %s "
+          "else if succeeded %s then %s</td></tr>", 
+	  operatornames[q->operator],
+	  q->limit/10.0,
+          ratio1, a->failed->description,
+          ratio2, a->succeeded->description);
+	break;
+	  
+      case RESOURCE_ID_SWAP_KBYTE: 
+	  
+	out_print(res,"<tr><td>Swap amount limit</td>"
+	  "<td>If %s %ld %s then %s "
+          "else if succeeded %s then %s</td></tr>", 
+	  operatornames[q->operator],
+	  q->limit,
+          ratio1, a->failed->description,
+          ratio2, a->succeeded->description);
 	break;
 	  
       case RESOURCE_ID_LOAD1: 
@@ -2400,6 +2424,11 @@ static void print_service_params_resource(HttpResponse res, Service_T s) {
           (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
           systeminfo.total_mem_kbyte,
           systeminfo.total_mem_percent/10.);
+        out_print(res,
+          "<tr><td>Swap usage</td><td><font%s>%ld kB [%.1f%%]</font></td></tr>",
+          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          systeminfo.total_swap_kbyte,
+          systeminfo.total_swap_percent/10.);
       }
     }
   }
@@ -2612,6 +2641,7 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
           " %.1f%%wa"
         #endif
           "\n"
+          "  %-33s %ld kB [%.1f%%]\n"
           "  %-33s %ld kB [%.1f%%]\n",
           "load average",
           systeminfo.loadavg[0],
@@ -2625,7 +2655,10 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
         #endif
           "memory usage",
           systeminfo.total_mem_kbyte,
-          systeminfo.total_mem_percent/10.);
+          systeminfo.total_mem_percent/10.,
+          "swap usage",
+          systeminfo.total_swap_kbyte,
+          systeminfo.total_swap_percent/10.);
       }
     }
     ctime_r((const time_t *)&s->collected.tv_sec, time);

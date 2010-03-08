@@ -37,6 +37,10 @@
 #include <stdlib.h>
 #endif
 
+#ifdef HAVE_POLL_H
+#include <poll.h>
+#endif
+
 #ifdef HAVE_STDARG_H
 #include <stdarg.h>
 #endif
@@ -487,22 +491,15 @@ int set_block(int socket) {
  * @return Return TRUE if the event occured, otherwise FALSE.
  */
 int can_read(int socket, int timeout) {
+  int r = 0;
+  struct pollfd fds[1];
 
-  int r= 0;
-  fd_set rset;
-  struct timeval tv;
-  
-  FD_ZERO(&rset);
-  FD_SET(socket, &rset);
-  tv.tv_sec= timeout;
-  tv.tv_usec= 0;
-  
+  fds[0].fd = socket;
+  fds[0].events = POLLIN;
   do {
-    r= select(socket+1, &rset, NULL, NULL, &tv);
-  } while(r == -1 && errno == EINTR);
-
+    r = poll(fds, 1, timeout * 1000);
+  } while (r == -1 && errno == EINTR);
   return (r > 0);
-
 }
 
 
@@ -514,22 +511,15 @@ int can_read(int socket, int timeout) {
  * @return Return TRUE if the event occured, otherwise FALSE.
  */
 int can_write(int socket, int timeout) {
+  int r = 0;
+  struct pollfd fds[1];
 
-  int r= 0;
-  fd_set wset;
-  struct timeval tv;
-
-  FD_ZERO(&wset);
-  FD_SET(socket, &wset);
-  tv.tv_sec= timeout;
-  tv.tv_usec= 0;
-
+  fds[0].fd = socket;
+  fds[0].events = POLLOUT;
   do {
-    r= select(socket+1, NULL, &wset, NULL, &tv);
-  } while(r == -1 && errno == EINTR);
-
+    r = poll(fds, 1, timeout * 1000);
+  } while (r == -1 && errno == EINTR);
   return (r > 0);
-  
 }
 
 
@@ -660,21 +650,19 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   struct addrinfo *result;
 #ifdef HAVE_SOL_IP
   struct iphdr *iphdrin;
-  struct icmphdr *icmphdrin= NULL;
+  struct icmphdr *icmphdrin = NULL;
   struct icmphdr *icmphdrout[ICMP_MAX_COUNT];
 #else
   struct ip *iphdrin;
-  struct icmp *icmphdrin= NULL;
+  struct icmp *icmphdrin = NULL;
   struct icmp *icmphdrout[ICMP_MAX_COUNT];
 #endif
-  fd_set rset;
   int i;
   int s;
-  int n= 0;
+  int n = 0;
   int sol_ip;
-  unsigned ttl= 255;
+  unsigned ttl = 255;
   char buf[STRLEN];
-  struct timeval tv;
   struct timeval t1[ICMP_MAX_COUNT];
   struct timeval t2;
   double response= -1.;
@@ -684,10 +672,10 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
-  if(getaddrinfo(hostname, NULL, &hints, &result) != 0)
+  if (getaddrinfo(hostname, NULL, &hints, &result) != 0)
     return response;
 
-  if((s= socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
+  if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
     freeaddrinfo(result);
     return response;
   }
@@ -697,109 +685,82 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 #else
   {
     struct protoent *pent;
-    pent = getprotobyname( "ip" );
-    sol_ip = ( pent != NULL ) ? pent->p_proto : 0;
+    pent = getprotobyname("ip");
+    sol_ip = pent ? pent->p_proto : 0;
   }
 #endif
 
-  if(setsockopt(s, sol_ip, IP_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
+  if (setsockopt(s, sol_ip, IP_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
     freeaddrinfo(result);
     goto error2;
   }
 
-  tv.tv_sec= timeout;
-  tv.tv_usec= 0;
-  
-  for(i=0; i<count; i++) {
+  for (i = 0; i < count; i++) {
     NEW(icmphdrout[i]);
 #ifdef HAVE_SOL_IP
-    icmphdrout[i]->code= 0;
-    icmphdrout[i]->type= ICMP_ECHO;
-    icmphdrout[i]->un.echo.id= getpid() + (long)hostname + time(NULL);
-    icmphdrout[i]->un.echo.sequence= i;
-    icmphdrout[i]->checksum= checksum_ip((unsigned char *)icmphdrout[i], ICMP_SIZE);
+    icmphdrout[i]->code             = 0;
+    icmphdrout[i]->type             = ICMP_ECHO;
+    icmphdrout[i]->un.echo.id       = getpid() + (long)hostname + time(NULL);
+    icmphdrout[i]->un.echo.sequence = i;
+    icmphdrout[i]->checksum         = checksum_ip((unsigned char *)icmphdrout[i], ICMP_SIZE);
 #else
-    icmphdrout[i]->icmp_code= 0;
-    icmphdrout[i]->icmp_type= ICMP_ECHO;
-    icmphdrout[i]->icmp_id= getpid() + (long)hostname + time(NULL);
-    icmphdrout[i]->icmp_seq= i;
-    icmphdrout[i]->icmp_cksum= checksum_ip((unsigned char *)icmphdrout[i], ICMP_SIZE);
+    icmphdrout[i]->icmp_code  = 0;
+    icmphdrout[i]->icmp_type  = ICMP_ECHO;
+    icmphdrout[i]->icmp_id    = getpid() + (long)hostname + time(NULL);
+    icmphdrout[i]->icmp_seq   = i;
+    icmphdrout[i]->icmp_cksum = checksum_ip((unsigned char *)icmphdrout[i], ICMP_SIZE);
 #endif
     sa = (struct sockaddr_in *)result->ai_addr;
     memcpy(&sout, sa, result->ai_addrlen);
-    sout.sin_family= AF_INET;
-    sout.sin_port= 0;
+    sout.sin_family = AF_INET;
+    sout.sin_port   = 0;
 
     /* Get time of particular connection attempt beginning */
     gettimeofday(&t1[i], NULL);
 
     do {
-      n= sendto(s, (char *)icmphdrout[i], ICMP_SIZE, 0,
-	      (struct sockaddr *)&sout, sizeof(struct sockaddr));
+      n = sendto(s, (char *)icmphdrout[i], ICMP_SIZE, 0, (struct sockaddr *)&sout, sizeof(struct sockaddr));
     } while(n == -1 && errno == EINTR);
   }
   freeaddrinfo(result);
   
-  do {
-
-    socklen_t size;
-
-    FD_ZERO(&rset);
-    FD_SET(s, &rset);
+  if (can_read(s, timeout)) {
+    socklen_t size = sizeof(struct sockaddr_in);
 
     do {
-      n= select(s+1, &rset, NULL, NULL, &tv);
+      n = recvfrom(s, buf, STRLEN, 0, (struct sockaddr *)&sin, &size);
     } while(n == -1 && errno == EINTR);
-
-    if(n <= 0)
+    
+    if (n < 0)
       goto error1;
 
-    size= sizeof(struct sockaddr_in);
-
-    do {
-      n= recvfrom(s, buf, STRLEN, 0, (struct sockaddr *)&sin, &size);
-    } while(n == -1 && errno == EINTR);
-    
-    if(n < 0)
-	    goto error1;
-    
-    for(i=0; i<count; i++) {
+    for (i = 0; i < count; i++) {
 #ifdef HAVE_SOL_IP
-      iphdrin= (struct iphdr *)buf;
-      icmphdrin= (struct icmphdr *)(buf + iphdrin->ihl * 4);
-      if( (icmphdrin->un.echo.id == icmphdrout[i]->un.echo.id) &&
-          (icmphdrin->type == ICMP_ECHOREPLY) &&
-          (icmphdrin->un.echo.sequence == icmphdrout[i]->un.echo.sequence) ) {
+      iphdrin = (struct iphdr *)buf;
+      icmphdrin = (struct icmphdr *)(buf + iphdrin->ihl * 4);
+      if ( (icmphdrin->un.echo.id == icmphdrout[i]->un.echo.id) && (icmphdrin->type == ICMP_ECHOREPLY) && (icmphdrin->un.echo.sequence == icmphdrout[i]->un.echo.sequence) ) {
 #else
-      iphdrin= (struct ip *)buf;
-      icmphdrin= (struct icmp *)(buf + iphdrin->ip_hl * 4);
-      if( (icmphdrin->icmp_id == icmphdrout[i]->icmp_id) &&
-          (icmphdrin->icmp_type == ICMP_ECHOREPLY) &&
-          (icmphdrin->icmp_seq == icmphdrout[i]->icmp_seq) ) {
+      iphdrin = (struct ip *)buf;
+      icmphdrin = (struct icmp *)(buf + iphdrin->ip_hl * 4);
+      if ( (icmphdrin->icmp_id == icmphdrout[i]->icmp_id) && (icmphdrin->icmp_type == ICMP_ECHOREPLY) && (icmphdrin->icmp_seq == icmphdrout[i]->icmp_seq) ) {
 #endif
 
         /* Get time of connection attempt finish */
         gettimeofday(&t2, NULL);
 
         /* Get the response time */
-        response= (double)(t2.tv_sec  - t1[i].tv_sec) +
-                  (double)(t2.tv_usec - t1[i].tv_usec)/1000000;
-
-        goto done;
+        response = (double)(t2.tv_sec - t1[i].tv_sec) + (double)(t2.tv_usec - t1[i].tv_usec) / 1000000;
       }
     }
-  } while(TRUE);
+  }
 
-  done:
   error1:
-  for(i=0; i<count; i++) {
+  for (i = 0; i < count; i++)
     FREE(icmphdrout[i]);
-  }    
   error2:
   close_socket(s);
 
   return response;
- 
 }
 
 
@@ -809,46 +770,36 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 /*
  * Do a non blocking connect, timeout if not connected within timeout seconds
  */
-static int do_connect(int s, const struct sockaddr *addr,
-		      socklen_t addrlen, int timeout) {
+static int do_connect(int s, const struct sockaddr *addr, socklen_t addrlen, int timeout) {
+  int error;
+  struct pollfd fds[1];
 
-  int n, error;
-  fd_set wset, rset;
-  struct timeval tv;
-
-  errno= 0;
-  error= 0;
-  
-  if(0 > (n= connect(s, addr, addrlen)))
-    if(errno != EINPROGRESS)
-      return -1;
-  
-  FD_ZERO(&rset);
-  FD_SET(s, &rset);
-  wset= rset;
-  tv.tv_sec= timeout;
-  tv.tv_usec= 0;
-  
-  if(select(s+1, NULL, &rset, &wset, &tv)==0) {
-    close(s);
-    errno= ETIMEDOUT;
+  switch (connect(s, addr, addrlen)) {
+    case 0:
+      return 0;
+    default:
+      if (errno != EINPROGRESS)
+        return -1;
+      break;
+  }
+  fds[0].fd = s;
+  fds[0].events = POLLIN|POLLOUT;
+  if (poll(fds, 1, timeout * 1000) == 0) {
+    errno = ETIMEDOUT;
     return -1;
   }
-
-  if(FD_ISSET(s, &rset) || FD_ISSET(s, &wset)) {
-    socklen_t len= sizeof(error);
-    if(getsockopt(s, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
-      return -1;
-  } else
-    return -1;
-
-  if(error) {
-    errno= error;
+  if (fds[0].events & POLLIN || fds[0].events & POLLOUT) {
+    socklen_t len = sizeof(error);
+    if (getsockopt(s, SOL_SOCKET, SO_ERROR, &error, &len) < 0)
+      return -1; // Solaris pending error
+  } else {
     return -1;
   }
-
+  if (error) {
+    errno = error;
+    return -1;
+  }
   return 0;
-  
 }
 
 

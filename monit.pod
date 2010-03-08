@@ -249,6 +249,7 @@ A Monit control file example:
     if loadavg (1min) > 4 then alert
     if loadavg (5min) > 2 then alert
     if memory usage > 75% then alert
+    if swap usage > 25% then alert
     if cpu usage (user) > 70% then alert
     if cpu usage (system) > 30% then alert
     if cpu usage (wait) > 20% then alert
@@ -1176,7 +1177,7 @@ statements in [brackets]),
 
 
 I<resource> is a choice of "CPU", "TOTALCPU",
-"CPU([user|system|wait])", "MEMORY", "CHILDREN", "TOTALMEMORY",
+"CPU([user|system|wait])", "MEMORY", "SWAP", "CHILDREN", "TOTALMEMORY",
 "LOADAVG([1min|5min|15min])". Some resource tests can be used
 inside a check system entry, some in a check process entry and
 some in both:
@@ -1186,6 +1187,9 @@ System only resource tests:
 CPU([user|system|wait]) is the percent of time the system spend
 in user or system/kernel space. Some systems such as linux 2.6
 supports a 'wait' indicator as well.
+
+SWAP is the swap usage of the system in either percent (of the
+systems total) or as an amount (Byte, kB, MB, GB).
 
 Process only resource tests:
 

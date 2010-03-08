@@ -104,6 +104,7 @@ AC_CHECK_HEADERS([ \
 	netinet/in.h \
         netinet/in_systm.h \
         pam/pam_appl.h \
+	poll.h \
 	procfs.h \
 	procinfo.h \
 	pthread.h \
@@ -134,6 +135,7 @@ AC_CHECK_HEADERS([ \
 	sys/resource.h \
 	sys/statfs.h \
 	sys/statvfs.h \
+        sys/swap.h \
 	sys/systemcfg.h \
 	sys/time.h \
 	sys/tree.h \

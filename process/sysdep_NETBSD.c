@@ -209,16 +209,32 @@ int getloadavg_sysdep (double *loadv, int nelem) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-  int            mib[] = {CTL_VM, VM_METER};
-  size_t         len   = sizeof(struct vmtotal);
+  int            mib[2]
+  size_t         len;
   struct vmtotal vm;
+  struct uvmexp  vmexp;
 
+  /* Memory */
+  mib[0] = CTL_VM;
+  mib[1] = VM_METER;
+  len    = sizeof(struct vmtotal);
   if (sysctl(mib, 2, &vm, &len, NULL, 0) == -1) {
     LogError("system statistic error -- cannot get real memory usage: %s\n", STRERROR);
     return FALSE;
   }
-
   si->total_mem_kbyte = (unsigned long)(vm.t_arm * pagesize_kbyte);
+
+  /* Swap */
+  mib[1] = VM_UVMEXP;
+  len = sizeof(vmexp);
+  if (sysctl(mib, 2, &vmexp, &len, NULL, 0) == -1) {
+    LogError("system statistic error -- cannot get swap usage: %s\n", STRERROR);
+    si->swap_kbyte_max = 0;
+    return FALSE;
+  }
+  si->swap_kbyte_max   = (unsigned long)((double)vmexp.swpages   * ((double)vmexp.pagesize / 1024.));
+  si->total_swap_kbyte = (unsigned long)((double)vmexp.swpginuse * ((double)vmexp.pagesize / 1024.));
+
   return TRUE;
 }
 

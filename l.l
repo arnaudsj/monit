@@ -243,6 +243,7 @@ waitlimit         { return WAITLIMIT; }
 gracefullimit     { return GRACEFULLIMIT; }
 cleanuplimit      { return CLEANUPLIMIT; }
 mem(ory)?         { return MEMORY; }
+swap              { return SWAP; }
 totalmem(ory)?    { return TOTALMEMORY; }
 cpu               { return CPU; }
 totalcpu          { return TOTALCPU; }

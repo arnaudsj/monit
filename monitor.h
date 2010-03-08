@@ -182,6 +182,8 @@
 #define RESOURCE_ID_CPUSYSTEM         13
 #define RESOURCE_ID_CPUWAIT           14
 #define RESOURCE_ID_TOTAL_CPU_PERCENT 15
+#define RESOURCE_ID_SWAP_PERCENT      16
+#define RESOURCE_ID_SWAP_KBYTE        17
 
 #define DIGEST_CLEARTEXT   1
 #define DIGEST_CRYPT       2
@@ -421,8 +423,11 @@ typedef struct mysysteminfo {
   int cpus;                                              /**< Number of CPUs */
   double loadavg[3];                                /**< Load average triple */
   unsigned long mem_kbyte_max;               /**< Maximal system real memory */
+  unsigned long swap_kbyte_max;                               /**< Swap size */
   unsigned long total_mem_kbyte; /**< Total real memory in use in the system */
+  unsigned long total_swap_kbyte;       /**< Total swap in use in the system */
   int    total_mem_percent;      /**< Total real memory in use in the system */
+  int    total_swap_percent;            /**< Total swap in use in the system */
   int    total_cpu_user_percent;   /**< Total CPU in use in user space (pct.)*/
   int    total_cpu_syst_percent; /**< Total CPU in use in kernel space (pct.)*/
   int    total_cpu_wait_percent;      /**< Total CPU in use in waiting (pct.)*/

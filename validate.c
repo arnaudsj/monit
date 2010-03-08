@@ -758,6 +758,26 @@ static void check_process_resources(Service_T s, Resource_T r) {
     }
     break;
 
+  case RESOURCE_ID_SWAP_PERCENT:
+    if (s->type == TYPE_SYSTEM) {
+      if (Util_evalQExpression(r->operator, systeminfo.total_swap_percent, r->limit)) {
+        snprintf(report, STRLEN, "swap usage of %.1f%% matches resource limit [swap usage%s%.1f%%]", systeminfo.total_swap_percent/10.0, operatorshortnames[r->operator], r->limit/10.0);
+        okay = FALSE;
+      } else
+        snprintf(report, STRLEN, "'%s' swap usage check succeeded [current swap usage=%.1f%%]\n", s->name, systeminfo.total_swap_percent/10.0);
+    }
+    break;
+
+  case RESOURCE_ID_SWAP_KBYTE:
+    if (s->type == TYPE_SYSTEM) {
+      if (Util_evalQExpression(r->operator, systeminfo.total_swap_kbyte, r->limit)) {
+        snprintf(report, STRLEN, "swap amount of %ldkB matches resource limit [swap amount%s%ldkB]", systeminfo.total_swap_kbyte, operatorshortnames[r->operator], r->limit);
+        okay = FALSE;
+      } else
+        snprintf(report, STRLEN, "'%s' swap amount check succeeded [current swap amount=%ldkB]\n", s->name, systeminfo.total_swap_kbyte);
+    }
+    break;
+
   case RESOURCE_ID_LOAD1:
     if (Util_evalQExpression(r->operator, (int)(systeminfo.loadavg[0]*10.0), r->limit)) {
       snprintf(report, STRLEN, "loadavg(1min) of %.1f matches resource limit " "[loadavg(1min)%s%.1f]", systeminfo.loadavg[0], operatorshortnames[r->operator], r->limit/10.0);

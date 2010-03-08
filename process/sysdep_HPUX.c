@@ -94,6 +94,10 @@
 #include <sys/dk.h>
 #endif
 
+#ifdef HAVE_SYS_SWAP_H
+#include <sys/swap.h>
+#endif
+
 #include "monitor.h"
 #include "process.h"
 #include "process_sysdep.h"
@@ -106,6 +110,8 @@ static long        cpu_syst_old = 0;
 static long        cpu_wait_old = 0;
 struct pst_dynamic pst_dyn;
 struct pst_status *psall;
+
+#define MAXSTRSIZE 80
 
 /**
  *  System dependent resource gathering code for HP/UX.
@@ -221,9 +227,14 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-  struct pst_static pst;
-  struct pst_dynamic psd;
+  struct pst_static   pst;
+  struct pst_dynamic  psd;
+  struct swaptable   *s;
+  char               *strtab;
+  unsigned long long  total = 0ULL;
+  unsigned long long  used  = 0ULL;
 
+  /* Memory */
   if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1) {
     LogError("system statistic error -- pstat_getstatic failed: %s\n", STRERROR);
     return FALSE;
@@ -232,8 +243,48 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
     LogError("system statistic error -- pstat_getdynamic failed: %s\n", STRERROR);
     return FALSE;
   }
-
   si->total_mem_kbyte = (unsigned long)((pst.physical_memory - psd.psd_free) * (pst.page_size/1024));
+
+  /* Swap */
+again:
+ if ((num = swapctl(SC_GETNSWP, 0)) == -1) {
+    LogError("system statistic error -- swap usage gathering failed: %s\n", STRERROR);
+    return FALSE;
+  }
+  if (num == 0) {
+    DEBUG("system statistic -- no swap configured\n");
+    si->swap_kbyte_max = 0;
+    return TRUE;
+  }
+  s = (struct swaptable *)xmalloc(num * sizeof(struct swapent) + sizeof(struct swaptable));
+  strtab = (char *)xmalloc((num + 1) * MAXSTRSIZE);
+  for (i = 0; i < (num + 1); i++)
+    s->swt_ent[i].ste_path = strtab + (i * MAXSTRSIZE);
+  s->swt_n = num + 1;
+  if ((n = swapctl(SC_LIST, s)) < 0) {
+    LogError("system statistic error -- swap usage gathering failed: %s\n", STRERROR);
+    si->swap_kbyte_max = 0;
+    FREE(s);
+    FREE(strtab);
+    return FALSE;
+  }
+  if (n > num) {
+    DEBUG("system statistic -- new swap added: deferring swap usage statistics to next cycle\n");
+    FREE(s);
+    FREE(strtab);
+    goto again;
+  }
+  for (i = 0; i < n; i++) {
+    if (!(s->swt_ent[i].ste_flags & ST_INDEL) && !(s->swt_ent[i].ste_flags & ST_DOINGDEL)) {
+      total += s->swt_ent[i].ste_pages;
+      used  += s->swt_ent[i].ste_pages - s->swt_ent[i].ste_free;
+    }
+  }
+  FREE(s);
+  FREE(strtab);
+  si->swap_kbyte_max   += (unsigned long)(double)(total * page_size) / 1024.;
+  si->total_swap_kbyte += (unsigned long)(double)(used  * page_size) / 1024.;
+
   return TRUE;
 }
 

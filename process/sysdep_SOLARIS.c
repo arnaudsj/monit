@@ -106,6 +106,7 @@
 
 #define pagetok(size) ((size) << pageshift)
 
+static int    page_size;
 static int    pageshift=0;
 static long   old_cpu_user=0;
 static long   old_cpu_syst=0;
@@ -132,6 +133,7 @@ int init_process_info_sysdep(void) {
   pageshift -= LOG1024;
 
   systeminfo.mem_kbyte_max = pagetok(sysconf(_SC_PHYS_PAGES));
+  page_size = getpagesize();
 
   return (TRUE);
 }
@@ -233,10 +235,16 @@ int getloadavg_sysdep (double *loadv, int nelem) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-  kstat_ctl_t   *kctl;  
-  kstat_named_t *knamed;
-  kstat_t       *kstat;
+  int                 i, n, num;
+  kstat_ctl_t        *kctl;  
+  kstat_named_t      *knamed;
+  kstat_t            *kstat;
+  swaptbl_t          *s;
+  char               *strtab;
+  unsigned long long  total = 0ULL;
+  unsigned long long  used  = 0ULL;
 
+  /* Memory */
   kctl  = kstat_open();
   kstat = kstat_lookup(kctl, "unix", 0, "system_pages");
   if (kstat_read(kctl, kstat, 0) == -1) {
@@ -244,12 +252,50 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
     kstat_close(kctl);
     return FALSE;
   }
-  
   knamed = kstat_data_lookup(kstat, "freemem");
   if (knamed)
     si->total_mem_kbyte = systeminfo.mem_kbyte_max-pagetok(knamed->value.ul);
-  
   kstat_close(kctl);
+
+ /* Swap */
+again:
+ if ((num = swapctl(SC_GETNSWP, 0)) == -1) {
+    LogError("system statistic error -- swap usage gathering failed: %s\n", STRERROR);
+    return FALSE;
+  }
+  if (num == 0) {
+    DEBUG("system statistic -- no swap configured\n");
+    si->swap_kbyte_max = 0;
+    return TRUE;
+  }
+  s = (swaptbl_t *)xmalloc(num * sizeof(swapent_t) + sizeof(struct swaptable));
+  strtab = (char *)xmalloc((num + 1) * MAXSTRSIZE);
+  for (i = 0; i < (num + 1); i++)
+    s->swt_ent[i].ste_path = strtab + (i * MAXSTRSIZE);
+  s->swt_n = num + 1;
+  if ((n = swapctl(SC_LIST, s)) < 0) {
+    LogError("system statistic error -- swap usage gathering failed: %s\n", STRERROR);
+    si->swap_kbyte_max = 0;
+    FREE(s);
+    FREE(strtab);
+    return FALSE;
+  }
+  if (n > num) {
+    DEBUG("system statistic -- new swap added: deferring swap usage statistics to next cycle\n");
+    FREE(s);
+    FREE(strtab);
+    goto again;
+  }
+  for (i = 0; i < n; i++) {
+    if (!(s->swt_ent[i].ste_flags & ST_INDEL) && !(s->swt_ent[i].ste_flags & ST_DOINGDEL)) {
+      total += s->swt_ent[i].ste_pages;
+      used  += s->swt_ent[i].ste_pages - s->swt_ent[i].ste_free;
+    }
+  }
+  FREE(s);
+  FREE(strtab);
+  si->swap_kbyte_max   += (unsigned long)(double)(total * page_size) / 1024.;
+  si->total_swap_kbyte += (unsigned long)(double)(used  * page_size) / 1024.;
 
   return TRUE;
 }

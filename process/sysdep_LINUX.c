@@ -108,10 +108,12 @@
 /* ----------------------------------------------------------------- Private */
 
 
-#define MEMTOTAL "MemTotal:"
-#define MEMFREE  "MemFree:"
-#define MEMBUF   "Buffers:"
-#define MEMCACHE "Cached:"
+#define MEMTOTAL  "MemTotal:"
+#define MEMFREE   "MemFree:"
+#define MEMBUF    "Buffers:"
+#define MEMCACHE  "Cached:"
+#define SWAPTOTAL "SwapTotal:"
+#define SWAPFREE  "SwapFree:"
 
 #define NSEC_PER_SEC    1000000000L
 
@@ -306,6 +308,8 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   unsigned long  buffers;
   unsigned long  cached;
   
+  /* Memory */
+
   if (! read_proc_file(buf, 1024, "meminfo", -1)) {
     LogError("system statistic error -- cannot get real memory free amount\n");
     goto error;
@@ -342,11 +346,34 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
 
   si->total_mem_kbyte = systeminfo.mem_kbyte_max - mem_free - buffers - cached;
 
+  /* Swap */
+
+  if (! (ptr = strstr(buf, SWAPTOTAL))) {
+    LogError("system statistic error -- cannot get swap total amount\n");
+    goto error;
+  }
+  if (sscanf(ptr + strlen(SWAPTOTAL), "%ld", &swap_total) != 1) {
+    LogError("system statistic error -- cannot get swap total amount\n");
+    goto error;
+  }
+
+  if (! (ptr = strstr(buf, SWAPFREE))) {
+    LogError("system statistic error -- cannot get swap free amount\n");
+    goto error;
+  }
+  if (sscanf(ptr + strlen(SWAPFREE), "%ld", &swap_free) != 1) {
+    LogError("system statistic error -- cannot get swap free amount\n");
+    goto error;
+  }
+
+  si->swap_kbyte_max   = swap_total;
+  si->total_swap_kbyte = swap_total - swap_free;
+
   return TRUE;
 
   error:
-  LogError("system statistic error -- memory usage gathering failed\n");
   si->total_mem_kbyte = 0;
+  si->swap_kbyte_max = 0;
   return FALSE;
 }
 

@@ -193,12 +193,13 @@ int update_system_load(ProcessTree_T *pt, int treesize) {
       goto error1;
     }
 
-    /** Get real memory usage statistic */
+    /** Get memory usage statistic */
     if (! used_system_memory_sysdep(&systeminfo)) {
       LogError("'%s' statistic error -- memory usage gathering failed\n", Run.system->name);
       goto error2;
     }
-    systeminfo.total_mem_percent = (int)(1000 * (double)systeminfo.total_mem_kbyte / (double)systeminfo.mem_kbyte_max);
+    systeminfo.total_mem_percent  = (int)(1000 * (double)systeminfo.total_mem_kbyte / (double)systeminfo.mem_kbyte_max);
+    systeminfo.total_swap_percent = systeminfo.swap_kbyte_max ? (int)(1000 * (double)systeminfo.total_swap_kbyte / (double)systeminfo.swap_kbyte_max) : 0;
 
     /** Get CPU usage statistic */
     if (! used_system_cpu_sysdep(&systeminfo)) {

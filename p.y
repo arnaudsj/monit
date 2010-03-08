@@ -289,7 +289,7 @@
 %token <real> REAL
 %token CHECKPROC CHECKFILESYS CHECKFILE CHECKDIR CHECKHOST CHECKSYSTEM CHECKFIFO CHECKSTATUS
 %token CHILDREN SYSTEM
-%token RESOURCE MEMORY TOTALMEMORY LOADAVG1 LOADAVG5 LOADAVG15 
+%token RESOURCE MEMORY TOTALMEMORY LOADAVG1 LOADAVG5 LOADAVG15 SWAP
 %token MODE ACTIVE PASSIVE MANUAL CPU TOTALCPU CPUUSER CPUSYSTEM CPUWAIT
 %token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE SECRET HOSTHEADER
 %token UID GID MMONIT INSTANCE USERNAME PASSWORD
@@ -1312,6 +1312,7 @@ resourcesystemlist : resourcesystemopt
 
 resourcesystemopt  : resourceload
                    | resourcemem
+                   | resourceswap
                    | resourcecpu
                    ;
 
@@ -1356,6 +1357,18 @@ resourcemem     : MEMORY operator value unit {
                   }
                 | TOTALMEMORY operator NUMBER PERCENT  {
                     resourceset.resource_id = RESOURCE_ID_TOTAL_MEM_PERCENT;
+                    resourceset.operator = $<number>2;
+                    resourceset.limit = ($3 * 10);
+                  }
+                ;
+
+resourceswap    : SWAP operator value unit {
+                    resourceset.resource_id = RESOURCE_ID_SWAP_KBYTE;
+                    resourceset.operator = $<number>2;
+                    resourceset.limit = (int) ($<real>3 * ($<number>4 / 1024.0));
+                  }
+                | SWAP operator NUMBER PERCENT {
+                    resourceset.resource_id = RESOURCE_ID_SWAP_PERCENT;
                     resourceset.operator = $<number>2;
                     resourceset.limit = ($3 * 10);
                   }

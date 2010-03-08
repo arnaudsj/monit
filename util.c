@@ -1120,6 +1120,26 @@ void Util_printService(Service_T s) {
         ratio2, a->succeeded->description);
       break;
 
+    case RESOURCE_ID_SWAP_PERCENT: 
+
+      printf(" %-20s = if %s %.1f%% %s then %s "
+        "else if succeeded %s then %s\n", 
+        "Swap usage limit", 
+        operatornames[q->operator], q->limit/10.0,
+        ratio1, a->failed->description,
+        ratio2, a->succeeded->description);
+      break;
+
+    case RESOURCE_ID_SWAP_KBYTE: 
+
+      printf(" %-20s = if %s %ldkB %s then %s "
+        "else if succeeded %s then %s\n", 
+        "Swap amount limit", 
+        operatornames[q->operator], q->limit,
+        ratio1, a->failed->description,
+        ratio2, a->succeeded->description);
+      break;
+
     case RESOURCE_ID_LOAD1: 
 
       printf(" %-20s = if %s %.1f %s then %s "

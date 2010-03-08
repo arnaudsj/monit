@@ -1,4 +1,4 @@
-                     CHANGES version 5.1.2
+                     CHANGES version 5.2
                                 
            This file summarizes changes made since 3.0
                                 
@@ -7,7 +7,14 @@
           https://savannah.nongnu.org/bugs/?group=monit
 
 
-Version 5.1.2
+Version 5.2
+
+NEW FEATURES AND FUNCTIONS:
+
+* Added support for system swap usage monitoring. Syntax is similar to
+  memory usage monitoring - example:
+      check system myserver
+          if swap usage > 25% then alert
 
 BUGFIXES:
 
