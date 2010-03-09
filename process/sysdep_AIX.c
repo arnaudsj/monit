@@ -293,8 +293,8 @@ again:
   }
   FREE(s);
   FREE(strtab);
-  si->swap_kbyte_max   += (unsigned long)(double)(total * page_size) / 1024.;
-  si->total_swap_kbyte += (unsigned long)(double)(used  * page_size) / 1024.;
+  si->swap_kbyte_max   = (unsigned long)(double)(total * page_size) / 1024.;
+  si->total_swap_kbyte = (unsigned long)(double)(used  * page_size) / 1024.;
 
   return TRUE;
 }
