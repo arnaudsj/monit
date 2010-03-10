@@ -297,7 +297,7 @@
 %token SSLAUTO SSLV2 SSLV3 TLSV1 CERTMD5
 %token BYTE KILOBYTE MEGABYTE GIGABYTE
 %token INODE SPACE PERMISSION SIZE MATCH NOT IGNORE ACTION
-%token EXEC UNMONITOR ICMP ICMPECHO NONEXIST INVALID DATA RECOVERED PASSED SUCCEEDED
+%token EXEC UNMONITOR ICMP ICMPECHO NONEXIST EXISTENCE INVALID DATA RECOVERED PASSED SUCCEEDED
 %token URL CONTENT PID PPID FSFLAG
 %token <url> URLOBJECT
 %token <string> TARGET
@@ -344,6 +344,7 @@ optproclist     : /* EMPTY */
 
 optproc         : start
                 | stop
+                | existence
                 | pid
                 | ppid
                 | connection
@@ -363,6 +364,7 @@ optfilelist      : /* EMPTY */
 
 optfile         : start
                 | stop
+                | existence
                 | timestamp
                 | actionrate
                 | every
@@ -384,6 +386,7 @@ optfilesyslist  : /* EMPTY */
 
 optfilesys      : start
                 | stop
+                | existence
                 | actionrate
                 | every
                 | alert
@@ -404,6 +407,7 @@ optdirlist      : /* EMPTY */
 
 optdir          : start
                 | stop
+                | existence
                 | timestamp
                 | actionrate
                 | every
@@ -422,6 +426,7 @@ opthostlist     : opthost
 
 opthost         : start
                 | stop
+                | existence
                 | connection
                 | icmp
                 | actionrate
@@ -450,6 +455,7 @@ optfifolist     : /* EMPTY */
 
 optfifo         : start
                 | stop
+                | existence
                 | timestamp
                 | actionrate
                 | every
@@ -467,6 +473,7 @@ optstatuslist   : /* EMPTY */
                 ;
                
 optstatus       : actionrate
+                | existence
                 | alert
                 | every
                 | group
@@ -1133,12 +1140,22 @@ apache_stat     : LOGLIMIT operator NUMBER PERCENT {
                   }
                 ;
 
+existence       : IF FAILED EXISTENCE rate1 THEN action1 recovery {
+                    *(current->action_NONEXIST->failed->description) = 0;
+                    *(current->action_NONEXIST->succeeded->description) = 0;
+                    seteventaction(&(current)->action_NONEXIST, $<number>6, $<number>7);
+                  }
+                ;
+
+
 pid             : IF CHANGED PID rate1 THEN action1 {
+                    *(current->action_PID->failed->description) = 0;
                     seteventaction(&(current)->action_PID, $<number>6, ACTION_IGNORE);
                   }
                 ;
 
 ppid            : IF CHANGED PPID rate1 THEN action1 {
+                    *(current->action_PPID->failed->description) = 0;
                     seteventaction(&(current)->action_PPID, $<number>6, ACTION_IGNORE);
                   }
                 ;
@@ -1556,6 +1573,7 @@ space           : IF SPACE operator value unit rate1 THEN action1 recovery {
                 ;
 
 fsflag          : IF CHANGED FSFLAG rate1 THEN action1 {
+                    *(current->action_FSFLAG->failed->description) = 0;
                     seteventaction(&(current)->action_FSFLAG, $<number>6, ACTION_IGNORE);
                   }
                 ;

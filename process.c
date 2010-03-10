@@ -246,6 +246,9 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
     DEBUG("system statistic error -- cannot initialize the process tree => process resource monitoring disabled\n");
     Run.doprocess = FALSE;
     return -1;
+  } else if (Run.doprocess == FALSE) {
+    DEBUG("system statistic -- initialization of the process tree succeeded => process resource monitoring enabled\n");
+    Run.doprocess = TRUE;
   }
 
   pt    = *pt_r;
@@ -307,6 +310,7 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
   }
 
   fillprocesstree(pt, root);
+  update_system_load(*pt_r, *size_r);
 
   return *size_r;
 }

@@ -104,20 +104,6 @@ Solaris Nevada:
   SUNWflexruntime        NOTE: see bellow for Solaris Nevada x86 - AMD64
   CSWgm4                (http://www.blastwave.org))
 
-  NOTE:
-  On AMD64 there was problem with flex library bundled with particular
-  Solaris Express versions (SUNWflexruntime). You can get following
-  error when trying to start Monit:
-
-  -bash-3.2# ./monit
-  ld.so.1: monit: fatal: relocation error: R_AMD64_PC32: file
-  /usr/lib/64/libfl.so.1: symbol yylex: value 0x280010e5ad3 does not fit
-  Killed 
-
-  The problem was fixed in SXCE b100 (see http://bugs.opensolaris.org/view_bug.do?bug_id=6752774
-  for more details).
-
-
 Set path to the SFW utilities and libraries, for example:
 
   PATH=$PATH:/usr/sfw/bin:/opt/csw/bin

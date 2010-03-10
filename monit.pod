@@ -1153,6 +1153,30 @@ or from the console using the monitor argument.
 
 
 
+=head2 EXISTENCE TESTING
+
+Monit's default action when service doesn't exist (for example
+process is not running, file doesn't exist, etc.) is to perform
+service restart action.
+
+The default action can be overrided with following statement:
+
+=over 4
+
+=item IF FAILED EXISTENCE [[<X>] <Y> CYCLES] THEN action
+      [ELSE IF SUCCEEDED [[<X>] <Y> CYCLES] THEN action]
+
+=back
+
+I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
+"EXEC", "MONITOR" or "UNMONITOR".
+
+Example:
+
+ check file with path /dev/usb000
+   if failed existence for 5 cycles then exec "/bin/flashdisk_removed.sh"
+
+
 =head2 RESOURCE TESTING
 
 Monit can examine how much system resources a service are using.

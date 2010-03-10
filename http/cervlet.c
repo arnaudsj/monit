@@ -579,6 +579,7 @@ static void do_viewlog(HttpRequest req, HttpResponse res) {
 
 
 static void handle_action(HttpRequest req, HttpResponse res) {
+  int doaction;
   char *name = req->url;
   const char *action;
   Service_T s;
@@ -594,10 +595,16 @@ static void handle_action(HttpRequest req, HttpResponse res) {
       send_error(res, SC_FORBIDDEN, "You do not have sufficent privileges to access this page");
       return;
     }
-    if((s->doaction = Util_getAction(action)) == ACTION_IGNORE) {
+    doaction = Util_getAction(action);
+    if(doaction == ACTION_IGNORE) {
       send_error(res, SC_BAD_REQUEST, "Invalid action");
       return;
     }
+    if(s->doaction != ACTION_IGNORE) {
+      send_error(res, SC_SERVICE_UNAVAILABLE, "Other action in progres already -- try again later");
+      return;
+    }
+    s->doaction = doaction;
     token = get_parameter(req, "token");
     s->token = token ? xstrdup(token) : NULL;
     LogDebug("%s service '%s' on user request\n", action, s->name);
@@ -635,6 +642,10 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
 
         if(!s) {
           send_error(res, SC_BAD_REQUEST, "There is no service by that name");
+          return;
+        }
+        if(s->doaction != ACTION_IGNORE) {
+          send_error(res, SC_SERVICE_UNAVAILABLE, "Other action in progres already -- try again later");
           return;
         }
 
@@ -700,6 +711,8 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
   ServiceGroupMember_T sgm;
   char *status;
   char time[STRLEN];
+  char ratio1[STRLEN];
+  char ratio2[STRLEN];
 
   ASSERT(s);
 
@@ -782,6 +795,12 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
       out_print(res, " as gid %d", s->stop->gid);
     out_print(res, " timeout %d second(s)", s->stop->timeout);
     out_print(res, "</td></tr>");
+  }
+
+  if(s->type != TYPE_SYSTEM) {
+    out_print(res, "<tr><td>Existence</td><td>If doesn't exist %s then %s else if succeeded %s then %s</td></tr>",
+      Util_getEventratio(s->action_NONEXIST->failed, ratio1), s->action_NONEXIST->failed->description,
+      Util_getEventratio(s->action_NONEXIST->succeeded, ratio2), s->action_NONEXIST->succeeded->description);
   }
 
   out_print(res,

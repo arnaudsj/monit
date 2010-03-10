@@ -16,12 +16,34 @@ NEW FEATURES AND FUNCTIONS:
       check system myserver
           if swap usage > 25% then alert
 
+* Allow to override default action when service doesn't exist (for example process
+  is not running, file doesn't exist). Default action is service restart, it can be
+  customized with following statement now:
+      if failed existence [[<x> times within] <y> cycles] then <action1>
+     [else if succeeded   [[<x> times within] <y> cycles] then <action2>]
+  For example instead of default restart action:
+     check file with path /dev/usb000
+        if failed existence for 5 cycles then exec "/bin/flashdisk_removed.sh"
+
+* MacOSX: allow monitoring of system-wide load average, cpu and memory usage
+  even when Monit is running as non-root user. Note: the monitoring of
+  per-process CPU usage on MacOSX still requires monit to run as root, otherwise
+  it will display process' cpu usage as 0.
+
 BUGFIXES:
 
 * Show real process uptime - formerly the presented uptime was
   based on create timestamp of process' pidfile which provides invalid
   uptime if the pidfile is replaced. This does for example apache when
   it is reloaded. Thanks to Nima Chavooshi for report.
+
+* When user triggered action for some service (such as stop) and before that action
+  completed user triggered another action for the same service (such as start), the
+  second action has been ignored. Monit will not accept new action and return temporary
+  error until the previous action completes.
+
+* If process resource usage gathering failed, retry next cycle as the error
+  can be temporary.
 
 
 Version 5.1.1

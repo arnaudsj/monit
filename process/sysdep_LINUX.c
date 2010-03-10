@@ -195,6 +195,7 @@ int init_process_info_sysdep(void) {
  */
 int initprocesstree_sysdep(ProcessTree_T ** reference) {
   int                 i = 0;
+  int                 rv;
   int                 treesize = 0;
   int                 stat_ppid = 0;
   char               *tmp = NULL;
@@ -212,8 +213,8 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   ASSERT(reference);
 
   /* Find all processes in the /proc directory */
-  if (glob("/proc/[0-9]*", GLOB_ONLYDIR, NULL, &globbuf)) {
-    LogError("system statistic error -- glob failed\n");
+  if ((rv = glob("/proc/[0-9]*", GLOB_ONLYDIR, NULL, &globbuf))) {
+    LogError("system statistic error -- glob failed: %d (%s)\n", rv, STRERROR);
     return FALSE;
   } 
 

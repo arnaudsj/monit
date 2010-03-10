@@ -283,6 +283,7 @@ sha1              { return SHA1HASH; }
 crypt             { return CRYPT; }
 signature         { return SIGNATURE; }
 nonexist          { return NONEXIST; }
+existence         { return EXISTENCE; }
 invalid           { return INVALID; }
 data              { return DATA; }
 recovered         { return RECOVERED; }

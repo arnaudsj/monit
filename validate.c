@@ -158,10 +158,7 @@ int validate() {
   Run.handler_flag = HANDLER_SUCCEEDED;
   Event_queue_process();
 
-  if (Run.doprocess) {
-    initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize);
-    update_system_load(ptree, ptreesize);
-  }
+  initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize);
   gettimeofday(&systeminfo.collected, NULL);
 
   /* In the case that at least one action is pending, perform quick

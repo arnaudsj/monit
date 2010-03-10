@@ -154,7 +154,7 @@ double timestruc_to_tseconds(timestruc_t t) {
  * the process tree (sysdep version... but should work for
  * all procfs based unices)
  * @param reference  reference of ProcessTree
- * @return treesize>=0 if succeeded otherwise <0.
+ * @return treesize>0 if succeeded otherwise =0.
  */
 int initprocesstree_sysdep(ProcessTree_T ** reference) {
   int            i;
@@ -169,8 +169,10 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   ASSERT(reference);
 
   /* Find all processes in the /proc directory */
-  if (glob("/proc/[0-9]*", 0, NULL, &globbuf) != 0)
+  if ((rv = glob("/proc/[0-9]*", GLOB_ONLYDIR, NULL, &globbuf)) != 0) {
+    LogError("system statistic error -- glob failed: %d (%s)\n", rv, STRERROR);
     return 0;
+  }
 
   treesize = globbuf.gl_pathc;
 

@@ -823,6 +823,13 @@ void Util_printService(Service_T s) {
     printf("\n");
   }
 
+  if(s->type != TYPE_SYSTEM) {
+    printf(" %-20s = if doesn't exist %s then %s else if succeeded %s then %s\n",
+      "Existence",
+      Util_getEventratio(s->action_NONEXIST->failed, ratio1), s->action_NONEXIST->failed->description,
+      Util_getEventratio(s->action_NONEXIST->succeeded, ratio2), s->action_NONEXIST->succeeded->description);
+  }
+
   for(d= s->dependantlist; d; d= d->next)
     if(d->dependant != NULL)
       printf(" %-20s = %s\n", "Depends on Service", d->dependant);

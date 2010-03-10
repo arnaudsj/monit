@@ -155,11 +155,6 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
   size_t             bufSize = 0;
   int                mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
 
-  if (getuid()!=0) {
-    LogError("system statistic error -- permission denied\n");
-    return FALSE;
-  }
-
   if (sysctl(mib, 4, NULL, &bufSize, NULL, 0) < 0) {
     LogError("system statistic error -- sysctl failed\n");
     return FALSE;
