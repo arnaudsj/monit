@@ -3261,6 +3261,7 @@ statement:
 
  check process resin with pidfile /usr/local/resin/srun.pid
        start program = "/usr/local/resin/bin/srun.sh start"
+       stop program = "/usr/local/resin/bin/srun.sh stop"
 
 Here's a more advanced example for monitoring an apache
 web-server listening on the default port number for HTTP and
