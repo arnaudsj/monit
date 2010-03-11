@@ -3176,6 +3176,10 @@ insensitive.
                  followed by a compare operator a number with 
                  unit {B|KB|MB|GB|%|byte|kilobyte|megabyte|
                  gigabyte|percent} and an action.
+ swap            Token for system swap usage monitoring. This token
+                 must be followed by a compare operator a number with 
+                 unit {B|KB|MB|GB|%|byte|kilobyte|megabyte|gigabyte|percent}
+                 and an action.
  loadavg         Must be followed by [1min,5min,15min] in (), a 
                  compare operator, a number and an action. This
                  statement is used to check the system load 
@@ -3216,7 +3220,7 @@ I<expect>, I<send>, I<mailserver>, I<every>, I<mode>, I<active>,
 I<passive>, I<manual>, I<depends>, I<host>, I<default>, I<http>,
 I<ftp>, I<smtp>, I<pop>, I<ntp3>, I<nntp>, I<imap>, I<clamav>, 
 I<ssh>, I<dwp>, I<ldap2>, I<ldap3>, I<tns>, I<request>, I<cpu>, 
-I<mem>, I<totalmem>, I<children>, I<loadavg>, I<timestamp>, 
+I<mem>, I<totalmem>, I<swap>, I<children>, I<loadavg>, I<timestamp>, 
 I<changed>, I<second(s)>, I<minute(s)>, I<hour(s)>, I<day(s)>, 
 I<space>, I<inode>, I<pid>, I<ppid>, I<perm(ission)>, I<icmp>,
 I<process>, I<file>, I<directory>, I<filesystem>, I<size>, I<action>,
