@@ -227,6 +227,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
+  int                 i, n, num;
   struct pst_static   pst;
   struct pst_dynamic  psd;
   struct swaptable   *s;
