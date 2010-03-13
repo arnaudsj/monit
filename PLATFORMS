@@ -5,6 +5,7 @@ This file describes platform specific notes for Monit.
 
 Platforms overview in alphabetical order:
 
+ o AIX
  o Darwin (Mac OS X)
  o FreeBSD
  o Linux
@@ -18,7 +19,6 @@ in particular Monit releases by contributors. Possible status reports, bug
 reports, patch contributions or access to such platforms for development is
 welcomed :)
 
- o AIX
  o HPUX
 
 
@@ -147,6 +147,18 @@ Configure Monit with 64-bit support (examples):
 Compile Monit with:
 
   gmake
+
+
+AIX
+===
+
+Configure Monit with SSL path (examples):
+
+    ./configure \
+        --with-ssl-incl-dir=/opt/freeware/include \
+        --with-ssl-lib-dir=/opt/freeware/64/lib
+
+Use GNU make to compile ('gmake')
 
 
 FreeBSD + NetBSD + OpenBSD
