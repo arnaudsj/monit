@@ -243,6 +243,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
+  int                      i, num;
   perfstat_memory_total_t  mem;
   struct swaptable        *s;
   char                    *strtab;
