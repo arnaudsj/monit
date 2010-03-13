@@ -243,12 +243,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
  * @return: TRUE if successful, FALSE if failed (or not available)
  */
 int used_system_memory_sysdep(SystemInfo_T *si) {
-  int                      i, num;
   perfstat_memory_total_t  mem;
-  struct swaptable        *s;
-  char                    *strtab;
-  unsigned long long       total = 0ULL;
-  unsigned long long       used  = 0ULL;
 
   /* Memory */
   if (perfstat_memory_total(NULL, &mem, sizeof(perfstat_memory_total_t), 1) < 1) {
@@ -258,44 +253,8 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   si->total_mem_kbyte = (unsigned long)((mem.real_total - mem.real_free - mem.numperm) * (page_size / 1024));
 
   /* Swap */
-again:
- if ((num = swapctl(SC_GETNSWP, 0)) == -1) {
-    LogError("system statistic error -- swap usage gathering failed: %s\n", STRERROR);
-    return FALSE;
-  }
-  if (num == 0) {
-    DEBUG("system statistic -- no swap configured\n");
-    si->swap_kbyte_max = 0;
-    return TRUE;
-  }
-  s = (struct swaptable *)xmalloc(num * sizeof(struct swapent) + sizeof(struct swaptable));
-  strtab = (char *)xmalloc((num + 1) * MAXSTRSIZE);
-  for (i = 0; i < (num + 1); i++)
-    s->swt_ent[i].ste_path = strtab + (i * MAXSTRSIZE);
-  s->swt_n = num + 1;
-  if ((n = swapctl(SC_LIST, s)) < 0) {
-    LogError("system statistic error -- swap usage gathering failed: %s\n", STRERROR);
-    si->swap_kbyte_max = 0;
-    FREE(s);
-    FREE(strtab);
-    return FALSE;
-  }
-  if (n > num) {
-    DEBUG("system statistic -- new swap added: deferring swap usage statistics to next cycle\n");
-    FREE(s);
-    FREE(strtab);
-    goto again;
-  }
-  for (i = 0; i < n; i++) {
-    if (!(s->swt_ent[i].ste_flags & ST_INDEL) && !(s->swt_ent[i].ste_flags & ST_DOINGDEL)) {
-      total += s->swt_ent[i].ste_pages;
-      used  += s->swt_ent[i].ste_pages - s->swt_ent[i].ste_free;
-    }
-  }
-  FREE(s);
-  FREE(strtab);
-  si->swap_kbyte_max   = (unsigned long)(double)(total * page_size) / 1024.;
-  si->total_swap_kbyte = (unsigned long)(double)(used  * page_size) / 1024.;
+  si->swap_kbyte_max   = (unsigned long)(mem.pgsp_total * 4);                   /* 4kB blocks */
+  si->total_swap_kbyte = (unsigned long)((mem.pgsp_total - mem.pgsp_free) * 4); /* 4kB blocks */
 
   return TRUE;
 }
