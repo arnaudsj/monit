@@ -692,7 +692,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 
   if (setsockopt(s, sol_ip, IP_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
     freeaddrinfo(result);
-    goto error2;
+    goto error;
   }
 
   for (i = 0; i < count; i++) {
@@ -732,7 +732,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     } while(n == -1 && errno == EINTR);
     
     if (n < 0)
-      goto error1;
+      goto done;
 
     for (i = 0; i < count; i++) {
 #ifdef HAVE_SOL_IP
@@ -750,14 +750,15 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 
         /* Get the response time */
         response = (double)(t2.tv_sec - t1[i].tv_sec) + (double)(t2.tv_usec - t1[i].tv_usec) / 1000000;
+        goto done;
       }
     }
   }
 
-  error1:
+  done:
   for (i = 0; i < count; i++)
     FREE(icmphdrout[i]);
-  error2:
+  error:
   close_socket(s);
 
   return response;
