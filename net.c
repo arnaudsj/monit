@@ -672,10 +672,13 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
-  if (getaddrinfo(hostname, NULL, &hints, &result) != 0)
+  if (getaddrinfo(hostname, NULL, &hints, &result) != 0) {
+    LogError("ICMP echo -- getaddrinfo failed: %s\n", STRERROR);
     return response;
+  }
 
   if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
+    LogError("ICMP echo -- socket failed: %s\n", STRERROR);
     freeaddrinfo(result);
     return response;
   }
@@ -691,8 +694,9 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 #endif
 
   if (setsockopt(s, sol_ip, IP_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
+    LogError("ICMP echo -- setsockopt failed: %s\n", STRERROR);
     freeaddrinfo(result);
-    goto error;
+    goto error2;
   }
 
   for (i = 0; i < count; i++) {
@@ -730,35 +734,40 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     do {
       n = recvfrom(s, buf, STRLEN, 0, (struct sockaddr *)&sin, &size);
     } while(n == -1 && errno == EINTR);
-    
     if (n < 0)
-      goto done;
+      goto error1;
 
-    for (i = 0; i < count; i++) {
 #ifdef HAVE_SOL_IP
-      iphdrin = (struct iphdr *)buf;
-      icmphdrin = (struct icmphdr *)(buf + iphdrin->ihl * 4);
-      if ( (icmphdrin->un.echo.id == icmphdrout[i]->un.echo.id) && (icmphdrin->type == ICMP_ECHOREPLY) && (icmphdrin->un.echo.sequence == icmphdrout[i]->un.echo.sequence) ) {
+    iphdrin = (struct iphdr *)buf;
+    icmphdrin = (struct icmphdr *)(buf + iphdrin->ihl * 4);
+    if (icmphdrin->type == ICMP_ECHOREPLY) {
 #else
-      iphdrin = (struct ip *)buf;
-      icmphdrin = (struct icmp *)(buf + iphdrin->ip_hl * 4);
-      if ( (icmphdrin->icmp_id == icmphdrout[i]->icmp_id) && (icmphdrin->icmp_type == ICMP_ECHOREPLY) && (icmphdrin->icmp_seq == icmphdrout[i]->icmp_seq) ) {
+    iphdrin = (struct ip *)buf;
+    icmphdrin = (struct icmp *)(buf + iphdrin->ip_hl * 4);
+    if (icmphdrin->icmp_type == ICMP_ECHOREPLY) {
+#endif
+      for (i = 0; i < count; i++) {
+#ifdef HAVE_SOL_IP
+        if ((icmphdrin->un.echo.id == icmphdrout[i]->un.echo.id) && (icmphdrin->un.echo.sequence == icmphdrout[i]->un.echo.sequence) ) {
+#else
+        if ( (icmphdrin->icmp_id == icmphdrout[i]->icmp_id) && (icmphdrin->icmp_seq == icmphdrout[i]->icmp_seq) ) {
 #endif
 
-        /* Get time of connection attempt finish */
-        gettimeofday(&t2, NULL);
+          /* Get time of connection attempt finish */
+          gettimeofday(&t2, NULL);
 
-        /* Get the response time */
-        response = (double)(t2.tv_sec - t1[i].tv_sec) + (double)(t2.tv_usec - t1[i].tv_usec) / 1000000;
-        goto done;
+          /* Get the response time */
+          response = (double)(t2.tv_sec - t1[i].tv_sec) + (double)(t2.tv_usec - t1[i].tv_usec) / 1000000;
+          break;
+        }
       }
     }
   }
 
-  done:
+  error1:
   for (i = 0; i < count; i++)
     FREE(icmphdrout[i]);
-  error:
+  error2:
   close_socket(s);
 
   return response;
