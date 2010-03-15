@@ -158,6 +158,7 @@ double timestruc_to_tseconds(timestruc_t t) {
  */
 int initprocesstree_sysdep(ProcessTree_T ** reference) {
   int            i;
+  int            rv;
   int            pid;
   int            treesize;
   char           buf[4096];
@@ -169,7 +170,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   ASSERT(reference);
 
   /* Find all processes in the /proc directory */
-  if ((rv = glob("/proc/[0-9]*", GLOB_ONLYDIR, NULL, &globbuf)) != 0) {
+  if ((rv = glob("/proc/[0-9]*", NULL, NULL, &globbuf)) != 0) {
     LogError("system statistic error -- glob failed: %d (%s)\n", rv, STRERROR);
     return 0;
   }
