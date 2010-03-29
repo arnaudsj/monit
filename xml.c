@@ -92,15 +92,11 @@ char *status_xml(Event_T E, short L) {
 
   document_head(&B);
 
-  if (E) {
+  if (E)
     status_event(E, &B);
-  } else {
-    for (S = servicelist_conf; S; S = S->next_conf) {
-      LOCK(S->mutex)
+  else
+    for (S = servicelist_conf; S; S = S->next_conf)
       status_service(S, &B, L);
-      END_LOCK;
-    }
-  }
 
   document_foot(&B);
 
@@ -435,7 +431,7 @@ static void status_event(Event_T E, Buffer_T *B) {
     Event_get_state(E),
     Event_get_action(E),
     Event_get_message(E));
-  if ((s = Event_get_source(E)) && s->token)
+  if ((s = Event_get_source(E)) && *s->token)
     Util_stringbuffer(B, "<token>%s</token>", s->token);
   Util_stringbuffer(B,
     "</event>");

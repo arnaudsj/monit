@@ -596,7 +596,7 @@ typedef struct mysize {
 
 /** Defines checksum object */
 typedef struct mychecksum {
-  char *hash;                     /**< A checksum hash computed for the path */
+  MD_T  hash;                     /**< A checksum hash computed for the path */
   int   type;                       /**< The type of hash (e.g. md5 or sha1) */
   int   length;                                      /**< Length of the hash */
   int   test_changes;           /**< TRUE if we only should test for changes */
@@ -682,8 +682,8 @@ typedef struct myinfo {
   /* File specific */
   off_t st_size;                                                   /**< Size */
   off_t readpos;                            /**< Position for regex matching */
-  ino_t  st_ino_prev;                 /**< Previous inode for regex matching */
-  char  *cs_sum;                                               /**< Checksum */
+  ino_t st_ino_prev;                  /**< Previous inode for regex matching */
+  MD_T  cs_sum;                                                /**< Checksum */
 
   /* Process specific */
   int    _pid;                              /**< Process PID from last cycle */
@@ -760,7 +760,7 @@ typedef struct myservice {
   Info_T             inf;                          /**< Service check result */
   struct timeval     collected;                /**< When were data collected */
   int                doaction;          /**< Action scheduled by http thread */
-  char              *token;                                /**< Action token */
+  char               token[STRLEN];                        /**< Action token */
 
   /** Events */
   struct myevent {

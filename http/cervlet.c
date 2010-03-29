@@ -606,7 +606,10 @@ static void handle_action(HttpRequest req, HttpResponse res) {
     }
     s->doaction = doaction;
     token = get_parameter(req, "token");
-    s->token = token ? xstrdup(token) : NULL;
+    if (token)
+      snprintf(s->token, sizeof(s->token), "%s", token);
+    else
+      *s->token = 0;
     LogDebug("%s service '%s' on user request\n", action, s->name);
     Run.doaction = TRUE; /* set the global flag */
     do_wakeupcall();
@@ -633,7 +636,7 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
       return;
     }
 
-    token = (char*)get_parameter(req, "token");
+    token = (char *)get_parameter(req, "token");
 
     for(p= req->params; p; p= p->next) {
 
@@ -650,7 +653,8 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
         }
 
         s->doaction = doaction;
-        s->token = token;
+        if (token)
+          snprintf(s->token, sizeof(s->token), "%s", token);
 
         LogDebug("%s service '%s' on user request\n", action, s->name);
       }
@@ -659,14 +663,14 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
     if (token) {
       Service_T q = NULL;
       /* Make sure only the last service gets the service token */
-      for (s = servicelist; s; s= s->next) {
-        if (s->token) {
-          s->token = NULL;
+      for (s = servicelist; s; s = s->next) {
+        if (*s->token) {
+          *s->token = 0;
           q = s;
         }
       }
       if (q)
-        q->token = xstrdup(token);
+        snprintf(q->token, sizeof(q->token), "%s", q->token);
     }
 
     Run.doaction = TRUE; 

@@ -282,13 +282,10 @@ static void _gc_service(Service_T *s) {
   if((*s)->eventlist)
     gc_event(&(*s)->eventlist);
 
-  FREE((*s)->token);
   FREE((*s)->name);
   FREE((*s)->path);
   
   (*s)->next= NULL;
-
-  assert(pthread_mutex_destroy(&(*s)->mutex) == 0);
 
   FREE(*s);
 
@@ -461,12 +458,8 @@ static void _gcpql(Resource_T *q) {
 
 
 static void _gc_inf(Info_T *i) {
-
   ASSERT(i);
-
-  FREE((*i)->cs_sum);
   FREE(*i);
-
 }
 
 
@@ -536,15 +529,12 @@ static void _gcmatch(Match_T *s) {
 
 
 static void _gcchecksum(Checksum_T *s) {
-  
   ASSERT(s);
 
-  if((*s)->action)
+  if ((*s)->action)
     _gc_eventaction(&(*s)->action);
 
-  FREE((*s)->hash);
   FREE(*s);
-
 }
 
 

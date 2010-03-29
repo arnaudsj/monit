@@ -1494,56 +1494,55 @@ char *Util_getUptime(time_t delta, char *sep) {
 
 
 /**
- * @return a checksum for the given file, or NULL if error.
+ * @return Store checksum for the given file in supplied buffer, return FALSE if failed, otherwise TRUE.
  */
- char *Util_getChecksum(char *file, int hashtype) {
+int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize) {
+  int hashlength = 16;
 
-   int hashlength=16;
+  ASSERT(file);
+  ASSERT(buf);
+  ASSERT(bufsize >= sizeof(MD_T));
 
-   ASSERT(file);
+  switch (hashtype) {
+    case HASH_MD5:
+      hashlength = 16;
+      break;
+    case HASH_SHA1:
+      hashlength = 20;
+      break;
+    default:
+      return FALSE;
+  }
 
-   switch(hashtype) {
-     case HASH_MD5:
-     hashlength=16;
-     break;
-     case HASH_SHA1:
-     hashlength=20;
-     break;
-     default:
-     return NULL;
-   }
+  if (File_isFile(file)) {
+    FILE *f = fopen(file, "r");
+    if (f) {
+      MD_T result;
+      unsigned char sum[STRLEN];
+      int fresult = 0;
 
-   if(File_isFile(file)) {
-     FILE *f= fopen(file, "r");
-     if(f) {
-       MD_T result;
-       unsigned char buf[STRLEN];
-       int fresult=0;
+      *result = 0;
 
-       *result=0;
+      switch (hashtype) {
+        case HASH_MD5:
+          fresult = md5_stream(f, sum);
+          break;
+        case HASH_SHA1:
+          fresult = sha_stream(f, sum);
+          break;
+      }
 
-       switch(hashtype) {
-         case HASH_MD5:
-         fresult=md5_stream(f, buf);
-         break;
-         case HASH_SHA1:
-         fresult=sha_stream(f, buf);
-         break;
-       }
+      fclose(f);
+      if (fresult)
+        return FALSE;
 
-       fclose(f);
-       if(fresult) {
-         return NULL;
-       }
+      Util_digest2Bytes(sum, hashlength, buf);
+      return TRUE;
 
-       return (xstrdup(Util_digest2Bytes(buf, hashlength, result)));
-
-     }
-   }
-
-   return NULL;
-
- }
+    }
+  }
+  return FALSE;
+}
 
 
 /**
@@ -2040,7 +2039,6 @@ process_partial_block:
  * Reset the service information structure
  */
 void Util_resetInfo(Service_T s) {
-  FREE(s->inf->cs_sum);
   memset(s->inf, 0, sizeof *(s->inf));
   s->inf->_pid=        -1;
   s->inf->_ppid=       -1;

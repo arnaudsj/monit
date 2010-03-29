@@ -643,7 +643,6 @@ int udp_write(int socket, void *b, int len, int timeout) {
  * @return response time on succes, -1 on error
  */
 double icmp_echo(const char *hostname, int timeout, int count) {
-  struct sockaddr_in sin;
   struct sockaddr_in sout;
   struct sockaddr_in *sa;
   struct addrinfo hints;
@@ -732,7 +731,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
       socklen_t size = sizeof(struct sockaddr_in);
 
       do {
-        n = recvfrom(s, buf, STRLEN, 0, (struct sockaddr *)&sin, &size);
+        n = recvfrom(s, buf, STRLEN, 0, (struct sockaddr *)&sout, &size);
       } while(n == -1 && errno == EINTR);
       if (n < 0) {
         LogError("ICMP echo response %d/%d failed -- %s\n", i + 1, count, STRERROR);

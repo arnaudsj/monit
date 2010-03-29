@@ -165,29 +165,24 @@ int validate() {
    * loop to handle the actions ASAP */
   if (Run.doaction) {
     Run.doaction = 0;
-    for (s = servicelist; s; s = s->next) {
-      LOCK(s->mutex)
+    for (s = servicelist; s; s = s->next)
       do_scheduled_action(s);
-      END_LOCK;
-    }
   }
 
   /* Check the services */
   for (s = servicelist; s && !Run.stopped; s = s->next) {
-    LOCK(s->mutex)
-      if (! do_scheduled_action(s) && s->monitor && ! check_skip(s)) {
-        check_timeout(s); // Can disable monitoring => need to check s->monitor again
-	if (s->monitor) {
-          if (! s->check(s))
-            errors++;
-          /* The monitoring may be disabled by some matching rule in s->check
-           * so we have to check again before setting to MONITOR_YES */
-          if (s->monitor != MONITOR_NOT)
-            s->monitor = MONITOR_YES;
-        }
+    if (! do_scheduled_action(s) && s->monitor && ! check_skip(s)) {
+      check_timeout(s); // Can disable monitoring => need to check s->monitor again
+      if (s->monitor) {
+        if (! s->check(s))
+          errors++;
+        /* The monitoring may be disabled by some matching rule in s->check
+         * so we have to check again before setting to MONITOR_YES */
+        if (s->monitor != MONITOR_NOT)
+          s->monitor = MONITOR_YES;
       }
-      gettimeofday(&s->collected, NULL);
-    END_LOCK;
+    }
+    gettimeofday(&s->collected, NULL);
   }
 
   if (Run.doprocess)
@@ -844,14 +839,11 @@ static void check_checksum(Service_T s) {
   int         changed;
   Checksum_T  cs;
 
-  ASSERT(s && s->path && s->checksum && s->checksum->hash);
+  ASSERT(s && s->path && s->checksum);
 
   cs = s->checksum;
 
-  FREE(s->inf->cs_sum);
-  s->inf->cs_sum = Util_getChecksum(s->path, cs->type);
-
-  if (s->inf->cs_sum) {
+  if (Util_getChecksum(s->path, cs->type, s->inf->cs_sum, sizeof(s->inf->cs_sum))) {
 
     Event_post(s, EVENT_DATA, STATE_SUCCEEDED, s->action_DATA, "checksum computed for %s", s->path);
 
@@ -864,7 +856,7 @@ static void check_checksum(Service_T s) {
         break;
       default:
         LogError("'%s' unknown hash type\n", s->name);
-        FREE(s->inf->cs_sum);
+        *s->inf->cs_sum = 0;
         return;
     }
 
@@ -872,8 +864,6 @@ static void check_checksum(Service_T s) {
 
       /* if we are testing for changes only, the value is variable */
       if (cs->test_changes) {
-        char *tmphash = xstrdup(s->inf->cs_sum);
-
         if (!cs->test_changes_ok)
           /* the checksum was not initialized during monit start, so set the checksum now and allow further checksum change testing */
           cs->test_changes_ok = TRUE;
@@ -881,8 +871,7 @@ static void check_checksum(Service_T s) {
           Event_post(s, EVENT_CHECKSUM, STATE_CHANGED, cs->action, "checksum was changed for %s", s->path);
 
         /* reset expected value for next cycle */
-        FREE(cs->hash);
-        cs->hash = tmphash;
+        snprintf(cs->hash, sizeof(cs->hash), "%s", s->inf->cs_sum);
 
       } else
         /* we are testing constant value for failed or succeeded state */
@@ -1333,7 +1322,7 @@ static int do_scheduled_action(Service_T s) {
     rv = control_service(s->name, s->doaction);
     Event_post(s, EVENT_ACTION, STATE_CHANGED, s->action_ACTION, "%s action done", actionnames[s->doaction]);
     s->doaction = ACTION_IGNORE;
-    FREE(s->token);
+    *s->token = 0;
   }
   return rv;
 }

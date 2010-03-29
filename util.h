@@ -288,9 +288,9 @@ char *Util_getUptime(time_t delta, char *sep);
 
 
 /**
- * @return a checksum for the given file, or NULL if error.
+ * @return Store checksum for the given file in supplied buffer, return FALSE if failed, otherwise TRUE.
  */
-char *Util_getChecksum(char *file, int hashtype);
+int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize);
 
 
 /**

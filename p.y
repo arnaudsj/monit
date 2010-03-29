@@ -1523,7 +1523,8 @@ checksum        : IF FAILED hashtype CHECKSUM rate1 THEN action1 recovery {
                   }
                 | IF FAILED hashtype CHECKSUM EXPECT STRING rate1 THEN action1
                   recovery {
-                    checksumset.hash = $6;
+                    snprintf(checksumset.hash, sizeof(checksumset.hash), "%s", $6);
+                    FREE($6);
                     addeventaction(&(checksumset).action, $<number>9, $<number>10);
                     addchecksum(&checksumset);
                   }
@@ -1977,8 +1978,6 @@ static void createservice(int type, char *name, char *value, int (*check)(Servic
   addeventaction(&(current)->action_MONIT_RELOAD, ACTION_START, ACTION_IGNORE);
   addeventaction(&(current)->action_ACTION,       ACTION_ALERT, ACTION_IGNORE);
   
-  pthread_mutex_init(&current->mutex, NULL);
-
   gettimeofday(&current->collected, NULL);
 
 }
@@ -2261,14 +2260,14 @@ static void addchecksum(Checksum_T cs) {
 
   cs->test_changes_ok = TRUE;
 
-  if (!cs->hash) {
+  if (! *cs->hash) {
     if (cs->type == HASH_UNKNOWN)
       cs->type = DEFAULT_HASH;
-    if ( !(cs->hash = Util_getChecksum(current->path, cs->type))) {
+    if ( !(Util_getChecksum(current->path, cs->type, cs->hash, sizeof(cs->hash)))) {
       if (cs->test_changes == TRUE) {
         /* If the file doesn't exist and we're checking for checksum changes, set dummy value */
         cs->test_changes_ok = FALSE;
-        cs->hash = xstrdup("00000000000000000000000000000000");
+        snprintf(cs->hash, sizeof(cs->hash), "00000000000000000000000000000000");
       } else {
         yyerror2("cannot compute a checksum for file %s", current->path);
         reset_checksumset();
@@ -2298,10 +2297,10 @@ static void addchecksum(Checksum_T cs) {
   NEW(c);
 
   c->type            = cs->type;
-  c->hash            = cs->hash;
   c->test_changes    = cs->test_changes;
   c->test_changes_ok = cs->test_changes_ok;
   c->action          = cs->action;
+  snprintf(c->hash, sizeof(c->hash), "%s", cs->hash);
  
   current->checksum = c;
 
@@ -3210,10 +3209,10 @@ static void reset_sizeset() {
  * Reset the Checksum set to default values
  */
 static void reset_checksumset() {
-  checksumset.type = HASH_UNKNOWN;
-  checksumset.hash = NULL;
+  checksumset.type         = HASH_UNKNOWN;
   checksumset.test_changes = FALSE;
-  checksumset.action = NULL;
+  checksumset.action       = NULL;
+  *checksumset.hash        = 0;
 }
 
 
