@@ -275,10 +275,7 @@ A Monit control file example:
  check file httpd.bin 
      with path /usr/local/apache/bin/httpd
      # Run /watch/dog in the case that the binary was changed
-     # and alert in the case that the checksum value recovered
-     # later
      if failed checksum then exec "/watch/dog"
-        else if recovered then alert
 
  include /etc/monit/mysql.monitrc
  include /etc/monit/mail/*.monitrc
