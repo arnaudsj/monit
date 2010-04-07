@@ -694,7 +694,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   icmpout = (struct icmp *)buf;
   for (i = 0; i < count; i++) {
     int j;
-    unsigned char *data = icmpout->icmp_data;
+    unsigned char *data = (unsigned char *)icmpout->icmp_data;
 
     icmpout->icmp_code  = 0;
     icmpout->icmp_type  = ICMP_ECHO;
