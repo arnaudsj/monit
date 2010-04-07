@@ -45,6 +45,10 @@ BUGFIXES:
 * If process resource usage gathering failed, retry next cycle as the error
   can be temporary.
 
+* Fixed sporadic ICMP echo (ping) false positive alert when response arrived out of order.
+  Also removed limit of 20 pings per cycle, improved response time computation, rised ICMP
+  request data size to 64 bytes.
+
 
 Version 5.1.1
 

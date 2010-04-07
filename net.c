@@ -53,12 +53,6 @@
 #define _BSD_SOCKLEN_T_
 #endif
 
-#ifdef HAVE_SOL_IP
-#define ICMP_SIZE sizeof(struct icmphdr)
-#else
-#define ICMP_SIZE sizeof(struct icmp)
-#endif
-
 #ifdef HAVE_NETINET_IN_SYSTM_H
 #include <netinet/in_systm.h>
 #endif
@@ -150,6 +144,12 @@
  *
  *  @file
  */
+
+
+/* ------------------------------------------------------------- Definitions */
+
+
+#define DATALEN 64
 
 
 /* -------------------------------------------------------------- Prototypes */
@@ -647,26 +647,21 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   struct sockaddr_in *sa;
   struct addrinfo hints;
   struct addrinfo *result;
-#ifdef HAVE_SOL_IP
-  struct iphdr *iphdrin;
-  struct icmphdr *icmphdrin = NULL;
-  struct icmphdr *icmphdrout = NULL;
-  int len = sizeof(struct iphdr) + sizeof(struct icmphdr);
-#else
   struct ip *iphdrin;
-  struct icmp *icmphdrin = NULL;
-  struct icmp *icmphdrout = NULL;
-  int len = sizeof(struct ip) + sizeof(struct icmp);
-#endif
-  uint16_t id_in, id_out;
-  int i, s, n = 0, sol_ip, type, sequence;
+  int len_out = offsetof(struct icmp, icmp_data) + DATALEN;
+  int len_in = sizeof(struct ip) + sizeof(struct icmp);
+  struct icmp *icmpin = NULL;
+  struct icmp *icmpout = NULL;
+  uint16_t id_out;
+  int i, s, n = 0, sol_ip;
   unsigned ttl = 255;
+  struct timeval t_out;
+  struct timeval t_in;
   char buf[STRLEN];
-  struct timeval t1;
-  struct timeval t2;
   double response = -1.;
   
   ASSERT(hostname);   
+  ASSERT(len_out < sizeof(buf));
 
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
@@ -695,32 +690,35 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     goto error1;
   }
 
-  id_out = getpid() + (long)hostname + time(NULL);
-  NEW(icmphdrout);
+  id_out = (getpid() + time(NULL)) & 0xFFFF;
+  icmpout = (struct icmp *)buf;
   for (i = 0; i < count; i++) {
-#ifdef HAVE_SOL_IP
-    icmphdrout->code             = 0;
-    icmphdrout->type             = ICMP_ECHO;
-    icmphdrout->un.echo.id       = id_out;
-    icmphdrout->un.echo.sequence = i;
-    icmphdrout->checksum         = checksum_ip((unsigned char *)icmphdrout, ICMP_SIZE);
-#else
-    icmphdrout->icmp_code  = 0;
-    icmphdrout->icmp_type  = ICMP_ECHO;
-    icmphdrout->icmp_id    = id_out;
-    icmphdrout->icmp_seq   = i;
-    icmphdrout->icmp_cksum = checksum_ip((unsigned char *)icmphdrout, ICMP_SIZE);
-#endif
+    int j;
+    unsigned char *data = icmpout->icmp_data;
+
+    icmpout->icmp_code  = 0;
+    icmpout->icmp_type  = ICMP_ECHO;
+    icmpout->icmp_id    = id_out;
+    icmpout->icmp_seq   = i;
+
+    /* Add originate timestamp to data section */
+    gettimeofday(&t_out, NULL);
+    memcpy(data, &t_out, sizeof(struct timeval));
+    data += sizeof(struct timeval);
+
+    /* Initialize rest of data section to numeric sequence */
+    for (j = 0; j < DATALEN - sizeof(struct timeval); j++)
+      data[j] = j;
+
+    icmpout->icmp_cksum = checksum_ip((unsigned char *)icmpout, len_out);
+
     sa = (struct sockaddr_in *)result->ai_addr;
     memcpy(&sout, sa, result->ai_addrlen);
     sout.sin_family = AF_INET;
     sout.sin_port   = 0;
 
-    /* Get time of connection attempt beginning */
-    gettimeofday(&t1, NULL);
-
     do {
-      n = sendto(s, (char *)icmphdrout, ICMP_SIZE, 0, (struct sockaddr *)&sout, sizeof(struct sockaddr));
+      n = sendto(s, (char *)icmpout, len_out, 0, (struct sockaddr *)&sout, sizeof(struct sockaddr));
     } while(n == -1 && errno == EINTR);
     if (n < 0) {
       LogError("ICMP echo request %d/%d failed -- %s\n", i + 1, count, STRERROR);
@@ -736,41 +734,28 @@ double icmp_echo(const char *hostname, int timeout, int count) {
       if (n < 0) {
         LogError("ICMP echo response %d/%d failed -- %s\n", i + 1, count, STRERROR);
         continue;
-      } else if (n < len) {
-        LogError("ICMP echo response %d/%d failed -- received %d bytes, expected at least %d bytes\n", i + 1, count, n, len);
+      } else if (n < len_in) {
+        LogError("ICMP echo response %d/%d failed -- received %d bytes, expected at least %d bytes\n", i + 1, count, n, len_in);
         continue;
       }
 
-#ifdef HAVE_SOL_IP
-      iphdrin   = (struct iphdr *)buf;
-      icmphdrin = (struct icmphdr *)(buf + iphdrin->ihl * 4);
-      type      = icmphdrin->type;
-      sequence  = icmphdrin->un.echo.sequence;
-      id_in     = icmphdrin->un.echo.id;
-#else
-      iphdrin   = (struct ip *)buf;
-      icmphdrin = (struct icmp *)(buf + iphdrin->ip_hl * 4);
-      type      = icmphdrin->icmp_type;
-      sequence  = icmphdrin->icmp_seq;
-      id_in     = icmphdrin->icmp_id;
-#endif
-      if (type == ICMP_ECHOREPLY) {
-        if (id_in == id_out && (sequence >= 0 && sequence < count)) {
-
-          /* Get time of connection attempt finish */
-          gettimeofday(&t2, NULL);
-
+      iphdrin = (struct ip *)buf;
+      icmpin  = (struct icmp *)(buf + iphdrin->ip_hl * 4);
+      if (icmpin->icmp_type == ICMP_ECHOREPLY) {
+        if (icmpin->icmp_id == id_out && icmpin->icmp_seq < (uint16_t)count) {
           /* Get the response time */
-          response = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_usec - t1.tv_usec) / 1000000;
-          break;
+          gettimeofday(&t_in, NULL);
+          memcpy(&t_out, icmpin->icmp_data, sizeof(struct timeval));
+          response = (double)(t_in.tv_sec - t_out.tv_sec) + (double)(t_in.tv_usec - t_out.tv_usec) / 1000000;
+          DEBUG("ICMP echo response %d/%d succeeded -- received id=%d sequence=%d response_time=%fs\n", i + 1, count, icmpin->icmp_id, icmpin->icmp_seq, response);
+          break; // Wait for one response only
         } else
-          LogError("ICMP echo response %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence 0-%d)\n", i, count, id_in, id_out, sequence, count - 1);
+          LogError("ICMP echo response %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence 0-%d)\n", i + 1, count, icmpin->icmp_id, id_out, icmpin->icmp_seq, count - 1);
       } else
-        LogError("ICMP echo response %d/%d failed -- invalid ICMP response type: %x\n", i + 1, count, type);
+        LogError("ICMP echo response %d/%d failed -- invalid ICMP response type: %x\n", i + 1, count, icmpin->icmp_type);
     } else
       LogError("ICMP echo response %d/%d timed out -- no response within %d seconds\n", i + 1, count, timeout);
   }
-  FREE(icmphdrout);
 
   error1:
   close_socket(s);

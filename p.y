@@ -2494,7 +2494,7 @@ static void addicmp(Icmp_T is) {
 
     NEW(icmp);
     icmp->type         = is->type;      
-    icmp->count        = is->count > ICMP_MAX_COUNT ? ICMP_MAX_COUNT : is->count;     
+    icmp->count        = is->count;
     icmp->timeout      = is->timeout;
     icmp->action       = is->action;
     icmp->is_available = FALSE;

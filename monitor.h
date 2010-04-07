@@ -218,7 +218,6 @@
 #define HANDLER_MAX        HANDLER_MMONIT
 
 #define ICMP_ATTEMPT_COUNT      3         
-#define ICMP_MAX_COUNT          20
 
 
 /** ------------------------------------------------- Special purpose macros */
