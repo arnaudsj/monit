@@ -49,52 +49,46 @@
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Michael Amster, <mamster@webeasy.com>
+ *  @author Martin Pala, <martinp@tildeslash.com>
  *
  *  @file
  */
 int check_ftp(Socket_T s) {
-
   int status;
   char buf[STRLEN];
 
   ASSERT(s);
 
-  // process multiline greetings
-  while (TRUE) {
-    if(!socket_readln(s, buf, STRLEN)) {
+  do {
+    if (! socket_readln(s, buf, STRLEN)) {
       LogError("FTP: error receiving data -- %s\n", STRERROR);
       return FALSE;
     }
     Util_chomp(buf);
-    if (!strncmp(buf, "220 ", 4))
-      break;
-  }
+  } while(buf[3] == '-'); // Discard multi-line response
 
-  sscanf(buf, "%d %*s", &status);
-  if(status != 220) {
+  if (sscanf(buf, "%d", &status) != 1 || status != 220) {
     LogError("FTP greeting error: %s\n", buf);
     return FALSE;
   }
 
-  if(socket_print(s, "QUIT\r\n") < 0) {
+  if (socket_print(s, "QUIT\r\n") < 0) {
     LogError("FTP: error sending data -- %s\n", STRERROR);
     return FALSE;
   }
 
-  if(!socket_readln(s, buf, STRLEN)) {
+  if (! socket_readln(s, buf, STRLEN)) {
     LogError("FTP: error receiving data -- %s\n", STRERROR);
     return FALSE;
   }
 
   Util_chomp(buf);
 
-  sscanf(buf, "%d %*s", &status);
-  if(status != 221) {
+  if (sscanf(buf, "%d", &status) != 1 || status != 221) {
     LogError("FTP quit error: %s\n", buf);
     return FALSE;
   }
 
   return TRUE;
-  
 }
 
