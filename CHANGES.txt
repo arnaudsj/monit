@@ -49,6 +49,10 @@ BUGFIXES:
 
 * Fixed sporadic ICMP echo (ping) false positive alerts.
 
+* DNS protocol test now accepts request refusal as correct response - the test is based
+  on query for NS root record which may be prohibited on server side, whereas the negative
+  response means that the server reacts to requests.
+
 
 Version 5.1.1
 

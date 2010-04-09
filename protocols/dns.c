@@ -60,15 +60,13 @@
  *
  *  @file
  */
-int check_dns(Socket_T s)
-{
-
+int check_dns(Socket_T s) {
   int            offset_request  = 0;
   int            offset_response = 0;
+  int            rc;
   unsigned char  buf[STRLEN];
   unsigned char *response = NULL; 
-  unsigned char request[19] =
-  {
+  unsigned char  request[19] = {
     0x00,          /** Request Length field for DNS via TCP */
     0x11,
 
@@ -103,8 +101,7 @@ int check_dns(Socket_T s)
 
   ASSERT(s);
 
-  switch(socket_get_type(s))
-  {
+  switch (socket_get_type(s)) {
     case SOCK_DGRAM:
       offset_request  = 2; /*  Skip Length field in request */
       offset_response = 0;
@@ -118,16 +115,13 @@ int check_dns(Socket_T s)
       return TRUE;
   }
 
-  if(socket_write(s, (unsigned char *)request + offset_request,
-                  sizeof(request) - offset_request) < 0)
-  {
+  if (socket_write(s, (unsigned char *)request + offset_request, sizeof(request) - offset_request) < 0) {
     LogError("DNS: error sending query -- %s\n", STRERROR);
     return FALSE;
   }
 
   /* Response should have at least 14 bytes */
-  if(socket_read(s, (unsigned char *)buf, 15) <= 14)
-  {
+  if (socket_read(s, (unsigned char *)buf, 15) <= 14) {
     LogError("DNS: error receiving response -- %s\n", STRERROR);
     return FALSE;
   }
@@ -135,41 +129,38 @@ int check_dns(Socket_T s)
   response = buf + offset_response;
 
   /* Compare transaction ID (it should be the same as in our request): */
-  if(response[0] != 0x00 && response[1] != 0x01)
-  {
-    LogError("DNS: transaction ID mismatch\n");
+  if (response[0] != 0x00 && response[1] != 0x01) {
+    LogError("DNS: response transaction ID mismatch -- received 0x%x%x, expected 0x1\n", response[0], response[1]);
     return FALSE;
   }
 
   /* Compare flags: */
 
-  if((response[2] & 0x80) != 0x80) /* Response type */
-  {
-    LogError("DNS: message is not response\n");
+  /* Response type */
+  if ((response[2] & 0x80) != 0x80) {
+    LogError("DNS: invalid response type: 0x%x\n", response[2] & 0x80);
     return FALSE;
   }
 
-  if((response[3] & 0x0F) != 0x00) /* Response code */
-  {
-    LogError("DNS: invalid reply code -- error occured\n");
+  /* Response code: accept request refusal as correct response as the server may disallow NS root query but the negative response means, it reacts to requests */
+  rc = response[3] & 0x0F;
+  if (rc != 0x0 && rc != 0x5) {
+    LogError("DNS: invalid response code: 0x%x\n", rc);
     return FALSE;
   }
 
   /* Compare queries count (it should be one as in our request): */
-  if(response[4] != 0x00 && response[5] != 0x01)
-  {
-    LogError("DNS: query count mismatch\n");
+  if (response[4] != 0x00 && response[5] != 0x01) {
+    LogError("DNS: invalid query count in response -- received 0x%x%x, expected 1\n", response[4], response[5]);
     return FALSE;
   }
 
   /* Compare answer resource records count (it should not be zero): */
-  if(response[6] == 0x00 && response[7] == 0x00)
-  {
+  if (rc == 0 && response[6] == 0x00 && response[7] == 0x00) {
     LogError("DNS: no answer records returned\n");
     return FALSE;
   }
 
   return TRUE;
-    
 }
 
