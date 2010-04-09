@@ -53,6 +53,9 @@ BUGFIXES:
   on query for NS root record which may be prohibited on server side, whereas the negative
   response means that the server reacts to requests.
 
+* M/Monit heartbeat is made non-blocking even on service level, so when some service test
+  takes long time (waiting on timeout), it won't generate false alert in M/Monit.
+
 
 Version 5.1.1
 
