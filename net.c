@@ -653,12 +653,15 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   struct icmp *icmpin = NULL;
   struct icmp *icmpout = NULL;
   uint16_t id_out;
-  int i, s, n = 0, sol_ip;
-  unsigned ttl = 255;
+  int i, s, n = 0;
   struct timeval t_out;
   struct timeval t_in;
   char buf[STRLEN];
   double response = -1.;
+#ifndef NETBSD
+  int sol_ip;
+  unsigned ttl = 255;
+#endif
   
   ASSERT(hostname);   
   ASSERT(len_out < sizeof(buf));
@@ -675,6 +678,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     goto error2;
   }
 
+#ifndef NETBSD
 #ifdef HAVE_SOL_IP
   sol_ip = SOL_IP;
 #else
@@ -684,11 +688,11 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     sol_ip = pent ? pent->p_proto : 0;
   }
 #endif
-
   if (setsockopt(s, sol_ip, IP_TTL, (char *)&ttl, sizeof(ttl)) < 0) {
     LogError("ICMP echo -- setsockopt failed: %s\n", STRERROR);
     goto error1;
   }
+#endif
 
   id_out = (getpid() + time(NULL)) & 0xFFFF;
   icmpout = (struct icmp *)buf;
