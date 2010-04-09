@@ -700,6 +700,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     icmpout->icmp_type  = ICMP_ECHO;
     icmpout->icmp_id    = id_out;
     icmpout->icmp_seq   = i;
+    icmpout->icmp_cksum = 0;
 
     /* Add originate timestamp to data section */
     gettimeofday(&t_out, NULL);
