@@ -26,26 +26,28 @@ NEW FEATURES AND FUNCTIONS:
         if failed existence for 5 cycles then exec "/bin/flashdisk_removed.sh"
 
 * MacOSX: allow monitoring of system-wide load average, cpu and memory usage
-  even when Monit is running as non-root user. Note: the monitoring of
-  per-process CPU usage on MacOSX still requires monit to run as root, otherwise
-  it will display process' cpu usage as 0.
+  even when Monit is running as non-root user. Note: the monitoring of per-process
+  CPU usage on MacOSX still requires monit to run as root, otherwise it will display
+  process' cpu usage as 0.
+
+* Remove configuration limit of 20 ICMP requests per cycle.
 
 BUGFIXES:
 
-* Show real process uptime - formerly the presented uptime was
-  based on create timestamp of process' pidfile which provides invalid
-  uptime if the pidfile is replaced. This does for example apache when
-  it is reloaded. Thanks to Nima Chavooshi for report.
+* Show real process uptime - formerly the presented uptime was based on create/modify
+  timestamp of process' pidfile which provides invalid uptime if the pidfile is
+  replaced and process keeps running with original PID (such as on apache reload).
+  Thanks to Nima Chavooshi for report.
 
 * When user triggered action for some service (such as stop) and before that action
   completed user triggered another action for the same service (such as start), the
   second action has been ignored. Monit will not accept new action and return temporary
   error until the previous action completes.
 
-* If process resource usage gathering failed, retry next cycle as the error
-  can be temporary.
+* If process resource usage gathering failed, retry next cycle as the error can be
+  temporary.
 
-* Fixed sporadic ICMP echo (ping) false positive alert.
+* Fixed sporadic ICMP echo (ping) false positive alerts.
 
 
 Version 5.1.1
