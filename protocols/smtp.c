@@ -56,27 +56,24 @@ static int expect(Socket_T s, int expect, int log);
  *
  *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
  *  @author Michael Amster, <mamster@webeasy.com>
+ *  @author Martin Pala, <martinp@tildeslash.com>
  *
  *  @file
  */
 int check_smtp(Socket_T s) {
-    
   ASSERT(s);
   
-  if(!expect(s, 220, TRUE))
+  if (! expect(s, 220, TRUE))
     return FALSE;
   
-  if(!(say(s, "EHLO localhost\r\n") && expect(s, 250, FALSE))) {
-    /* Try HELO also before giving up as of rfc2821 4.1.1.1 */
-    if(!(say(s, "HELO localhost\r\n") && expect(s, 250, TRUE)))
-      return FALSE;
-  }
+  /* Try HELO also before giving up as of rfc2821 4.1.1.1 */
+  if (! (say(s, "EHLO localhost\r\n") && expect(s, 250, FALSE)) || ! (say(s, "HELO localhost\r\n") && expect(s, 250, TRUE)))
+    return FALSE;
 
-  if(!(say(s, "QUIT\r\n") && expect(s, 221, TRUE)))
+  if (! (say(s, "QUIT\r\n") && expect(s, 221, TRUE)))
     return FALSE;
     
   return TRUE;
-  
 }
 
 
@@ -84,40 +81,30 @@ int check_smtp(Socket_T s) {
 
 
 static int say(Socket_T s, char *msg) {
-  
-  if(socket_write(s, msg, strlen(msg)) < 0) {
+  if (socket_write(s, msg, strlen(msg)) < 0) {
     LogError("SMTP: error sending data -- %s\n", STRERROR);
     return FALSE;
   }
-  
   return TRUE;
-  
 }
 
 
 static int expect(Socket_T s, int expect, int log) {
-  
   int status;
-  char text[STRLEN];
   char buf[STRLEN];
 
-  while (TRUE) {
-    if(!socket_readln(s, buf, STRLEN)) {
+  do {
+    if (! socket_readln(s, buf, STRLEN)) {
       LogError("SMTP: error receiving data -- %s\n", STRERROR);
       return FALSE;
     }
     Util_chomp(buf);
-    if (sscanf(buf, "%d-%256s", &status, text) != 2) // EHLO send multiple lines
-      break;
-  }
-
-  if(sscanf(buf, "%d%*s", &status) != 1 || status != expect) {
+  } while (buf[3] == '-'); // Discard multi-line response
+  if (sscanf(buf, "%d", &status) != 1) {
     if(log) 
       LogError("SMTP error: %s\n", buf);
     return FALSE;
   }
-
   return TRUE;
-  
 }
 
