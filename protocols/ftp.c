@@ -66,7 +66,6 @@ int check_ftp(Socket_T s) {
     }
     Util_chomp(buf);
   } while(buf[3] == '-'); // Discard multi-line response
-
   if (sscanf(buf, "%d", &status) != 1 || status != 220) {
     LogError("FTP greeting error: %s\n", buf);
     return FALSE;
@@ -81,9 +80,7 @@ int check_ftp(Socket_T s) {
     LogError("FTP: error receiving data -- %s\n", STRERROR);
     return FALSE;
   }
-
   Util_chomp(buf);
-
   if (sscanf(buf, "%d", &status) != 1 || status != 221) {
     LogError("FTP quit error: %s\n", buf);
     return FALSE;
