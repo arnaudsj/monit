@@ -576,7 +576,7 @@ static void check_connection(Service_T s, Port_T p) {
    * adds 2s delay when used with UDP socket. When there is specific protocol used, we
    * don't need it for UDP, since the protocol test is sufficient */
   if ((socket_get_type(socket) != SOCK_DGRAM || p->protocol->check == check_default) && !socket_is_ready(socket)) {
-    snprintf(report, STRLEN, "failed, the socket at %s%s%s is not ready for i|o -- %s", p->address, p->family == AF_INET ?" via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "", STRERROR);
+    snprintf(report, STRLEN, "connection failed, %s%s%s is not ready for i|o -- %s", p->address, p->family == AF_INET ?" via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "", STRERROR);
     rv = FALSE;
     goto error;
   }
