@@ -91,7 +91,7 @@ Setting up the developing environment
 SVN standards
 -------------
 
-   * ONLY check-in files that will compile without any warnings.
+   * ONLY check in files that will compile without any warnings.
      (Change the CFLAGS macro in the Makefile to include -Wall;
      CFLAGS = -Wall .. to compile with all warnings turned on)
 
@@ -102,9 +102,9 @@ SVN standards
    
      svn checkout http://monit.googlecode.com/svn/trunk/ monit
 
-   * To check out full source code including all release tags:
+   * To check out the complete source code repository:
 
-     svn checkout http://monit.googlecode.com/svn/ monit-full
+     svn checkout http://monit.googlecode.com/svn/ monit
 
    For Project Managers:
 
@@ -120,11 +120,14 @@ SVN standards
       y is for minor feature releases
       z is for bug fix releases
 
-   * To tag a new relase use ollowing in full source code copy:
+   * To tag a new release in svn:
+   
+     svn checkout http://monit.googlecode.com/svn/ svn
+     cd svn
+     svn copy trunk tags/release-x-y-z
+     svn ci
 
-     svn copy trunk release-x-y-z
-
-   * Only the project manager is allowed to create and tag a new
+   * Only the project manager should create and tag a new
      release
 
 
