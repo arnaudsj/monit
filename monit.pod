@@ -2896,13 +2896,21 @@ Currently, six types of check statements are supported:
 
 =over 4
 
-=item 1. CHECK PROCESS <unique name> PIDFILE <path>
+=item 1. CHECK PROCESS <unique name> <PIDFILE <path> | MATCHING <regex>>
 
 <path> is the absolute path to the program's pidfile. If the
 pidfile does not exist or does not contain the pid number of a
 running process, Monit will call the entry's start method if
-defined, If Monit runs in passive mode or the start methods is
-not defined, Monit will just send alerts on errors.
+defined.
+<regex> is alternative process specification using pattern matching
+to process name (command line) from process table instead of pidfile.
+The pattern to match can be obtained using 'ps' utility. The first
+match is used so this form of check is useful for unique pattern
+matching - the pidfile should be used where possible as it defines
+expected pid exactly (pattern matching won't be useful for Apache
+in most cases for example).
+If Monit runs in passive mode or the start methods is not defined,
+Monit will just send alerts on errors.
 
 =item 2. CHECK FILE <unique name> PATH <path>
 
@@ -3252,6 +3260,10 @@ The simplest form is just the check statement. In this example we
 check to see if the server is running and log a message if not:
 
  check process resin with pidfile /usr/local/resin/srun.pid
+
+Checking process without pidfile:
+
+ check process matching "/sbin/dynamic_pager -F /private/var/vm/swapfile"
 
 To have Monit start the server if it's not running, add a start
 statement:

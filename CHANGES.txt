@@ -11,6 +11,17 @@ Version 5.2
 
 NEW FEATURES AND FUNCTIONS:
 
+* Added support for monitoring processes without pidfile using pattern matching.
+  You can use POSIX regular expressions or full strings maching process name.
+  The process string corresponds to output of 'ps' utility. Some platforms
+  like Mac OS X require super-user privileges to get full process name.
+  The first match is used so this form of check is useful for unique
+  pattern matching - the pidfile should be used where possible as it defines
+  expected pid exactly (pattern matching won't be useful for Apache for example).
+  Example usage:
+      check process matching "/sbin/dynamic_pager -F /private/var/vm/swapfile"
+          ...
+
 * Added support for system swap usage monitoring. Syntax is similar to
   memory usage monitoring - example:
       check system myserver

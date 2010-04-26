@@ -392,27 +392,29 @@ typedef struct myauthentication {
 
 /** Defines process tree - data storage backend*/
 typedef struct myprocesstree {
-  int  pid;
-  int  ppid;
-  int  status_flag;
-  time_t  starttime;
+  int           pid;
+  int           ppid;
+  int           status_flag;
+  time_t        starttime;
+  char          procname[STRLEN];
+  char         *cmdline;
   
-  int  visited;
-  int  children_num;
-  int  children_sum;
-  int  cpu_percent;
-  int  cpu_percent_sum;
+  int           visited;
+  int           children_num;
+  int           children_sum;
+  int           cpu_percent;
+  int           cpu_percent_sum;
   unsigned long mem_kbyte;
   unsigned long mem_kbyte_sum;
 
   /** For internal use */
-  double time;                                             /**< 1/10 seconds */
-  double time_prev;                                        /**< 1/10 seconds */
-  long  cputime;                                           /**< 1/10 seconds */
-  long  cputime_prev;                                      /**< 1/10 seconds */
+  double        time;                                      /**< 1/10 seconds */
+  double        time_prev;                                 /**< 1/10 seconds */
+  long          cputime;                                   /**< 1/10 seconds */
+  long          cputime_prev;                              /**< 1/10 seconds */
   
-  int parent;
-  int *children;
+  int           parent;
+  int          *children;
 } ProcessTree_T;
 
 
@@ -876,6 +878,18 @@ extern ProcessTree_T *ptree;
 extern int            ptreesize;    
 extern ProcessTree_T *oldptree;  
 extern int            oldptreesize; 
+
+extern char actionnames[][STRLEN];
+extern char modenames[][STRLEN];
+extern char checksumnames[][STRLEN];
+extern char operatornames[][STRLEN];
+extern char operatorshortnames[][3];
+extern char monitornames[][STRLEN];
+extern char statusnames[][STRLEN];
+extern char servicetypes[][STRLEN];
+extern char pathnames[][STRLEN];
+extern char icmpnames[19][STRLEN];
+extern char sslnames[][STRLEN];
 
 /* ------------------------------------------------------- Public prototypes */
 

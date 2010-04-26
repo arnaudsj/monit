@@ -233,9 +233,13 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
 
     pt[i].time = get_float_time();
 
-    /* Move along the buffer to get past the process name */
     if (!(tmp = strrchr(buf, ')'))) {
       DEBUG("system statistic error -- file /proc/%d/stat parse error\n", pt[i].pid);
+      continue;
+    }
+    *tmp = 0;
+    if (sscanf(buf, "%*d (%256s", pt[i].procname) != 1) {
+      DEBUG("system statistic error -- file /proc/%d/stat process name parse error\n", pt[i].pid);
       continue;
     }
 
@@ -277,6 +281,12 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
       pt[i].mem_kbyte = (stat_item_rss >> abs(page_shift_to_kb));
     else
       pt[i].mem_kbyte = (stat_item_rss << abs(page_shift_to_kb));
+
+    if (! read_proc_file(buf, sizeof(buf), "cmdline", pt[i].pid)) {
+      DEBUG("system statistic error -- cannot read /proc/%d/cmdline\n", pt[i].pid);
+      continue;
+    }
+    pt[i].cmdline = xstrdup(buf);
   }
   
   *reference = pt;

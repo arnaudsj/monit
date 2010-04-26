@@ -84,6 +84,9 @@
  */
 
 
+#define ARGSSIZE 8192
+
+
 /* ----------------------------------------------------------------- Private */
 
 
@@ -92,6 +95,9 @@ static int  pagesize_kbyte;
 static long total_old    = 0;
 static long cpu_user_old = 0;
 static long cpu_syst_old = 0;
+
+
+static char *skipString(char *p);
 
 
 /* ------------------------------------------------------------------ Public */
@@ -150,26 +156,42 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
   int                i;
   int                treesize;
   mach_port_t        mytask = mach_task_self();
-  struct kinfo_proc *pinfo;
   ProcessTree_T     *pt;
-  size_t             bufSize = 0;
-  int                mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
+  struct kinfo_proc *pinfo;
+  size_t             pinfo_size = 0;
+  char              *args;
+  size_t             args_size = 0;
+  size_t             size;
+  int                mib[4];
 
-  if (sysctl(mib, 4, NULL, &bufSize, NULL, 0) < 0) {
-    LogError("system statistic error -- sysctl failed\n");
+  mib[0] = CTL_KERN;
+  mib[1] = KERN_PROC;
+  mib[2] = KERN_PROC_ALL;
+  mib[3] = 0;
+  if (sysctl(mib, 4, NULL, &pinfo_size, NULL, 0) < 0) {
+    LogError("system statistic error -- sysctl failed: %s\n", STRERROR);
     return FALSE;
   }
-  pinfo = (struct kinfo_proc *)xcalloc(1, bufSize);
-
-  if (sysctl(mib, 4, pinfo, &bufSize, NULL, 0)) {
+  pinfo = (struct kinfo_proc *)xcalloc(1, pinfo_size);
+  if (sysctl(mib, 4, pinfo, &pinfo_size, NULL, 0)) {
     FREE(pinfo);
-    LogError("system statistic error -- sysctl failed\n");
+    LogError("system statistic error -- sysctl failed: %s\n", STRERROR);
     return FALSE;
   }
-
-  treesize = bufSize / sizeof(struct kinfo_proc);
-
+  treesize = pinfo_size / sizeof(struct kinfo_proc);
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
+
+  mib[0] = CTL_KERN;
+  mib[1] = KERN_ARGMAX;
+  size = sizeof(args_size);
+  if (sysctl(mib, 2, &args_size, &size, NULL, 0) == -1) {
+    FREE(pinfo);
+    FREE(pt);
+    LogError("system statistic error -- sysctl failed: %s\n", STRERROR);
+    return FALSE;
+  }
+  args = (char *)xcalloc(1, args_size);
+  size = args_size; // save for per-process sysctl loop
 
   for (i = 0; i < treesize; i++) {
     mach_port_t task;
@@ -177,6 +199,35 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     pt[i].pid       = pinfo[i].kp_proc.p_pid;
     pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
     pt[i].starttime = pinfo[i].kp_proc.p_starttime.tv_sec;
+
+    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].kp_proc.p_comm);
+    args_size = size;
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROCARGS2;
+    mib[2] = pt[i].pid;
+    if (sysctl(mib, 3, args, &args_size, NULL, 0) != -1) {
+      /* KERN_PROCARGS2 sysctl() returns following pseudo structure:
+       *        struct {
+       *                int argc
+       *                char execname[];
+       *                char argv[argc][];
+       *                char env[][];
+       *        }
+       * The strings are terminated with '\0' and may have variable '\0' padding
+       */
+      int       argc = *args;
+      char     *p = args + sizeof(int); // arguments beginning
+      Buffer_T  cmdline;
+
+      memset(&cmdline, 0, sizeof(Buffer_T));
+
+      p = skipString(p); // skip exec name
+      while (argc-- && p < args + args_size) {
+        Util_stringbuffer(&cmdline, argc ? "%s " : "%s", p);
+        p = skipString(p);
+      }
+      pt[i].cmdline = cmdline.buf;
+    }
 
     if (pinfo[i].kp_proc.p_stat == SZOMB)
       pt[i].status_flag |= PROCESS_ZOMBIE;
@@ -215,6 +266,7 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
       mach_port_deallocate(mytask, task); 	
     }
   }
+  FREE(args);
   FREE(pinfo);
 
   *reference = pt;
@@ -306,5 +358,13 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
     return TRUE;
   }
   return FALSE;
+}
+
+
+static char *skipString(char *p) {
+  p += strlen(p);
+  while (! *p) // skip terminating '\0' and possible padding
+    p++;
+  return p;
 }
 

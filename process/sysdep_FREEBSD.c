@@ -172,24 +172,40 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
   for (i = 0; i < treesize; i++) {
+    int        j, flags;
+    char     **args;
+    Buffer_T   cmdline;
+
+    memset(&cmdline, 0, sizeof(Buffer_T));
 #if (__FreeBSD_version > 500000)
     pt[i].pid       = pinfo[i].ki_pid;
     pt[i].ppid      = pinfo[i].ki_ppid;
     pt[i].starttime = pinfo[i].ki_start.tv_sec;
     pt[i].cputime   = (long)(pinfo[i].ki_runtime / 100000);
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].ki_rssize * pagesize_kbyte);
-    if (pinfo[i].ki_stat == SZOMB)
+    flags           = pinfo[i].ki_stat;
+    args            = kvm_getargv(kvm_handle, &pinfo[i], 0);
+    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].ki_comm);
 #else
     pt[i].pid       = pinfo[i].kp_proc.p_pid;
     pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
     pt[i].starttime = pinfo[i].kp_eproc.e_stats.p_start.tv_sec;
     pt[i].cputime   = (long)(pinfo[i].kp_proc.p_runtime / 100000);
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].kp_eproc.e_vm.vm_rssize * pagesize_kbyte);
-    if (pinfo[i].kp_proc.p_stat == SZOMB)
+    flags           = pinfo[i].kp_proc.p_stat;
+    args            = kvm_getargv(kvm_handle, &pinfo[i].kp_proc, 0);
+    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].kp_proc.p_comm);
 #endif
-      pt[i].status_flag |= PROCESS_ZOMBIE;
+    if (flags == SZOMB)
+      pt[i].status_flag |= PROCESS_ZOMBIE; //FIXME: save flag for kernel threads
     pt[i].cpu_percent = 0;
     pt[i].time = get_float_time();
+
+    if (args) {
+      for (j = 0; args[j]; j++)
+        Util_stringbuffer(&cmdline, args[j + 1] ? "%s " : "%s", args[j]);
+      pt[i].cmdline = cmdline.buf;
+    }
   }
 
   *reference = pt;

@@ -38,18 +38,6 @@
 
 #define PROCESS_ZOMBIE        1
 
-extern char actionnames[][STRLEN];
-extern char modenames[][STRLEN];
-extern char checksumnames[][STRLEN];
-extern char operatornames[][STRLEN];
-extern char operatorshortnames[][3];
-extern char monitornames[][STRLEN];
-extern char statusnames[][STRLEN];
-extern char servicetypes[][STRLEN];
-extern char pathnames[][STRLEN];
-extern char icmpnames[][STRLEN];
-extern char sslnames[][STRLEN];
-
 int update_process_data(Service_T s, ProcessTree_T *, int treesize, pid_t pid);
 int init_process_info(void);
 int update_system_load(ProcessTree_T *, int);

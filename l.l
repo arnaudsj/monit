@@ -266,7 +266,7 @@ size              { return SIZE; }
 basedir           { return BASEDIR; }
 slot(s)?          { return SLOT; }
 eventqueue        { return EVENTQUEUE; }
-match             { return MATCH; }
+match(ing)?       { return MATCH; }
 not               { return NOT; }
 ignore            { return IGNORE; }
 connection        { return CONNECTION; }

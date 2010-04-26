@@ -128,6 +128,19 @@ pthread_t       heartbeatThread;               /**< M/Monit heartbeat thread */
 pthread_cond_t  heartbeatCond;                /**< Hearbeat wakeup condition */
 pthread_mutex_t heartbeatMutex;                          /**< Hearbeat mutex */
 
+char actionnames[][STRLEN]   = {"ignore", "alert", "restart", "stop", "exec", "unmonitor", "start", "monitor", ""};
+char modenames[][STRLEN]     = {"active", "passive", "manual"};
+char checksumnames[][STRLEN] = {"UNKNOWN", "MD5", "SHA1"};
+char operatornames[][STRLEN] = {"greater than", "less than", "equal to", "not equal to"};
+char operatorshortnames[][3] = {">", "<", "=", "!="};
+char monitornames[][STRLEN]  = {"not monitored", "monitored", "initializing"};
+char statusnames[][STRLEN]   = {"accessible", "accessible", "accessible", "running", "online with all services", "running", "accessible"};
+char servicetypes[][STRLEN]  = {"Filesystem", "Directory", "File", "Process", "Remote Host", "System", "Fifo"};
+char pathnames[][STRLEN]     = {"Path", "Path", "Path", "Pid file", "Path", "", "Path"};
+char icmpnames[19][STRLEN]   = {"Echo Reply", "", "", "Destination Unreachable", "Source Quench", "Redirect", "", "", "Echo Request", "", "", "Time Exceeded", "Parameter Problem", "Timestamp Request", "Timestamp Reply", "Information Request", "Information Reply", "Address Mask Request", "Address Mask Reply"};
+char sslnames[][STRLEN]      = {"auto", "v2", "v3", "tls"};
+
+
 
 
 /* ------------------------------------------------------------------ Public */

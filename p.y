@@ -784,55 +784,53 @@ readonly        : /* EMPTY */ { $<number>$ = FALSE; }
                 ;
 
 checkproc       : CHECKPROC SERVICENAME PIDFILE PATH {
-                    check_name($<string>2);
                     createservice(TYPE_PROCESS, $<string>2, $4, check_process);
                   }
                 | CHECKPROC SERVICENAME PATHTOK PATH {
-                    check_name($<string>2);
                     createservice(TYPE_PROCESS, $<string>2, $4, check_process);
+                  }
+                | CHECKPROC SERVICENAME MATCH STRING {
+                    createservice(TYPE_PROCESS, $<string>2, $4, check_process);
+                    matchset.ignore = FALSE;
+                    matchset.match_path = NULL;
+                    matchset.match_string = xstrdup($4);
+                    addmatch(&matchset, ACTION_IGNORE, 0);
                   }
                 ;
 
 checkfile       : CHECKFILE SERVICENAME PATHTOK PATH {
-                    check_name($<string>2); 
                     createservice(TYPE_FILE, $<string>2, $4, check_file);
                   }
                 ;
 
 checkfilesys    : CHECKFILESYS SERVICENAME PATHTOK PATH {
-                    check_name($<string>2);
                     createservice(TYPE_FILESYSTEM, $<string>2, $4, check_filesystem);
                   }
                 ;
 
 checkdir        : CHECKDIR SERVICENAME PATHTOK PATH {
-                    check_name($<string>2);
                     createservice(TYPE_DIRECTORY, $<string>2, $4, check_directory);
                   }
                 ;
 
 checkhost       : CHECKHOST SERVICENAME ADDRESS STRING {
                     check_hostname($4); 
-                    check_name($<string>2);
                     createservice(TYPE_HOST, $<string>2, $4, check_remote_host);
                   }
                 ;
 
 checksystem     : CHECKSYSTEM SERVICENAME {
-                    check_name($<string>2);
                     createservice(TYPE_SYSTEM, $<string>2, xstrdup(""), check_system);
                     hassystem = TRUE;
                   }
                 ;
 
 checkfifo       : CHECKFIFO SERVICENAME PATHTOK PATH {
-                    check_name($<string>2);
                     createservice(TYPE_FIFO, $<string>2, $4, check_fifo);
                   }
                 ;
 
 checkstatus     : CHECKSTATUS SERVICENAME PATHTOK PATH {
-                    check_name($<string>2);
                     createservice(TYPE_STATUS, $<string>2, $4, check_status);
                   }
                 ;
@@ -1943,6 +1941,8 @@ static void createservice(int type, char *name, char *value, int (*check)(Servic
 
   ASSERT(name);
   ASSERT(value);
+
+  check_name(name);
 
   if (current)
     addservice(current);

@@ -736,14 +736,10 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
     servicetypes[s->type],
     s->name);
 
-  if(s->path && *s->path)
-    out_print(res,
-      "<tr>"
-      "<td>%s</td>"
-      "<td>%s</td>"
-      "</tr>",
-      pathnames[s->type],
-      s->path);
+  if(s->type == TYPE_PROCESS)
+    out_print(res, "<tr><td>%s</td><td>%s</td></tr>", s->matchlist ? "Match" : "Pid file", s->path);
+  else if(s->type != TYPE_HOST && s->type != TYPE_SYSTEM)
+    out_print(res, "<tr><td>Path</td><td>%s</td></tr>", s->path);
 
   status= get_service_status_html(s);
   out_print(res,
@@ -1791,8 +1787,7 @@ static void print_service_rules_size(HttpResponse res, Service_T s) {
 
 static void print_service_rules_match(HttpResponse res, Service_T s) {
 
-  if(s->matchlist) {
-
+  if(s->matchlist && s->type != TYPE_PROCESS) {
     char          ratio1[STRLEN];
     Match_T       ml;
     EventAction_T a;

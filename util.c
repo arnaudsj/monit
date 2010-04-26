@@ -785,10 +785,14 @@ void Util_printService(Service_T s) {
   if (sgheader)
     printf("\n");
 
-  if(s->type == TYPE_PROCESS)
-    printf(" %-20s = %s\n", "Pid file", s->path);
-  else if(s->type != TYPE_HOST && s->type != TYPE_SYSTEM)
+  if(s->type == TYPE_PROCESS) {
+    if (s->matchlist)
+      printf(" %-20s = %s\n", "Match", s->path);
+    else
+      printf(" %-20s = %s\n", "Pid file", s->path);
+  } else if(s->type != TYPE_HOST && s->type != TYPE_SYSTEM) {
     printf(" %-20s = %s\n", "Path", s->path);
+  }
   printf(" %-20s = %s\n", "Monitoring mode", modenames[s->mode]);
   if(s->start) {
     int i = 0;
@@ -992,15 +996,15 @@ void Util_printService(Service_T s) {
     
   }
 
-  for(ml= s->matchlist; ml; ml= ml->next) {
-    EventAction_T a= ml->action;
+  if (s->type != TYPE_PROCESS) {
+    for(ml= s->matchlist; ml; ml= ml->next) {
+      EventAction_T a= ml->action;
     
-    Util_getEventratio(a->failed, ratio1);
-
-    printf(" %-20s = if%s match \"%s\" %s then %s\n",
-           "Regex", ml->not?" not":"", ml->match_string,
-           ratio1, a->failed->description);
-    
+      Util_getEventratio(a->failed, ratio1);
+      printf(" %-20s = if%s match \"%s\" %s then %s\n",
+        "Regex", ml->not?" not":"", ml->match_string,
+        ratio1, a->failed->description);
+    }
   }
   
   for(dl= s->filesystemlist; dl; dl= dl->next) {
@@ -1390,21 +1394,40 @@ pid_t Util_getPid(char *pidfile) {
  * the process is running, otherwise FALSE
  */
 int Util_isProcessRunning(Service_T s) {
-  
-  pid_t  pid;
+  int   i;
+  pid_t pid = -1;
   
   ASSERT(s);
   
-  errno= 0;
-  if((pid= Util_getPid(s->path)) > 0) {
-    if( (getpgid(pid) > -1) || (errno == EPERM) )
+  errno = 0;
+
+  if (s->matchlist) {
+    for (i = 0; i < ptreesize; i++) {
+      int found = FALSE;
+      char *value = ptree[i].cmdline ? ptree[i].cmdline : ptree[i].procname;
+
+#ifdef HAVE_REGEX_H
+      found = regexec(s->matchlist->regex_comp, value, 0, NULL, 0) ? FALSE : TRUE;
+#else
+      found = strstr(value, s->matchlist->match_string) ? TRUE : FALSE;
+#endif
+      if (found) {
+        pid = ptree[i].pid;
+        break;
+      }
+    }
+  } else {
+    pid = Util_getPid(s->path);
+  }
+
+  if (pid > 0) {
+    if ((getpgid(pid) > -1) || (errno == EPERM))
       return pid;
     DEBUG("'%s' Error testing process id [%d] -- %s\n", s->name, pid, STRERROR);
   }
   Util_resetInfo(s);
   
   return FALSE;
-  
 }
 
 

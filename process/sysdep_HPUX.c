@@ -212,6 +212,9 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     pt[i].cpu_percent = (int)(1000. * psall[i].pst_pctcpu / (float)systeminfo.cpus);
     pt[i].mem_kbyte   = (unsigned long)(psall[i].pst_rssize * (page_size / 1024.0));
 
+    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", psall[i].pst_ucomm);
+    pt[i].cmdline = xstrdup(psall[i].pst_cmd);
+
     if ( psall[i].pst_stat == PS_ZOMBIE )
       pt[i].status_flag |= PROCESS_ZOMBIE;
   }

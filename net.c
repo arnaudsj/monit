@@ -757,7 +757,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
         } else
           LogError("ICMP echo response %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence 0-%d)\n", i + 1, count, icmpin->icmp_id, id_out, icmpin->icmp_seq, count - 1);
       } else
-        LogError("ICMP echo response %d/%d failed -- invalid ICMP response type: %x\n", i + 1, count, icmpin->icmp_type);
+        LogError("ICMP echo response %d/%d failed -- invalid ICMP response type: %x (%s)\n", i + 1, count, icmpin->icmp_type, icmpin->icmp_type < 19 ? icmpnames[icmpin->icmp_type] : "unknown");
     } else
       LogError("ICMP echo response %d/%d timed out -- no response within %d seconds\n", i + 1, count, timeout);
   }

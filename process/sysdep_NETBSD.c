@@ -50,6 +50,10 @@
 #include <sys/proc.h>
 #endif
 
+#ifdef HAVE_KVM_H
+#include <kvm.h>
+#endif
+
 #ifdef HAVE_UVM_UVM_H
 #include <uvm/uvm.h>
 #endif
@@ -145,9 +149,11 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   int                        i;
   int                        treesize;
   size_t                     size = sizeof(maxslp);
+  char                       buf[_POSIX2_LINE_MAX];
   int                        mib_proc2[6] = {CTL_KERN, KERN_PROC2, KERN_PROC_ALL, 0, sizeof(struct kinfo_proc2), 0};
   static int                 mib_maxslp[] = {CTL_VM, VM_MAXSLP};
   ProcessTree_T             *pt;
+  kvm_t                     *kvm_handle;
   static struct kinfo_proc2 *pinfo;
 
   if (sysctl(mib_maxslp, 2, &maxslp, &size, NULL, 0) < 0) {
@@ -173,7 +179,16 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
+  if (! (kvm_handle = kvm_openfiles(NULL, NULL, NULL, KVM_NO_FILES, buf))) {
+    LogError("system statistic error -- kvm_openfiles failed: %s", buf);
+    return FALSE;
+  }
+
   for (i = 0; i < treesize; i++) {
+    int        j;
+    char     **args;
+    Buffer_T   cmdline;
+
     pt[i].pid         = pinfo[i].p_pid;
     pt[i].ppid        = pinfo[i].p_ppid;
     pt[i].starttime   = pinfo[i].p_ustart_sec;
@@ -183,8 +198,16 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     if (pinfo[i].p_stat == SZOMB)
       pt[i].status_flag |= PROCESS_ZOMBIE;
     pt[i].time = get_float_time();
+    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].p_comm);
+    memset(&cmdline, 0, sizeof(Buffer_T));
+    if ((args = kvm_getargv2(kvm_handle, &pinfo[i], 0))) {
+      for (j = 0; args[j]; j++)
+        Util_stringbuffer(&cmdline, args[j + 1] ? "%s " : "%s", args[j]);
+      pt[i].cmdline = cmdline.buf;
+    }
   }
   FREE(pinfo);
+  kvm_close(kvm_handle);
 
   *reference = pt;
 
