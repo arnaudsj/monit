@@ -584,7 +584,7 @@ group[ \t]+       {
                   }
 
   [/][^?#\r\n ]*  {
-	              yylval.url->path= Util_urlEncode(yytext);
+	              yylval.url->path= xstrdup(yytext);
                   }
 
   [?][^#\r\n ]*   {

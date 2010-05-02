@@ -200,7 +200,6 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
     pt[i].starttime = pinfo[i].kp_proc.p_starttime.tv_sec;
 
-    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].kp_proc.p_comm);
     args_size = size;
     mib[0] = CTL_KERN;
     mib[1] = KERN_PROCARGS2;
@@ -228,6 +227,8 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
       }
       pt[i].cmdline = cmdline.buf;
     }
+    if (! pt[i].cmdline || ! *pt[i].cmdline)
+      pt[i].cmdline = xstrdup(pinfo[i].kp_proc.p_comm);
 
     if (pinfo[i].kp_proc.p_stat == SZOMB)
       pt[i].status_flag |= PROCESS_ZOMBIE;

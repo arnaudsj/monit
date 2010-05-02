@@ -223,8 +223,8 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     pt[i].ppid        = procs[i].pi_ppid;
     pt[i].starttime   = procs[i].pi_start;
 
-    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", procs[i].pi_comm);
-    //FIXME: add full process command line
+    //FIXME: add full process command line instead of process name only:
+    pt[i].cmdline = xstrdup(procs[i].pi_comm);
 
     if (procs[i].pi_state == SZOMB) {
       pt[i].status_flag |= PROCESS_ZOMBIE;

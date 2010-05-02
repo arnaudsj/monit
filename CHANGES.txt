@@ -67,6 +67,10 @@ BUGFIXES:
 * M/Monit heartbeat is made non-blocking even on service level, so when some service test
   takes long time (waiting on timeout), it won't generate false alert in M/Monit.
 
+* Fixed support for service names which contain "/" in the name so they can be managed
+  via monit web interface, also removed limitation of service names so they can start
+  with slash ("/") now. Thanks to Artyom Khafizof.
+
 
 Version 5.1.1
 

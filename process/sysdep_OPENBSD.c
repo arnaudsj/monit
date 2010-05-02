@@ -199,13 +199,14 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
       pt[i].status_flag |= PROCESS_ZOMBIE; //FIXME: save system service flag too (kernel threads)
     pt[i].time = get_float_time();
 
-    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].p_comm);
     memset(&cmdline, 0, sizeof(Buffer_T));
     if ((args = kvm_getargv2(kvm_handle, &pinfo[i], 0))) {
       for (j = 0; args[j]; j++)
         Util_stringbuffer(&cmdline, args[j + 1] ? "%s " : "%s", args[j]);
       pt[i].cmdline = cmdline.buf;
     }
+    if (! pt[i].cmdline || ! *pt[i].cmdline)
+      pt[i].cmdline = xstrdup(pinfo[i].p_comm);
   }
   FREE(pinfo);
   kvm_close(kvm_handle);

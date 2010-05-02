@@ -100,8 +100,8 @@
 "</div></body></html>"
 
 
-#define HEAD(location, refresh) \
-   out_print(res, HEAD_HTML, Run.localhostname, refresh, location, location);
+#define HEAD(path, name, refresh) \
+   out_print(res, HEAD_HTML, Run.localhostname, refresh, path, name);
 
 #define FOOT  out_print(res, FOOT_HTML);
 

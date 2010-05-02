@@ -1404,12 +1404,11 @@ int Util_isProcessRunning(Service_T s) {
   if (s->matchlist) {
     for (i = 0; i < ptreesize; i++) {
       int found = FALSE;
-      char *value = ptree[i].cmdline ? ptree[i].cmdline : ptree[i].procname;
 
 #ifdef HAVE_REGEX_H
-      found = regexec(s->matchlist->regex_comp, value, 0, NULL, 0) ? FALSE : TRUE;
+      found = regexec(s->matchlist->regex_comp, ptree[i].cmdline, 0, NULL, 0) ? FALSE : TRUE;
 #else
-      found = strstr(value, s->matchlist->match_string) ? TRUE : FALSE;
+      found = strstr(ptree[i].cmdline, s->matchlist->match_string) ? TRUE : FALSE;
 #endif
       if (found) {
         pid = ptree[i].pid;
@@ -2280,7 +2279,7 @@ static char *is_str_defined(char *s) {
  */
 static int is_url_unsafe(unsigned char *c) {
   int i;
-  static unsigned char unsafe[]= "<>\"#{}|\\^~[]`";
+  static unsigned char unsafe[]= "<>\"#{}|\\^~[]`/";
   
   ASSERT(c);
   

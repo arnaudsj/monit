@@ -199,6 +199,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   int                 treesize = 0;
   int                 stat_ppid = 0;
   char               *tmp = NULL;
+  char                procname[STRLEN];
   char                buf[1024];
   char                stat_item_state;
   long                stat_item_cutime = 0;
@@ -224,6 +225,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
 
   /* Insert data from /proc directory */
   for (i = 0; i < treesize; i++) {
+
     pt[i].pid = atoi(globbuf.gl_pathv[i] + strlen("/proc/"));
     
     if (!read_proc_file(buf, sizeof(buf), "stat", pt[i].pid)) {
@@ -238,7 +240,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
       continue;
     }
     *tmp = 0;
-    if (sscanf(buf, "%*d (%256s", pt[i].procname) != 1) {
+    if (sscanf(buf, "%*d (%256s", procname) != 1) {
       DEBUG("system statistic error -- file /proc/%d/stat process name parse error\n", pt[i].pid);
       continue;
     }
@@ -286,7 +288,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
       DEBUG("system statistic error -- cannot read /proc/%d/cmdline\n", pt[i].pid);
       continue;
     }
-    pt[i].cmdline = xstrdup(buf);
+    pt[i].cmdline = *buf ? xstrdup(buf) : xstrdup(procname);
   }
   
   *reference = pt;

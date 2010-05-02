@@ -173,6 +173,7 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
 
   for (i = 0; i < treesize; i++) {
     int        j, flags;
+    char      *procname = NULL;
     char     **args;
     Buffer_T   cmdline;
 
@@ -185,7 +186,7 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].ki_rssize * pagesize_kbyte);
     flags           = pinfo[i].ki_stat;
     args            = kvm_getargv(kvm_handle, &pinfo[i], 0);
-    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].ki_comm);
+    procname        = pinfo[i].ki_comm;
 #else
     pt[i].pid       = pinfo[i].kp_proc.p_pid;
     pt[i].ppid      = pinfo[i].kp_eproc.e_ppid;
@@ -194,10 +195,10 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].kp_eproc.e_vm.vm_rssize * pagesize_kbyte);
     flags           = pinfo[i].kp_proc.p_stat;
     args            = kvm_getargv(kvm_handle, &pinfo[i].kp_proc, 0);
-    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", pinfo[i].kp_proc.p_comm);
+    procname        = pinfo[i].kp_proc.p_comm;
 #endif
     if (flags == SZOMB)
-      pt[i].status_flag |= PROCESS_ZOMBIE; //FIXME: save flag for kernel threads
+      pt[i].status_flag |= PROCESS_ZOMBIE;
     pt[i].cpu_percent = 0;
     pt[i].time = get_float_time();
 
@@ -206,6 +207,8 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
         Util_stringbuffer(&cmdline, args[j + 1] ? "%s " : "%s", args[j]);
       pt[i].cmdline = cmdline.buf;
     }
+    if (! pt[i].cmdline || ! *pt[i].cmdline)
+      pt[i].cmdline = xstrdup(procname);
   }
 
   *reference = pt;

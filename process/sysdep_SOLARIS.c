@@ -209,8 +209,9 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     
     pt[i].mem_kbyte = psinfo->pr_rssize;
 
-    snprintf(pt[i].procname, sizeof(pt[i].procname), "%s", psinfo->pr_fname);
     pt[i].cmdline  = xstrdup(psinfo->pr_psargs);
+    if (! pt[i].cmdline || ! *pt[i].cmdline)
+      pt[i].cmdline = xstrdup(psinfo->pr_fname);
 
     if (! read_proc_file(buf, sizeof(buf), "status", pt[i].pid)) {
       pt[i].cputime     = 0;

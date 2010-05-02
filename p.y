@@ -796,6 +796,13 @@ checkproc       : CHECKPROC SERVICENAME PIDFILE PATH {
                     matchset.match_string = xstrdup($4);
                     addmatch(&matchset, ACTION_IGNORE, 0);
                   }
+                | CHECKPROC SERVICENAME MATCH PATH {
+                    createservice(TYPE_PROCESS, $<string>2, $4, check_process);
+                    matchset.ignore = FALSE;
+                    matchset.match_path = NULL;
+                    matchset.match_string = xstrdup($4);
+                    addmatch(&matchset, ACTION_IGNORE, 0);
+                  }
                 ;
 
 checkfile       : CHECKFILE SERVICENAME PATHTOK PATH {
@@ -3285,14 +3292,10 @@ static void reset_rateset() {
  * Check for unique service name
  */
 static void check_name(char *name) {
-
   ASSERT(name);
 
   if (Util_existService(name) || (current && IS(name, current->name)))
     yyerror2("service name conflict, %s already defined", name);
-  if (name && *name == '/')
-    yyerror2("service name must not start with '/' -- ", name);
-  
 }
 
 

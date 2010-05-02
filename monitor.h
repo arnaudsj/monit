@@ -396,7 +396,6 @@ typedef struct myprocesstree {
   int           ppid;
   int           status_flag;
   time_t        starttime;
-  char          procname[STRLEN];
   char         *cmdline;
   
   int           visited;
