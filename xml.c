@@ -156,13 +156,15 @@ static void document_head(Buffer_T *B) {
      "<machine>%s</machine>"
      "<cpu>%d</cpu>"
      "<memory>%lu</memory>"
+     "<swap>%lu</swap>"
      "</platform>",
      systeminfo.uname.sysname,
      systeminfo.uname.release,
      systeminfo.uname.version,
      systeminfo.uname.machine,
      systeminfo.cpus,
-     systeminfo.mem_kbyte_max);
+     systeminfo.mem_kbyte_max,
+     systeminfo.swap_kbyte_max);
 
 }
 
@@ -374,6 +376,10 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 					"<percent>%.1f</percent>"
 					"<kilobyte>%ld</kilobyte>"
 					"</memory>"
+                                        "<swap>"
+                                        "<percent>%.1f</percent>"
+                                        "<kilobyte>%ld</kilobyte>"
+                                        "</swap>"
 					"</system>",
 					systeminfo.loadavg[0],
 					systeminfo.loadavg[1],
@@ -384,7 +390,9 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
 					systeminfo.total_cpu_wait_percent/10.,
 					#endif
 					systeminfo.total_mem_percent/10.,
-					systeminfo.total_mem_kbyte);
+					systeminfo.total_mem_kbyte,
+                                        systeminfo.total_swap_percent/10.,
+                                        systeminfo.total_swap_kbyte);
       }
     }
   }
