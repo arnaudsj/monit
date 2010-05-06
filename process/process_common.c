@@ -85,10 +85,11 @@
  * @param buf buffer to write to
  * @param buf_size size of buffer "buf"
  * @param name name of proc service
- * @param pid pid number of the process / or <0 if main directory
+ * @param pid number of the process / or <0 if main directory
+ * @param bytes_read number of bytes read to buffer
  * @return TRUE if succeeded otherwise FALSE.
  */
-int read_proc_file(char *buf, int buf_size, char * name, int pid) {
+int read_proc_file(char *buf, int buf_size, char *name, int pid, int *bytes_read) {
   int fd;
   char filename[STRLEN];
   int bytes;
@@ -111,6 +112,8 @@ int read_proc_file(char *buf, int buf_size, char * name, int pid) {
     DEBUG("cannot read file %s -- %s\n", filename, STRERROR);
     return FALSE;
   }
+  if (bytes_read)
+    *bytes_read = bytes;
        
   /* In case it is a string we have to 0 terminate it our self */
   buf[bytes]='\0';

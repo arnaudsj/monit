@@ -1405,11 +1405,13 @@ int Util_isProcessRunning(Service_T s) {
     for (i = 0; i < ptreesize; i++) {
       int found = FALSE;
 
+      if (ptree[i].cmdline) {
 #ifdef HAVE_REGEX_H
-      found = regexec(s->matchlist->regex_comp, ptree[i].cmdline, 0, NULL, 0) ? FALSE : TRUE;
+        found = regexec(s->matchlist->regex_comp, ptree[i].cmdline, 0, NULL, 0) ? FALSE : TRUE;
 #else
-      found = strstr(ptree[i].cmdline, s->matchlist->match_string) ? TRUE : FALSE;
+        found = strstr(ptree[i].cmdline, s->matchlist->match_string) ? TRUE : FALSE;
 #endif
+      }
       if (found) {
         pid = ptree[i].pid;
         break;

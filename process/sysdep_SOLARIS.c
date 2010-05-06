@@ -188,7 +188,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     /* get the actual time */
     pt[i].time = get_float_time();
 
-    if (! read_proc_file(buf, sizeof(buf), "psinfo", pt[i].pid)) {
+    if (! read_proc_file(buf, sizeof(buf), "psinfo", pt[i].pid, NULL)) {
       pt[i].cputime     = 0;
       pt[i].cpu_percent = 0;
       pt[i].mem_kbyte   = 0;
@@ -213,7 +213,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     if (! pt[i].cmdline || ! *pt[i].cmdline)
       pt[i].cmdline = xstrdup(psinfo->pr_fname);
 
-    if (! read_proc_file(buf, sizeof(buf), "status", pt[i].pid)) {
+    if (! read_proc_file(buf, sizeof(buf), "status", pt[i].pid, NULL)) {
       pt[i].cputime     = 0;
       pt[i].cpu_percent = 0;
     } else {

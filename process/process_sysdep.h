@@ -33,7 +33,7 @@
 int init_process_info_sysdep(void);
 int init_proc_info_sysdep(void);
 
-int read_proc_file(char *, int, char *, int);
+int read_proc_file(char *, int, char *, int, int *);
 int getloadavg_sysdep (double *, int);
 int used_system_memory_sysdep(SystemInfo_T *);
 int used_system_cpu_sysdep(SystemInfo_T *);

@@ -18,8 +18,8 @@ NEW FEATURES AND FUNCTIONS:
   The first match is used so this form of check is useful for unique
   pattern matching - the pidfile should be used where possible as it defines
   expected pid exactly (pattern matching won't be useful for Apache for example).
-  Example usage:
-      check process matching "/sbin/dynamic_pager -F /private/var/vm/swapfile"
+  Example usage (monitoring VMware virtual machine):
+      check process vmware-debian matching "/usr/lib/vmware/bin/vmware-vmx .*debian4-x86.vmx"
           ...
 
 * Added support for system swap usage monitoring. Syntax is similar to

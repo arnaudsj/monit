@@ -49,6 +49,7 @@
 	<li><a href="#service_tests">SERVICE TESTS</a></li>
 	<ul>
 
+		<li><a href="#existence_testing">EXISTENCE TESTING</a></li>
 		<li><a href="#resource_testing">RESOURCE TESTING</a></li>
 		<li><a href="#file_checksum_testing">FILE CHECKSUM TESTING</a></li>
 		<li><a href="#timestamp_testing">TIMESTAMP TESTING</a></li>
@@ -323,6 +324,7 @@ service type.</p>
     if loadavg (1min) &gt; 4 then alert
     if loadavg (5min) &gt; 2 then alert
     if memory usage &gt; 75% then alert
+    if swap usage &gt; 25% then alert
     if cpu usage (user) &gt; 70% then alert
     if cpu usage (system) &gt; 30% then alert
     if cpu usage (wait) &gt; 20% then alert</pre>
@@ -348,10 +350,7 @@ service type.</p>
  check file httpd.bin 
      with path /usr/local/apache/bin/httpd
      # Run /watch/dog in the case that the binary was changed
-     # and alert in the case that the checksum value recovered
-     # later
-     if failed checksum then exec &quot;/watch/dog&quot;
-        else if recovered then alert</pre>
+     if failed checksum then exec &quot;/watch/dog&quot;</pre>
 <pre>
  include /etc/monit/mysql.monitrc
  include /etc/monit/mail/*.monitrc</pre>
@@ -1107,6 +1106,24 @@ or from the console using the monitor argument.</p>
 </ul>
 <p>
 </p>
+<h2><a name="existence_testing">EXISTENCE TESTING</a></h2>
+<p>Monit's default action when service doesn't exist (for example
+process is not running, file doesn't exist, etc.) is to perform
+service restart action.</p>
+<p>The default action can be overrided with following statement:</p>
+<dl>
+<dt><strong><a name="if_failed_existence_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED EXISTENCE [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
+      [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
+
+</dl>
+<p><em>action</em> is a choice of &quot;ALERT&quot;, &quot;RESTART&quot;, &quot;START&quot;, &quot;STOP&quot;,
+&quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
+<p>Example:</p>
+<pre>
+ check file with path /dev/usb000
+   if failed existence for 5 cycles then exec &quot;/bin/flashdisk_removed.sh&quot;</pre>
+<p>
+</p>
 <h2><a name="resource_testing">RESOURCE TESTING</a></h2>
 <p>Monit can examine how much system resources a service are using.
 This test can only be used within a system or process service
@@ -1124,7 +1141,7 @@ statements in [brackets]),</p>
 
 </dl>
 <p><em>resource</em> is a choice of &quot;CPU&quot;, &quot;TOTALCPU&quot;,
-&quot;CPU([user|system|wait])&quot;, &quot;MEMORY&quot;, &quot;CHILDREN&quot;, &quot;TOTALMEMORY&quot;,
+&quot;CPU([user|system|wait])&quot;, &quot;MEMORY&quot;, &quot;SWAP&quot;, &quot;CHILDREN&quot;, &quot;TOTALMEMORY&quot;,
 &quot;LOADAVG([1min|5min|15min])&quot;. Some resource tests can be used
 inside a check system entry, some in a check process entry and
 some in both:</p>
@@ -1132,6 +1149,8 @@ some in both:</p>
 <p>CPU([user|system|wait]) is the percent of time the system spend
 in user or system/kernel space. Some systems such as linux 2.6
 supports a 'wait' indicator as well.</p>
+<p>SWAP is the swap usage of the system in either percent (of the
+systems total) or as an amount (Byte, kB, MB, GB).</p>
 <p>Process only resource tests:</p>
 <p>CPU is the CPU usage of the process itself (percent).</p>
 <p>TOTALCPU is the total CPU usage of the process and its children
@@ -2517,13 +2536,21 @@ with the user.</p>
 </ol>
 <p>Currently, six types of check statements are supported:</p>
 <ol>
-<li><strong><a name="check_process_unique_name_pidfile_path" class="item">CHECK PROCESS &lt;unique name&gt; PIDFILE &lt;path&gt;</a></strong>
+<li><strong><a name="check_process_unique_name_pidfile_path_matching_regex" class="item">CHECK PROCESS &lt;unique name&gt; &lt;PIDFILE &lt;path&gt; | MATCHING &lt;regex&gt;&gt;</a></strong>
 
 <p>&lt;path&gt; is the absolute path to the program's pidfile. If the
 pidfile does not exist or does not contain the pid number of a
 running process, Monit will call the entry's start method if
-defined, If Monit runs in passive mode or the start methods is
-not defined, Monit will just send alerts on errors.</p>
+defined.
+&lt;regex&gt; is alternative process specification using pattern matching
+to process name (command line) from process table instead of pidfile.
+The pattern to match can be obtained using 'ps' utility. The first
+match is used so this form of check is useful for unique pattern
+matching - the pidfile should be used where possible as it defines
+expected pid exactly (pattern matching won't be useful for Apache
+in most cases for example).
+If Monit runs in passive mode or the start methods is not defined,
+Monit will just send alerts on errors.</p>
 </li>
 <li><strong><a name="check_file_unique_name_path_path" class="item">CHECK FILE &lt;unique name&gt; PATH &lt;path&gt;</a></strong>
 
@@ -2791,6 +2818,10 @@ insensitive.</p>
                  followed by a compare operator a number with 
                  unit {B|KB|MB|GB|%|byte|kilobyte|megabyte|
                  gigabyte|percent} and an action.
+ swap            Token for system swap usage monitoring. This token
+                 must be followed by a compare operator a number with 
+                 unit {B|KB|MB|GB|%|byte|kilobyte|megabyte|gigabyte|percent}
+                 and an action.
  loadavg         Must be followed by [1min,5min,15min] in (), a 
                  compare operator, a number and an action. This
                  statement is used to check the system load 
@@ -2828,7 +2859,7 @@ insensitive.</p>
 <em>passive</em>, <em>manual</em>, <em>depends</em>, <em>host</em>, <em>default</em>, <em>http</em>,
 <em>ftp</em>, <em>smtp</em>, <em>pop</em>, <em>ntp3</em>, <em>nntp</em>, <em>imap</em>, <em>clamav</em>, 
 <em>ssh</em>, <em>dwp</em>, <em>ldap2</em>, <em>ldap3</em>, <em>tns</em>, <em>request</em>, <em>cpu</em>, 
-<em>mem</em>, <em>totalmem</em>, <em>children</em>, <em>loadavg</em>, <em>timestamp</em>, 
+<em>mem</em>, <em>totalmem</em>, <em>swap</em>, <em>children</em>, <em>loadavg</em>, <em>timestamp</em>, 
 <em>changed</em>, <em>second(s)</em>, <em>minute(s)</em>, <em>hour(s)</em>, <em>day(s)</em>, 
 <em>space</em>, <em>inode</em>, <em>pid</em>, <em>ppid</em>, <em>perm(ission)</em>, <em>icmp</em>,
 <em>process</em>, <em>file</em>, <em>directory</em>, <em>filesystem</em>, <em>size</em>, <em>action</em>,
@@ -2857,11 +2888,15 @@ first line must specify an interpreter for the program. E.g.
 check to see if the server is running and log a message if not:</p>
 <pre>
  check process resin with pidfile /usr/local/resin/srun.pid</pre>
+<p>Checking process without pidfile:</p>
+<pre>
+ check process matching &quot;/sbin/dynamic_pager -F /private/var/vm/swapfile&quot;</pre>
 <p>To have Monit start the server if it's not running, add a start
 statement:</p>
 <pre>
  check process resin with pidfile /usr/local/resin/srun.pid
-       start program = &quot;/usr/local/resin/bin/srun.sh start&quot;</pre>
+       start program = &quot;/usr/local/resin/bin/srun.sh start&quot;
+       stop program = &quot;/usr/local/resin/bin/srun.sh stop&quot;</pre>
 <p>Here's a more advanced example for monitoring an apache
 web-server listening on the default port number for HTTP and
 HTTPS. In this example Monit will restart apache if it's not

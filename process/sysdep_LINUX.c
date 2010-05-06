@@ -132,7 +132,7 @@ static time_t get_starttime() {
   char   buf[1024];
   double up = 0;
 
-  if (! read_proc_file(buf, 1024, "uptime", -1)) {
+  if (! read_proc_file(buf, 1024, "uptime", -1, NULL)) {
     LogError("system statistic error -- cannot get system uptime\n");
     return 0;
   }
@@ -155,7 +155,7 @@ int init_process_info_sysdep(void) {
   long  page_size;
   int   page_shift;  
 
-  if (! read_proc_file(buf, sizeof(buf), "meminfo", -1)) 
+  if (! read_proc_file(buf, sizeof(buf), "meminfo", -1, NULL)) 
     return FALSE;
   if (! (ptr = strstr(buf, MEMTOTAL))) {
     DEBUG("system statistic error -- cannot get real memory amount\n");
@@ -194,8 +194,8 @@ int init_process_info_sysdep(void) {
  * @return treesize>0 if succeeded otherwise =0.
  */
 int initprocesstree_sysdep(ProcessTree_T ** reference) {
-  int                 i = 0;
-  int                 rv;
+  int                 i = 0, j;
+  int                 rv, bytes = 0;
   int                 treesize = 0;
   int                 stat_ppid = 0;
   char               *tmp = NULL;
@@ -228,7 +228,7 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
 
     pt[i].pid = atoi(globbuf.gl_pathv[i] + strlen("/proc/"));
     
-    if (!read_proc_file(buf, sizeof(buf), "stat", pt[i].pid)) {
+    if (!read_proc_file(buf, sizeof(buf), "stat", pt[i].pid, NULL)) {
       DEBUG("system statistic error -- cannot read /proc/%d/stat\n", pt[i].pid);
       continue;
     }
@@ -284,10 +284,14 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     else
       pt[i].mem_kbyte = (stat_item_rss << abs(page_shift_to_kb));
 
-    if (! read_proc_file(buf, sizeof(buf), "cmdline", pt[i].pid)) {
+    if (! read_proc_file(buf, sizeof(buf), "cmdline", pt[i].pid, &bytes)) {
       DEBUG("system statistic error -- cannot read /proc/%d/cmdline\n", pt[i].pid);
       continue;
     }
+    /* The cmdline file contains argv elements/strings terminated separated by '\0' => join the string: */
+    for (j = 0; j < (bytes - 1); j++)
+      if (buf[j] == 0)
+        buf[j] = ' ';
     pt[i].cmdline = *buf ? xstrdup(buf) : xstrdup(procname);
   }
   
@@ -325,7 +329,7 @@ int used_system_memory_sysdep(SystemInfo_T *si) {
   
   /* Memory */
 
-  if (! read_proc_file(buf, 1024, "meminfo", -1)) {
+  if (! read_proc_file(buf, 1024, "meminfo", -1, NULL)) {
     LogError("system statistic error -- cannot get real memory free amount\n");
     goto error;
   }
@@ -409,7 +413,7 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
   unsigned long long cpu_softirq;
   char               buf[1024];
 
-  if (!read_proc_file(buf, 1024, "stat", -1)) {
+  if (!read_proc_file(buf, 1024, "stat", -1, NULL)) {
     LogError("system statistic error -- cannot read /proc/stat\n");
     goto error;
   }
