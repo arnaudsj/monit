@@ -58,7 +58,9 @@ BUGFIXES:
 * If process resource usage gathering failed, retry next cycle as the error can be
   temporary.
 
-* Fixed sporadic ICMP echo (ping) false positive alerts.
+* Fixed ICMP echo test on AIX and NETBSD
+
+* Fixed sporadic ICMP echo (ping) false positive/negative alerts.
 
 * DNS protocol test now accepts request refusal as correct response - the test is based
   on query for NS root record which may be prohibited on server side, whereas the negative
@@ -71,11 +73,11 @@ BUGFIXES:
   via monit web interface, also removed limitation of service names so they can start
   with slash ("/") now. Thanks to Artyom Khafizof.
   
- * Fixed SMTP STARTTLS protocol. Required for servers that adhere strictly to 
-   RFC 3207: 4.2. Thanks to Lorenzo A. Sedano Cadiñanos for patch and
-   investigating the problem.
+* Fixed SMTP STARTTLS protocol. Required for servers that adhere strictly to 
+  RFC 3207: 4.2. Thanks to Lorenzo A. Sedano Cadiñanos for patch and
+  investigating the problem.
 
- * Fixed system load average monitoring on AIX
+* Fixed system load average monitoring on AIX
 
 
 Version 5.1.1

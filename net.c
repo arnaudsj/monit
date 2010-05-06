@@ -658,7 +658,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   struct timeval t_in;
   char buf[STRLEN];
   double response = -1.;
-#ifndef NETBSD
+#if ! defined NETBSD && ! defined AIX
   int sol_ip;
   unsigned ttl = 255;
 #endif
@@ -678,7 +678,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     goto error2;
   }
 
-#ifndef NETBSD
+#if ! defined NETBSD && ! defined AIX
 #ifdef HAVE_SOL_IP
   sol_ip = SOL_IP;
 #else
