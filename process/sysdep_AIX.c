@@ -172,13 +172,13 @@ int getloadavg_sysdep (double *loadv, int nelem) {
       
   switch (nelem) {
     case 3:
-      loadv[2] = (double)(cpu.loadavg[2] / (1<<SBITS));
+      loadv[2] = (double)cpu.loadavg[2] / (double)(1<<SBITS);
 
     case 2:
-      loadv[1] = (double)(cpu.loadavg[1] / (1<<SBITS));
+      loadv[1] = (double)cpu.loadavg[1] / (double)(1<<SBITS);
 
     case 1:
-      loadv[0] = (double)(cpu.loadavg[0] / (1<<SBITS));
+      loadv[0] = (double)cpu.loadavg[0] / (double)(1<<SBITS);
   }
 
   return TRUE;

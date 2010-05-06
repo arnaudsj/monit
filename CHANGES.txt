@@ -75,6 +75,8 @@ BUGFIXES:
    RFC 3207: 4.2. Thanks to Lorenzo A. Sedano Cadiñanos for patch and
    investigating the problem.
 
+ * Fixed system load average monitoring on AIX
+
 
 Version 5.1.1
 
