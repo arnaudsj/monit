@@ -157,6 +157,9 @@ int sendmail(Mail_T mail) {
       rv = FALSE;
       goto exit;
     }
+    /* After starttls, send ehlo again: RFC 3207: 4.2 Result of the STARTTLS Command */
+    do_send(&S, "EHLO %s\r\n", S.localhost);
+    do_status(&S);
   }
 
   /* Authenticate if possible */

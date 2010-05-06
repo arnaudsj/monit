@@ -70,6 +70,10 @@ BUGFIXES:
 * Fixed support for service names which contain "/" in the name so they can be managed
   via monit web interface, also removed limitation of service names so they can start
   with slash ("/") now. Thanks to Artyom Khafizof.
+  
+ * Fixed SMTP STARTTLS protocol. Required for servers that adhere to 
+   RFC 3207: 4.2. Thanks to Lorenzo A. Sedano Cadiñanos for patch and
+   investigating the problem.
 
 
 Version 5.1.1
