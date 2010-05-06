@@ -106,6 +106,7 @@ AC_CHECK_HEADERS([ \
         pam/pam_appl.h \
 	poll.h \
 	procfs.h \
+	sys/procfs.h \
 	procinfo.h \
 	pthread.h \
 	pwd.h \

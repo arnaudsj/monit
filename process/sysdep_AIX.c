@@ -82,8 +82,8 @@
 #include <sys/proc.h>
 #endif
 
-#ifdef HAVE_PROCFS_H
-#include <procfs.h>
+#ifdef HAVE_SYS_PROCFS_H
+#include <sys/procfs.h>
 #endif
 
 #ifdef HAVE_CF_H
@@ -216,6 +216,10 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
   pt = xcalloc(sizeof(ProcessTree_T), treesize);
 
   for (i = 0; i < treesize; i++) {
+    int fd;
+    struct psinfo ps;
+    char filename[STRLEN];
+
     pt[i].cputime     = 0;
     pt[i].cpu_percent = 0;
     pt[i].mem_kbyte   = 0;
@@ -223,15 +227,25 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
     pt[i].ppid        = procs[i].pi_ppid;
     pt[i].starttime   = procs[i].pi_start;
 
-    //FIXME: add full process command line instead of process name only:
-    pt[i].cmdline = xstrdup(procs[i].pi_comm);
-
     if (procs[i].pi_state == SZOMB) {
       pt[i].status_flag |= PROCESS_ZOMBIE;
     } else if (getuser(&(procs[i]), sizeof(struct procinfo), &user, sizeof(struct userinfo)) != -1) {
       pt[i].mem_kbyte = (user.ui_drss + user.ui_trss) * (page_size / 1024);
       pt[i].cputime   = (user.ui_ru.ru_utime.tv_sec + user.ui_ru.ru_utime.tv_usec * 1.0e-6 + user.ui_ru.ru_stime.tv_sec + user.ui_ru.ru_stime.tv_usec * 1.0e-6) * 10;
     }
+
+    snprintf(filename, sizeof(filename), "/proc/%d/psinfo", pt[i].pid);
+    if ((fd = open(filename, O_RDONLY)) < 0) {
+      DEBUG("cannot open file %s -- %s\n", filename, STRERROR);
+      continue;
+    }
+    if (read(fd, &ps, sizeof(ps)) < 0) {
+      close(fd);
+      DEBUG("cannot read file %s -- %s\n", filename, STRERROR);
+      return FALSE;
+    }
+    close(fd);
+    pt[i].cmdline = (ps.pr_psargs && *ps.pr_psargs) ? xstrdup(ps.pr_psargs) : xstrdup(procs[i].pi_comm);
   }
 
   FREE(procs);
