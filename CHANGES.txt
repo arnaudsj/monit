@@ -71,7 +71,7 @@ BUGFIXES:
   via monit web interface, also removed limitation of service names so they can start
   with slash ("/") now. Thanks to Artyom Khafizof.
   
- * Fixed SMTP STARTTLS protocol. Required for servers that adhere to 
+ * Fixed SMTP STARTTLS protocol. Required for servers that adhere strictly to 
    RFC 3207: 4.2. Thanks to Lorenzo A. Sedano Cadiñanos for patch and
    investigating the problem.
 
