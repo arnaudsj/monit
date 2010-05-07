@@ -79,6 +79,8 @@ BUGFIXES:
 
 * Fixed system load average monitoring on AIX
 
+* Fixed compilation on AIX 6.1
+
 
 Version 5.1.1
 

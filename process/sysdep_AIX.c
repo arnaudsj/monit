@@ -125,9 +125,8 @@
  *  @file
  */
 
-/* There is no prototype for getprocs64 as of AIX 5.3 yet */
-int getprocs64(struct procentry64 *ProcessBuffer, int ProcessSize, struct fdsinfo64 *FileBuffer, int FileSize, pid_t *IndexPointer, int Count);
-
+/* There is no prototype for getprocs64 in AIX <= 5.3 */
+int getprocs64(void *, int, void *, int, pid_t *, int);
 
 static int                page_size;
 static int                cpu_initialized = 0;
