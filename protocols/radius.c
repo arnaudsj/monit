@@ -164,7 +164,7 @@ int check_radius(Socket_T s) {
 
   ASSERT(s);
 
-  switch(socket_get_type(s)) {
+  switch (socket_get_type(s)) {
     case SOCK_DGRAM:
       break;
     default:
@@ -189,38 +189,38 @@ int check_radius(Socket_T s) {
   /* sign the packet */
   hmac_md5(request, sizeof(request), (unsigned char *)secret, secret_len, request + 22);
 
-  if(socket_write(s, (unsigned char *)request, sizeof(request)) < 0) {
+  if (socket_write(s, (unsigned char *)request, sizeof(request)) < 0) {
     LogError("RADIUS: error sending query -- %s\n", STRERROR);
     return FALSE;
   }
 
   /* Response should have at least 20 bytes */
   length = socket_read(s, (unsigned char *)response, sizeof(response));
-  if(length < 20) {
+  if (length < 20) {
     LogError("RADIUS: error receiving response -- %s\n", STRERROR);
     return FALSE;
   }
 
   /* Compare response code (should be Access-Accept or Accounting-Response) */
-  if((response[0] != 2) && (response[0] != 5)) {
+  if ((response[0] != 2) && (response[0] != 5)) {
     LogError("RADIUS: Invalid reply code -- error occured\n");
     return FALSE;
   }
 
   /* Compare packet ID (it should be the same as in our request): */
-  if(response[1] != 0x00) {
+  if (response[1] != 0x00) {
     LogError("RADIUS: ID mismatch\n");
     return FALSE;
   }
 
   /* check length */
-  if(response[2] != 0) {
+  if (response[2] != 0) {
     LogError("RADIUS: message is too long\n");
     return FALSE;
   }
 
   /* check length against packet data*/
-  if(response[3] != length) {
+  if (response[3] != length) {
     LogError("RADIUS: message has invalid length\n");
     return FALSE;
   }
