@@ -239,7 +239,7 @@ int check_radius(Socket_T s) {
       return FALSE;
     }
 
-    if (attr[1] > length) {
+    if (attr[1] > left) {
       LogError("RADIUS: message has attribute that is too long\n");
       return FALSE;
     }
@@ -248,6 +248,7 @@ int check_radius(Socket_T s) {
     if (attr[0] == 0x50) {
       /* FIXME: validate it */
     }
+    left -= attr[1];
   }
 
   /* save the reply authenticator, and copy the request authenticator over */
