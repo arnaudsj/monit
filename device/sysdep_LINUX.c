@@ -104,6 +104,7 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
 
   endmntent(mntfd);
 
+  DEBUG("Device %s not found in /etc/mtab\n", blockdev);
   return NULL;
 
 }
