@@ -83,6 +83,14 @@ BUGFIXES:
 
 * Fixed compilation on AIX 6.1
 
+* When 'check system' is not defined, monit adds it automatically using hostname
+  for service name. If existing service was defined with the same service name
+  (matching hostname), monit didn't added the entry and reported error (correctly),
+  but the error message was confusing as it incorrectly pointed to the end of
+  configuration file. The error message is fixed and monit also prefixes the hostname
+  with string "system_" so conflict with existing service is less likely. Thanks to
+  Thorsten Kampe for report and help.
+
 
 
 Version 5.1.1

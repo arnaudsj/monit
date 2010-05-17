@@ -1810,8 +1810,14 @@ int parse(char *controlfile) {
     fclose(yyin);
     /* Add the default general system service if not specified explicitly */
     if (!hassystem) {
-      check_name(Run.localhostname);
-      createservice(TYPE_SYSTEM, xstrdup(Run.localhostname), xstrdup(""), check_system);
+      char *name = Util_getString("system_%s", Run.localhostname);
+      if (Util_existService(name) || (current && IS(name, current->name))) {
+        LogError("'check system' not defined in control file, failed to add automatic configuration (service name %s is used already) -- please add 'check system <name>' manually\n", name, name);
+        FREE(name);
+        cfg_errflag++;
+      } else {
+        createservice(TYPE_SYSTEM, name, xstrdup(""), check_system);
+      }
     }
     /* If defined - add the last service to the service list */
     if (current) {
