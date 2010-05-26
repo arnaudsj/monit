@@ -2445,7 +2445,7 @@ For more examples, see the example section below.
 
 =head4 Testing the RADIUS protocol
 
-The SIP test is similar to the other protocol tests, but in
+The RADIUS test is similar to the other protocol tests, but in
 addition allows extra optional parameters.
 
 =over 4
