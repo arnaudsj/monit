@@ -1953,7 +1953,6 @@ static void postparse() {
     }
   }
 
-DEBUG("BUBUBUBUBUBU: Run.mmonits=%p, Run.dommonitcredentials=%d\n", Run.mmonits, Run.dommonitcredentials);
   if (Run.mmonits && Run.dommonitcredentials) {
     Auth_T c;
     for (c = Run.credentials; c; c = c->next) {
