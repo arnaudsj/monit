@@ -67,6 +67,11 @@
 ## see http://mmonit.com/).
 #
 # set mmonit http://monit:monit@192.168.1.10:8080/collector
+#     # and register without credentials     # by default Monit registers credentials
+#                                            # with M/Monit so M/Monit can smoothly
+#                                            # communicate back to Monit. It is
+#                                            # possible to disable the credentials
+#                                            # registration with this option
 #
 #
 ## Monit by default uses the following alert mail format:

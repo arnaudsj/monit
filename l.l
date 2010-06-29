@@ -130,7 +130,7 @@ as                {/* EMPTY */}
 are               {/* EMPTY */}
 for               {/* EMPTY */}
 on(ly)?           {/* EMPTY */}
-with(in)?         {/* EMPTY */}
+with(in|out)?     {/* EMPTY */}
 program(s)?       {/* EMPTY */}
 and               {/* EMPTY */}
 has               {/* EMPTY */}
@@ -301,6 +301,8 @@ instance          { return INSTANCE; }
 hostname          { return HOSTNAME; }
 username          { return USERNAME; }
 password          { return PASSWORD; }
+credentials       { return CREDENTIALS; }
+register          { return REGISTER; }
 fsflag(s)?        { return FSFLAG; }
 {byte}            { return BYTE; }
 {kilobyte}        { return KILOBYTE; }

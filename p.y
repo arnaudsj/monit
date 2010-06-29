@@ -299,6 +299,7 @@
 %token INODE SPACE PERMISSION SIZE MATCH NOT IGNORE ACTION
 %token EXEC UNMONITOR ICMP ICMPECHO NONEXIST EXISTENCE INVALID DATA RECOVERED PASSED SUCCEEDED
 %token URL CONTENT PID PPID FSFLAG
+%token REGISTER CREDENTIALS 
 %token <url> URLOBJECT
 %token <string> TARGET
 %token <number> MAXFORWARD
@@ -565,13 +566,19 @@ setpid          : SET PIDFILE PATH {
 setmmonits      : SET MMONIT mmonitlist
                 ;
 
-mmonitlist      : mmonit
-                | mmonitlist mmonit
+mmonitlist      : mmonit credentials
+                | mmonitlist mmonit credentials
                 ;
 
 mmonit          : URLOBJECT nettimeout sslversion certmd5 {
                     check_hostname(($<url>1)->hostname);
                     addmmonit($<url>1, $<number>2, $<number>3, $<string>4); 
+                  }
+                ;
+
+credentials     : /* EMPTY */
+                | REGISTER CREDENTIALS {
+                    Run.dommonitcredentials = FALSE;
                   }
                 ;
 
@@ -1855,38 +1862,40 @@ static void preparse() {
   /* Set instance incarnation ID */
   time(&Run.incarnation);
   /* Reset lexer */
-  buffer_stack_ptr       = 0;
-  lineno                 = 1;
-  arglineno              = 1;
-  argcurrentfile         = NULL;
-  argyytext              = NULL;
+  buffer_stack_ptr        = 0;
+  lineno                  = 1;
+  arglineno               = 1;
+  argcurrentfile          = NULL;
+  argyytext               = NULL;
   /* Reset parser */
-  Run.stopped            = FALSE;
-  Run.dolog              = FALSE;
-  Run.dohttpd            = FALSE;
-  Run.doaction           = FALSE;
-  Run.httpdsig           = TRUE;
-  Run.credentials        = NULL;
-  Run.httpdssl           = FALSE;
-  Run.httpsslpem         = NULL;
-  Run.httpsslclientpem   = NULL;
-  Run.clientssl          = FALSE;
-  Run.mailserver_timeout = NET_TIMEOUT;
-  Run.bind_addr          = NULL;
-  Run.eventlist          = NULL;
-  Run.eventlist_dir      = NULL;
-  Run.eventlist_slots    = -1;
-  Run.system             = NULL;
-  Run.expectbuffer       = STRLEN;
-  Run.mmonits            = NULL;
-  Run.maillist           = NULL;
-  Run.mailservers        = NULL;
-  Run.MailFormat.from    = NULL;
-  Run.MailFormat.subject = NULL;
-  Run.MailFormat.message = NULL;
-  Run.localhostname      = xstrdup(localhost);
-  depend_list            = NULL;
-  Run.handler_init       = TRUE;
+  Run.stopped             = FALSE;
+  Run.dolog               = FALSE;
+  Run.dohttpd             = FALSE;
+  Run.doaction            = FALSE;
+  Run.httpdsig            = TRUE;
+  Run.dommonitcredentials = TRUE;
+  Run.mmonitcredentials   = NULL;
+  Run.credentials         = NULL;
+  Run.httpdssl            = FALSE;
+  Run.httpsslpem          = NULL;
+  Run.httpsslclientpem    = NULL;
+  Run.clientssl           = FALSE;
+  Run.mailserver_timeout  = NET_TIMEOUT;
+  Run.bind_addr           = NULL;
+  Run.eventlist           = NULL;
+  Run.eventlist_dir       = NULL;
+  Run.eventlist_slots     = -1;
+  Run.system              = NULL;
+  Run.expectbuffer        = STRLEN;
+  Run.mmonits             = NULL;
+  Run.maillist            = NULL;
+  Run.mailservers         = NULL;
+  Run.MailFormat.from     = NULL;
+  Run.MailFormat.subject  = NULL;
+  Run.MailFormat.message  = NULL;
+  Run.localhostname       = xstrdup(localhost);
+  depend_list             = NULL;
+  Run.handler_init        = TRUE;
   for (i = 0; i <= HANDLER_MAX; i++)
     Run.handler_queue[i] = 0;
   /* 
@@ -1942,6 +1951,19 @@ static void postparse() {
       LogError("%s: Error: 'check host' statement is incomplete; Please specify a port number to test\n or an icmp test at the remote host: '%s'\n", prog, s->name);
       cfg_errflag++;
     }
+  }
+
+DEBUG("BUBUBUBUBUBU: Run.mmonits=%p, Run.dommonitcredentials=%d\n", Run.mmonits, Run.dommonitcredentials);
+  if (Run.mmonits && Run.dommonitcredentials) {
+    Auth_T c;
+    for (c = Run.credentials; c; c = c->next) {
+      if (c->digesttype == DIGEST_CLEARTEXT && ! c->is_readonly) {
+          Run.mmonitcredentials = c;
+          break;
+      }
+    }
+    if (! Run.mmonitcredentials)
+      LogInfo("%s: Info: M/Monit registration with credentials enabled, but no suitable credentials found in monit configuration file\n", prog);
   }
 }
 

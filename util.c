@@ -656,8 +656,7 @@ void Util_printRunList() {
   if(Run.mmonits) {
     Mmonit_T c= Run.mmonits;
     printf(" %-18s = ", "M/Monit(s)");
-    for(c= Run.mmonits; c; c= c->next)
-    {
+    for(c= Run.mmonits; c; c= c->next) {
       printf("%s with timeout %d seconds%s%s%s%s%s%s",
         c->url->url,
         c->timeout,
@@ -668,6 +667,8 @@ void Util_printRunList() {
         c->url->user?" using credentials":"",
         c->next?",\n                    = ":"");
     }
+    if (! Run.dommonitcredentials)
+      printf("\n                      register without credentials");
     printf("\n");
   }
 

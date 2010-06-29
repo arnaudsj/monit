@@ -145,6 +145,15 @@ static void document_head(Buffer_T *B) {
       Run.bind_addr?Run.bind_addr:"",
       Run.httpdport,
       Run.httpdssl);
+
+    if (Run.mmonitcredentials)
+        Util_stringbuffer(B,
+          "<credentials>"
+          "<username>%s</username>"
+          "<password>%s</password>"
+          "</credentials>",
+          Run.mmonitcredentials->uname,
+          Run.mmonitcredentials->passwd);
   }
  
   Util_stringbuffer(B,

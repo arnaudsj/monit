@@ -3232,12 +3232,13 @@ I<process>, I<file>, I<directory>, I<filesystem>, I<size>, I<action>,
 I<unmonitor>, I<rdate>, I<rsync>, I<data>, I<invalid>, I<exec>,
 I<nonexist>, I<policy>, I<reminder>, I<instance>, I<eventqueue>,
 I<basedir>, I<slot(s)>, I<system>, I<idfile>, I<gps>, I<radius>,
-I<secret>, I<target>, I<maxforward>, I<hostheader> and I<failed>
+I<secret>, I<target>, I<maxforward>, I<hostheader>, I<register>,
+I<credentials> and I<failed>
 
 And here is a complete list of B<noise keywords> ignored by
 monit:
 
-I<is>, I<as>, I<are>, I<on(ly)>, I<with(in)>, I<and>, I<has>,
+I<is>, I<as>, I<are>, I<on(ly)>, I<with(in|out)>, I<and>, I<has>,
 I<using>, I<use>, I<the>, I<sum>, I<program(s)>, I<than>, I<for>,
 I<usage>, I<was>, I<but>, I<of>.
 
@@ -3798,8 +3799,6 @@ Jan-Henrik Haukeland <hauk@tildeslash.com>,
 Martin Pala <martinp@tildeslash.com>, 
 Christian Hopp <chopp@iei.tu-clausthal.de>, 
 Rory Toma <rory@digeo.com>
-
-See also http://mmonit.com/monit/who/
 
 
 =head1 COPYRIGHT

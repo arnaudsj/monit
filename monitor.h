@@ -853,6 +853,8 @@ struct myrun {
   MailServer_T mailservers;    /**< List of MTAs used for alert notification */
   Mmonit_T mmonits;        /**< Event notification and status receivers list */
   Auth_T credentials;    /** A list holding Basic Authentication information */
+  int dommonitcredentials;   /**< TRUE if M/Monit should receive credentials */
+  Auth_T mmonitcredentials;     /**< Pointer to selected credentials or NULL */
   Event_T eventlist;              /** A list holding partialy handled events */
                                       /** User selected standard mail format */
   struct myformat {
