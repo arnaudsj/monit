@@ -1953,16 +1953,21 @@ static void postparse() {
     }
   }
 
-  if (Run.mmonits && Run.dommonitcredentials) {
-    Auth_T c;
-    for (c = Run.credentials; c; c = c->next) {
-      if (c->digesttype == DIGEST_CLEARTEXT && ! c->is_readonly) {
-          Run.mmonitcredentials = c;
-          break;
+  if (Run.mmonits) {
+    if (Run.dohttpd) {
+      if (Run.dommonitcredentials) {
+        Auth_T c;
+        for (c = Run.credentials; c; c = c->next) {
+          if (c->digesttype == DIGEST_CLEARTEXT && ! c->is_readonly) {
+              Run.mmonitcredentials = c;
+              break;
+          }
+        }
+        if (! Run.mmonitcredentials)
+          LogWarning("%s: Warning: M/Monit registration with credentials enabled, but no suitable credentials found in monit configuration file -- please add 'allow user:password' option to 'set httpd' statement\n", prog);
       }
-    }
-    if (! Run.mmonitcredentials)
-      LogInfo("%s: Info: M/Monit registration with credentials enabled, but no suitable credentials found in monit configuration file\n", prog);
+    } else
+        LogWarning("%s: Warning: M/Monit enabled but no httpd allowed -- please add 'set httpd' statement\n", prog);
   }
 }
 
