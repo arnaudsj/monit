@@ -144,6 +144,7 @@ was               {/* EMPTY */}
 times             {/* EMPTY */}
 but               {/* EMPTY */}
 of                {/* EMPTY */}
+does              {/* EMPTY */}
 
 {startarg}        { BEGIN(ARGUMENT_COND); return START; }
 {stoparg}         { BEGIN(ARGUMENT_COND); return STOP; }
@@ -283,7 +284,7 @@ sha1              { return SHA1HASH; }
 crypt             { return CRYPT; }
 signature         { return SIGNATURE; }
 nonexist          { return NONEXIST; }
-existence         { return EXISTENCE; }
+exist             { return EXIST; }
 invalid           { return INVALID; }
 data              { return DATA; }
 recovered         { return RECOVERED; }

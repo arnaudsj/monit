@@ -1160,7 +1160,7 @@ The default action can be overrided with following statement:
 
 =over 4
 
-=item IF FAILED EXISTENCE [[<X>] <Y> CYCLES] THEN action
+=item IF [DOES] NOT EXIST [[<X>] <Y> CYCLES] THEN action
       [ELSE IF SUCCEEDED [[<X>] <Y> CYCLES] THEN action]
 
 =back
@@ -1170,8 +1170,8 @@ I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
 
 Example:
 
- check file with path /dev/usb000
-   if failed existence for 5 cycles then exec "/bin/flashdisk_removed.sh"
+ check file with path /cifs/mydata
+   if does not exist for 5 cycles then exec "/usr/bin/mount_cifs.sh"
 
 
 =head2 RESOURCE TESTING

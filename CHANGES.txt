@@ -30,11 +30,11 @@ NEW FEATURES AND FUNCTIONS:
 * Allow to override default action when service doesn't exist (for example process
   is not running, file doesn't exist). Default action is service restart, it can be
   customized with following statement now:
-      if failed existence [[<x> times within] <y> cycles] then <action1>
+      if [does] not exist [[<x> times within] <y> cycles] then <action1>
      [else if succeeded   [[<x> times within] <y> cycles] then <action2>]
   For example instead of default restart action:
-     check file with path /dev/usb000
-        if failed existence for 5 cycles then exec "/bin/flashdisk_removed.sh"
+      check file with path /cifs/mydata
+        if does not exist for 5 cycles then exec "/usr/bin/mount_cifs.sh"
 
 * MacOSX: allow monitoring of system-wide load average, cpu and memory usage
   even when Monit is running as non-root user. Note: the monitoring of per-process

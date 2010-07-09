@@ -297,7 +297,7 @@
 %token SSLAUTO SSLV2 SSLV3 TLSV1 CERTMD5
 %token BYTE KILOBYTE MEGABYTE GIGABYTE
 %token INODE SPACE PERMISSION SIZE MATCH NOT IGNORE ACTION
-%token EXEC UNMONITOR ICMP ICMPECHO NONEXIST EXISTENCE INVALID DATA RECOVERED PASSED SUCCEEDED
+%token EXEC UNMONITOR ICMP ICMPECHO NONEXIST EXIST INVALID DATA RECOVERED PASSED SUCCEEDED
 %token URL CONTENT PID PPID FSFLAG
 %token REGISTER CREDENTIALS 
 %token <url> URLOBJECT
@@ -345,7 +345,7 @@ optproclist     : /* EMPTY */
 
 optproc         : start
                 | stop
-                | existence
+                | exist
                 | pid
                 | ppid
                 | connection
@@ -365,7 +365,7 @@ optfilelist      : /* EMPTY */
 
 optfile         : start
                 | stop
-                | existence
+                | exist
                 | timestamp
                 | actionrate
                 | every
@@ -387,7 +387,7 @@ optfilesyslist  : /* EMPTY */
 
 optfilesys      : start
                 | stop
-                | existence
+                | exist
                 | actionrate
                 | every
                 | alert
@@ -408,7 +408,7 @@ optdirlist      : /* EMPTY */
 
 optdir          : start
                 | stop
-                | existence
+                | exist
                 | timestamp
                 | actionrate
                 | every
@@ -427,7 +427,7 @@ opthostlist     : opthost
 
 opthost         : start
                 | stop
-                | existence
+                | exist
                 | connection
                 | icmp
                 | actionrate
@@ -456,7 +456,7 @@ optfifolist     : /* EMPTY */
 
 optfifo         : start
                 | stop
-                | existence
+                | exist
                 | timestamp
                 | actionrate
                 | every
@@ -474,7 +474,7 @@ optstatuslist   : /* EMPTY */
                 ;
                
 optstatus       : actionrate
-                | existence
+                | exist
                 | alert
                 | every
                 | group
@@ -1152,7 +1152,7 @@ apache_stat     : LOGLIMIT operator NUMBER PERCENT {
                   }
                 ;
 
-existence       : IF FAILED EXISTENCE rate1 THEN action1 recovery {
+exist           : IF NOT EXIST rate1 THEN action1 recovery {
                     *(current->action_NONEXIST->failed->description) = 0;
                     *(current->action_NONEXIST->succeeded->description) = 0;
                     seteventaction(&(current)->action_NONEXIST, $<number>6, $<number>7);

@@ -829,7 +829,7 @@ void Util_printService(Service_T s) {
   }
 
   if(s->type != TYPE_SYSTEM) {
-    printf(" %-20s = if doesn't exist %s then %s else if succeeded %s then %s\n",
+    printf(" %-20s = if does not exist %s then %s else if succeeded %s then %s\n",
       "Existence",
       Util_getEventratio(s->action_NONEXIST->failed, ratio1), s->action_NONEXIST->failed->description,
       Util_getEventratio(s->action_NONEXIST->succeeded, ratio2), s->action_NONEXIST->succeeded->description);
