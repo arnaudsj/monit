@@ -67,11 +67,13 @@
 ## see http://mmonit.com/).
 #
 # set mmonit http://monit:monit@192.168.1.10:8080/collector
-#     # and register without credentials     # by default Monit registers credentials
+#     # and register without credentials     # By default Monit registers credentials
 #                                            # with M/Monit so M/Monit can smoothly
 #                                            # communicate back to Monit. It is
-#                                            # possible to disable the credentials
-#                                            # registration with this option
+#                                            # possible to disable credentials
+#                                            # registration with this option. 
+#                                            # Alternatively use https when 
+#                                            # communicating with M/Monit
 #
 #
 ## Monit by default uses the following alert mail format:
@@ -137,7 +139,7 @@
 #    if cpu usage (wait) > 20% then alert
 #
 #    
-## Check a file for existence, checksum, permissions, uid and gid. In addition
+## Check if a file exists, checksum, permissions, uid and gid. In addition
 ## to alert recipients in the global section, customized alert can be sent to 
 ## additional recipients by specifying a local alert handler. The service may 
 ## be grouped using the GROUP option. More than one group can be specified by

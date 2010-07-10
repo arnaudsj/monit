@@ -325,7 +325,7 @@ int check_file(Service_T s) {
     s->inf->st_gid    = stat_buf.st_gid;
     s->inf->st_size   = stat_buf.st_size;
     s->inf->timestamp = MAX(stat_buf.st_mtime, stat_buf.st_ctime);
-    DEBUG("'%s' file existence check succeeded\n", s->name);
+    DEBUG("'%s' file exists check succeeded\n", s->name);
     Event_post(s, EVENT_NONEXIST, STATE_SUCCEEDED, s->action_NONEXIST, "file exist");
   }
 
@@ -381,7 +381,7 @@ int check_directory(Service_T s) {
     s->inf->st_uid    = stat_buf.st_uid;
     s->inf->st_gid    = stat_buf.st_gid;
     s->inf->timestamp = MAX(stat_buf.st_mtime, stat_buf.st_ctime);
-    DEBUG("'%s' directory existence check succeeded\n", s->name);
+    DEBUG("'%s' directory exists check succeeded\n", s->name);
     Event_post(s, EVENT_NONEXIST, STATE_SUCCEEDED, s->action_NONEXIST, "directory exist");
   }
 
@@ -428,7 +428,7 @@ int check_fifo(Service_T s) {
     s->inf->st_uid    = stat_buf.st_uid;
     s->inf->st_gid    = stat_buf.st_gid;
     s->inf->timestamp = MAX(stat_buf.st_mtime, stat_buf.st_ctime);
-    DEBUG("'%s' fifo existence check succeeded\n", s->name);
+    DEBUG("'%s' fifo exists check succeeded\n", s->name);
     Event_post(s, EVENT_NONEXIST, STATE_SUCCEEDED, s->action_NONEXIST, "fifo exist");
   }
 
