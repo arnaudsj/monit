@@ -670,7 +670,7 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
         }
       }
       if (q)
-        snprintf(q->token, sizeof(q->token), "%s", q->token);
+        snprintf(q->token, sizeof(q->token), "%s", token);
     }
 
     Run.doaction = TRUE; 
