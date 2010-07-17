@@ -155,9 +155,9 @@ int check_dns(Socket_T s) {
     return FALSE;
   }
 
-  /* Compare answer resource records count (it should not be zero): */
-  if (rc == 0 && response[6] == 0x00 && response[7] == 0x00) {
-    LogError("DNS: no answer records returned\n");
+  /* Compare answer and authority resource record counts (they shouldn't be both zero) */
+  if (rc == 0 && response[6] == 0x00 && response[7] == 0x00 && response[8] == 0x00 && response[9] == 0x00) {
+    LogError("DNS: no answer or authority records returned\n");
     return FALSE;
   }
 

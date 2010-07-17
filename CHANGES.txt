@@ -71,6 +71,9 @@ BUGFIXES:
   on query for NS root record which may be prohibited on server side, whereas the negative
   response means that the server reacts to requests.
 
+* DNS protocol test accepts authority answer as alternative to resource records. Thanks
+  to Nick Osborn for patch.
+
 * M/Monit heartbeat is made non-blocking even on service level, so when some service test
   takes long time (waiting on timeout), it won't generate false alert in M/Monit.
 
