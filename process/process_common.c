@@ -180,7 +180,7 @@ void fillprocesstree(ProcessTree_T *pt, int index) {
   for (i = 0; i < pt[index].children_num; i++)
     fillprocesstree(pt, pt[index].children[i]);
 
-  if (pt[index].parent != -1) {
+  if (pt[index].parent != -1 && pt[index].parent != index) {
     parent_pt                   = &pt[pt[index].parent];
     parent_pt->children_sum    += pt[index].children_sum;
     parent_pt->mem_kbyte_sum   += pt[index].mem_kbyte_sum;

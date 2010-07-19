@@ -250,8 +250,10 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
       pt[i].cpu_percent  = 0;
     }
         
-    if (pt[i].pid == pt[i].ppid)
+    if (pt[i].pid == pt[i].ppid) {
+      pt[i].parent = i;
       continue;
+    }
 
     if ((pt[i].parent = findprocess(pt[i].ppid, pt, *size_r)) == -1) {
       /* Parent process wasn't found - on Linux this is normal: main process with PID 0 is not listed, similarly in FreeBSD jail.
