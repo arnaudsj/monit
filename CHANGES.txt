@@ -48,6 +48,9 @@ NEW FEATURES AND FUNCTIONS:
   on Monit host. The automatic credentials registration can be disabled:
      set mmonit http://monit:monit@192.168.1.10:8080/collector and register without credentials
 
+* Added FIPS OpenSSL module to Monit httpd. Many thanks to Lior Okman
+  for providing the patch. 
+
 BUGFIXES:
 
 * Show real process uptime - formerly the presented uptime was based on create/modify

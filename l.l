@@ -305,6 +305,7 @@ password          { return PASSWORD; }
 credentials       { return CREDENTIALS; }
 register          { return REGISTER; }
 fsflag(s)?        { return FSFLAG; }
+fips              { return FIPS; }
 {byte}            { return BYTE; }
 {kilobyte}        { return KILOBYTE; }
 {megabyte}        { return MEGABYTE; }

@@ -337,8 +337,18 @@ ssl_server_connection *init_ssl_server(char *pemfile, char *clientpemfile) {
     start_ssl();
 
   ssl_server = new_ssl_server_connection(pemfile, clientpemfile);
-  
-  if(!(ssl_server->method= SSLv23_server_method())) {
+  SSL_METHOD *server_method = NULL;
+#ifdef OPENSSL_FIPS
+  if (FIPS_mode()) {
+	  server_method = TLSv1_server_method();
+  }
+  else {
+	  server_method = SSLv23_server_method();
+  }
+#else
+  server_method = SSLv23_server_method();
+#endif
+  if(!(ssl_server->method= server_method)) {
     LogError("%s: Cannot initialize the SSL method -- %s\n", prog, SSLERROR);
     goto sslerror;
   }
@@ -667,15 +677,41 @@ ssl_connection *new_ssl_connection(char *clientpemfile, int sslversion) {
   switch (sslversion) {
 
   case SSL_VERSION_AUTO:
-    ssl->method = SSLv23_client_method();
+#ifdef OPENSSL_FIPS
+	  if (FIPS_mode()) {
+	    ssl->method = TLSv1_client_method();
+	  } else {
+#endif
+		ssl->method = SSLv23_client_method();
+#ifdef OPENSSL_FIPS
+	  }
+#endif
     break;
 
   case SSL_VERSION_SSLV2:
-    ssl->method = SSLv2_client_method();
+#ifdef OPENSSL_FIPS
+	if (FIPS_mode()) {
+	  LogError("SSLv2 is not allowed in FIPS mode - use TLSv1");
+	  goto sslerror;
+	} else {
+#endif
+	  ssl->method = SSLv2_client_method();
+#ifdef OPENSSL_FIPS
+	}
+#endif
     break;
 
   case SSL_VERSION_SSLV3:
-    ssl->method = SSLv3_client_method();
+#ifdef OPENSSL_FIPS
+	if (FIPS_mode()) {
+	  LogError("SSLv3 is not allowed in FIPS mode - use TLSv1");
+	  goto sslerror;
+	} else {
+#endif
+      ssl->method = SSLv3_client_method();
+#ifdef OPENSSL_FIPS
+	}
+#endif
     break;
 
   case SSL_VERSION_TLS:
@@ -1019,11 +1055,17 @@ static int update_ssl_cert_data(ssl_connection *ssl) {
   if(!(ssl->cert = SSL_get_peer_certificate(ssl->handler)))
     return FALSE;
 
-  ssl->cert_issuer= X509_NAME_oneline (X509_get_issuer_name(ssl->cert), 0, 0);
-  ssl->cert_subject= X509_NAME_oneline (X509_get_subject_name(ssl->cert), 0, 0);
-  X509_digest(ssl->cert, EVP_md5(), md5, &ssl->cert_md5_len);
-  ssl->cert_md5= (unsigned char *)xstrdup((char *)md5);
-
+#ifdef OPENSSL_FIPS
+  if (!FIPS_mode()) {
+    /* In FIPS-140 mode, MD5 is unavailable. */
+#endif
+    ssl->cert_issuer= X509_NAME_oneline (X509_get_issuer_name(ssl->cert), 0, 0);
+    ssl->cert_subject= X509_NAME_oneline (X509_get_subject_name(ssl->cert), 0, 0);
+    X509_digest(ssl->cert, EVP_md5(), md5, &ssl->cert_md5_len);
+    ssl->cert_md5= (unsigned char *)xstrdup((char *)md5);
+#ifdef OPENSSL_FIPS
+  }
+#endif
   return TRUE;
 
 }
@@ -1052,6 +1094,18 @@ static ssl_server_connection *new_ssl_server_connection(char * pemfile,
 
 }
 
+#ifdef OPENSSL_FIPS
+/**
+ * Enable FIPS mode, if it isn't enabled yet.
+ */
+void enable_fips_mode()
+{
+	if (!FIPS_mode()) {
+		ASSERT(FIPS_mode_set(1));
+		LogInfo("FIPS-140 mode is enabled\n");
+	}
+}
+#endif
 
 /**
  * Start SSL support library. It has to be run before the SSL support
@@ -1061,6 +1115,11 @@ static ssl_server_connection *new_ssl_server_connection(char * pemfile,
 static int start_ssl() {
 
   if(! ssl_initialized) {
+#ifdef OPENSSL_FIPS
+	if (Run.fipsEnabled) {
+		enable_fips_mode();
+	}
+#endif
     int i;
     int locks = CRYPTO_num_locks();
 

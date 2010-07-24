@@ -38,6 +38,9 @@
 #include <openssl/pem.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+#ifdef OPENSSL_FIPS
+#include <openssl/fips.h>
+#endif
 #endif
 
 #define SSL_VERSION_AUTO       0
@@ -102,6 +105,9 @@ int                    recv_ssl_socket(ssl_connection *, void *, int, int);
 ssl_connection        *new_ssl_connection(char *, int);
 ssl_connection        *insert_accepted_ssl_socket(ssl_server_connection *);
 ssl_server_connection *init_ssl_server(char *, char *);
+#ifdef OPENSSL_FIPS
+void                   enable_fips_mode();
+#endif
 
 
 #else

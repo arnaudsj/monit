@@ -2581,6 +2581,19 @@ This ensures that a daemon will not restart a service that you
 requested to stop and that (any) timeout lock will be removed
 from a service when you start it.
 
+=head2 FIPS support
+
+Monit built-in web-server support the OpenSSL FIPS module. 
+To enable this mode, your OpenSSL library must first be built
+with FIPS support. Then in the Monit control file, simply
+add this I<set> statement at the top;
+
+ set fips
+
+Note that the FIPS module may not be supported in the lates 
+version of OpenSSL. So make sure that your version of OpenSSL
+support the FIPS object module before attempting to enable this
+in Monit.
 
 =head2 Monit HTTPD Authentication
 

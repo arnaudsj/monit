@@ -303,6 +303,7 @@
 %token <url> URLOBJECT
 %token <string> TARGET
 %token <number> MAXFORWARD
+%token FIPS
 
 %left GREATER LESS EQUAL NOTEQUAL
 
@@ -329,6 +330,7 @@ statement       : setalert
                 | setstatefile
                 | setexpectbuffer
                 | setinit
+                | setfips
                 | checkproc optproclist
                 | checkfile optfilelist
                 | checkfilesys optfilesyslist
@@ -513,6 +515,13 @@ setexpectbuffer : SET EXPECTBUFFER NUMBER unit {
 
 setinit         : SET INIT {
                     Run.init = TRUE;
+                  }
+                ;
+
+setfips         : SET FIPS {
+                  #ifdef OPENSSL_FIPS
+                    Run.fipsEnabled = TRUE;
+                  #endif
                   }
                 ;
 
@@ -1896,6 +1905,9 @@ static void preparse() {
   Run.localhostname       = xstrdup(localhost);
   depend_list             = NULL;
   Run.handler_init        = TRUE;
+#ifdef OPENSSL_FIPS  
+  Run.fipsEnabled         = FALSE;
+#endif
   for (i = 0; i <= HANDLER_MAX; i++)
     Run.handler_queue[i] = 0;
   /* 

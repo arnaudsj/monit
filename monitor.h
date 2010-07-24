@@ -864,6 +864,9 @@ struct myrun {
   } MailFormat;
                                           
   pthread_mutex_t mutex;    /**< Mutex used for service data synchronization */
+#ifdef OPENSSL_FIPS
+  int fipsEnabled;                /** TRUE if monit should use FIPS-140 mode */
+#endif
 };
 
 
