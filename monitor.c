@@ -722,7 +722,6 @@ static void *heartbeat(void *args) {
   sigset_t ns;
   struct timespec wait;
 
-  wait.tv_nsec = 0;
   set_signal_block(&ns, NULL);
   LogInfo("M/Monit heartbeat started\n");
   LOCK(heartbeatMutex)
@@ -733,6 +732,7 @@ static void *heartbeat(void *args) {
         wait.tv_sec = time(NULL) + Run.polltime;
       else
         wait.tv_sec = time(NULL) + 1;
+      wait.tv_nsec = 0;
       pthread_cond_timedwait(&heartbeatCond, &heartbeatMutex, &wait);
     }
   }
