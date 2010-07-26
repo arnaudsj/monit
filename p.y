@@ -257,7 +257,6 @@
   static int   cleanup_hash_string(char *);
   static void  check_depend();
   static void  setsyslog(char *);
-  static void describeAction(Action_T);
   static Command_T copycommand(Command_T);
   static int verifyMaxForward(int);  
 
@@ -1162,21 +1161,17 @@ apache_stat     : LOGLIMIT operator NUMBER PERCENT {
                 ;
 
 exist           : IF NOT EXIST rate1 THEN action1 recovery {
-                    *(current->action_NONEXIST->failed->description) = 0;
-                    *(current->action_NONEXIST->succeeded->description) = 0;
                     seteventaction(&(current)->action_NONEXIST, $<number>6, $<number>7);
                   }
                 ;
 
 
 pid             : IF CHANGED PID rate1 THEN action1 {
-                    *(current->action_PID->failed->description) = 0;
                     seteventaction(&(current)->action_PID, $<number>6, ACTION_IGNORE);
                   }
                 ;
 
 ppid            : IF CHANGED PPID rate1 THEN action1 {
-                    *(current->action_PPID->failed->description) = 0;
                     seteventaction(&(current)->action_PPID, $<number>6, ACTION_IGNORE);
                   }
                 ;
@@ -1595,7 +1590,6 @@ space           : IF SPACE operator value unit rate1 THEN action1 recovery {
                 ;
 
 fsflag          : IF CHANGED FSFLAG rate1 THEN action1 {
-                    *(current->action_FSFLAG->failed->description) = 0;
                     seteventaction(&(current)->action_FSFLAG, $<number>6, ACTION_IGNORE);
                   }
                 ;
@@ -2579,7 +2573,6 @@ static void addeventaction(EventAction_T *_ea, int failed, int succeeded) {
     ea->failed->exec = command1;
     command1 = NULL;
   }
-  describeAction(ea->failed);
 
   ea->succeeded->id     = succeeded;
   ea->succeeded->count  = rate2.count;
@@ -2589,7 +2582,6 @@ static void addeventaction(EventAction_T *_ea, int failed, int succeeded) {
     ea->succeeded->exec = command2;
     command2 = NULL;
   }
-  describeAction(ea->succeeded);
   *_ea = ea;
   reset_rateset();
 }
@@ -2613,7 +2605,6 @@ static void seteventaction(EventAction_T *_ea, int failed, int succeeded) {
     ea->failed->exec = command1;
     command1 = NULL;
   }
-  describeAction(ea->failed);
 
   ea->succeeded->id     = succeeded;
   ea->succeeded->count  = rate2.count;
@@ -2623,7 +2614,6 @@ static void seteventaction(EventAction_T *_ea, int failed, int succeeded) {
     ea->succeeded->exec = command2;
     command2 = NULL;
   }
-  describeAction(ea->succeeded);
 }
 
 
@@ -3482,30 +3472,6 @@ static int cleanup_hash_string(char *hashstring) {
   }
   hashstring[j] = '\0';
   return j;
-}
-
-
-static void describeAction(Action_T A) {
-  #define BUF_CURSOR    (A->description + strlen(A->description))
-  #define BUF_AVAILABLE (sizeof(A->description) - strlen(A->description))
-  snprintf(BUF_CURSOR, BUF_AVAILABLE, "%s", actionnames[A->id]);
-  if (A->id == ACTION_EXEC) {
-    int i = 0;
-    Command_T C = A->exec;
-
-    while (C->arg[i]) {
-      snprintf(BUF_CURSOR, BUF_AVAILABLE, "%s%s", i ? " " : " '", C->arg[i]);
-      i++;
-    }
-    snprintf(BUF_CURSOR, BUF_AVAILABLE, "'");
-    if (C->has_uid)
-      snprintf(BUF_CURSOR, BUF_AVAILABLE, " as uid %d", C->uid);
-    if (C->has_gid)
-      snprintf(BUF_CURSOR, BUF_AVAILABLE, " as gid %d", C->gid);
-    snprintf(BUF_CURSOR, BUF_AVAILABLE, " timeout %d cycle(s)", C->timeout);
-  }
-  #undef BUF_CURSOR
-  #undef BUF_AVAILABLE
 }
 
 

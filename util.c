@@ -763,14 +763,12 @@ void Util_printService(Service_T s) {
   Dependant_T d;
   ServiceGroup_T sg;
   ServiceGroupMember_T sgm;
-  char string[STRLEN];
-  char ratio1[STRLEN];
-  char ratio2[STRLEN];
+  char buf[STRLEN];
 
   ASSERT(s);
  
-  snprintf(string, STRLEN, "%s Name", servicetypes[s->type]);
-  printf("%-21s = %s\n", string, s->name);
+  snprintf(buf, sizeof(buf), "%s Name", servicetypes[s->type]);
+  printf("%-21s = %s\n", buf, s->name);
 
   for (sg = servicegrouplist; sg; sg = sg->next) {
     for (sgm = sg->members; sgm; sgm = sgm->next) {
@@ -829,10 +827,12 @@ void Util_printService(Service_T s) {
   }
 
   if(s->type != TYPE_SYSTEM) {
-    printf(" %-20s = if does not exist %s then %s else if succeeded %s then %s\n",
-      "Existence",
-      Util_getEventratio(s->action_NONEXIST->failed, ratio1), s->action_NONEXIST->failed->description,
-      Util_getEventratio(s->action_NONEXIST->succeeded, ratio2), s->action_NONEXIST->succeeded->description);
+    printf(" %-20s = ", "Existence");
+    printf("if does not exist %s ", Util_getEventratio(s->action_NONEXIST->failed, buf, sizeof(buf)));
+    printf("then %s ", Util_describeAction(s->action_NONEXIST->failed, buf, sizeof(buf)));
+    printf("else if succeeded %s ", Util_getEventratio(s->action_NONEXIST->succeeded, buf, sizeof(buf)));
+    printf("then %s", Util_describeAction(s->action_NONEXIST->succeeded, buf, sizeof(buf)));
+    printf("\n");
   }
 
   for(d= s->dependantlist; d; d= d->next)
@@ -840,385 +840,289 @@ void Util_printService(Service_T s) {
       printf(" %-20s = %s\n", "Depends on Service", d->dependant);
 
   if(s->type == TYPE_PROCESS) {
-    printf(" %-20s = if changed %s then %s\n",
-      "Pid",
-      Util_getEventratio(s->action_PID->failed, ratio1),
-      s->action_PID->failed->description);
+    printf(" %-20s = ", "Pid");
+    printf("if changed %s ", Util_getEventratio(s->action_PID->failed, buf, sizeof(buf)));
+    printf("then %s", Util_describeAction(s->action_PID->failed, buf, sizeof(buf)));
+    printf("\n");
 
-    printf(" %-20s = if changed %s then %s\n",
-      "Ppid",
-      Util_getEventratio(s->action_PPID->failed, ratio1),
-      s->action_PPID->failed->description);
+    printf(" %-20s = ", "Ppid");
+    printf("if changed %s ", Util_getEventratio(s->action_PPID->failed, buf, sizeof(buf)));
+    printf("then %s", Util_describeAction(s->action_PPID->failed, buf, sizeof(buf)));
+    printf("\n");
   }
 
   if(s->type == TYPE_FILESYSTEM) {
-    printf(" %-20s = if changed %s then %s\n",
-      "Filesystem flags",
-      Util_getEventratio(s->action_FSFLAG->failed, ratio1),
-      s->action_FSFLAG->failed->description);
+    printf(" %-20s = ", "Filesystem flags");
+    printf("if changed %s ", Util_getEventratio(s->action_FSFLAG->failed, buf, sizeof(buf)));
+    printf("then %s", Util_describeAction(s->action_FSFLAG->failed, buf, sizeof(buf)));
+    printf("\n");
   }
 
   if(s->checksum && s->checksum->action) {
     Checksum_T cs= s->checksum;
     EventAction_T a= cs->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    if(cs->test_changes)
-      printf(" %-20s = if changed %s %s then %s\n",
-        "Checksum", checksumnames[cs->type],
-        ratio1, a->failed->description);
-    else
-      printf(" %-20s = if failed %s(%s) %s then %s else if succeeded %s then %s\n",
-        "Checksum", cs->hash, checksumnames[cs->type],
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
+    printf(" %-20s = ", "Checksum");
+    if(cs->test_changes) {
+      printf("if changed %s %s ", checksumnames[cs->type], Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->failed, buf, sizeof(buf)));
+    } else {
+      printf("if failed %s(%s) %s ", cs->hash, checksumnames[cs->type], Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+      printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+    }
+    printf("\n");
   }
   
   if(s->perm && s->perm->action) {
     EventAction_T a= s->perm->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    printf(" %-20s = if failed %04o %s then %s else if succeeded %s then %s\n",
-      "Permission", s->perm->perm,
-      ratio1, a->failed->description,
-      ratio2, a->succeeded->description);
+    printf(" %-20s = ", "Permission");
+    printf("if failed %04o %s ", s->perm->perm, Util_getEventratio(a->failed, buf, sizeof(buf)));
+    printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+    printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+    printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+    printf("\n");
   }
 
   if(s->uid && s->uid->action) {
     EventAction_T a= s->uid->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    printf(" %-20s = if failed %d %s then %s else if succeeded %s then %s\n",
-      "UID", (int)s->uid->uid,
-      ratio1, a->failed->description,
-      ratio2, a->succeeded->description);
+    printf(" %-20s = ", "UID");
+    printf("if failed %d %s ", (int)s->uid->uid, Util_getEventratio(a->failed, buf, sizeof(buf)));
+    printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+    printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+    printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+    printf("\n");
   }
 
   if(s->gid && s->gid->action) {
     EventAction_T a= s->gid->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    printf(" %-20s = if failed %d %s then %s else if succeeded %s then %s\n",
-      "GID", (int)s->gid->gid,
-      ratio1, a->failed->description,
-      ratio2, a->succeeded->description);
+    printf(" %-20s = ", "GID");
+    printf("if failed %d %s ", (int)s->gid->gid, Util_getEventratio(a->failed, buf, sizeof(buf)));
+    printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+    printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+    printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+    printf("\n");
   }
 
   if(s->icmplist)
     for(i= s->icmplist; i; i= i->next) {
       EventAction_T a= i->action;
-
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
-      printf(" %-20s = if failed %s count %d with timeout %d seconds %s then %s "
-        "else if succeeded %s then %s\n",
-        "ICMP", icmpnames[i->type], i->count, i->timeout,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
+      printf(" %-20s = ", "ICMP");
+      printf("if failed %s count %d with timeout %d seconds %s ", icmpnames[i->type], i->count, i->timeout, Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+      printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+      printf("\n");
     }
 
   if(s->portlist) {
-    
     for(n= s->portlist; n; n= n->next) {
       EventAction_T a= n->action;
-      
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
       if(n->family == AF_INET) {
-	
-	   printf(" %-20s = if failed %s:%d%s [%s via %s] with "
-             "timeout %d seconds %s then %s else if succeeded %s then %s\n",
-	     "Port", n->hostname, n->port, n->request?n->request:"",
-             n->protocol->name, Util_portTypeDescription(n),
-             n->timeout,
-             ratio1, a->failed->description,
-             ratio2, a->succeeded->description);
-	  
-	   if(n->SSL.certmd5 != NULL)
-	     printf(" %-20s = %s\n", "Server cert md5 sum", n->SSL.certmd5);
-
+        printf(" %-20s = ", "Port");
+        printf("if failed %s:%d%s [%s via %s] with timeout %d seconds %s ", n->hostname, n->port, n->request ? n->request : "", n->protocol->name, Util_portTypeDescription(n), n->timeout, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+        printf("\n");
+        if(n->SSL.certmd5 != NULL)
+          printf(" %-20s = %s\n", "Server cert md5 sum", n->SSL.certmd5);
       } else if(n->family == AF_UNIX) {
-	
-        printf(" %-20s = if failed %s [protocol %s] with timeout %d seconds "
-          "%s then %s else if succeeded %s then %s\n",
-          "Unix Socket", n->pathname, n->protocol->name, n->timeout,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	
+        printf(" %-20s = ", "Unix Socket");
+        printf("if failed %s [protocol %s] with timeout %d seconds %s ", n->pathname, n->protocol->name, n->timeout, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+        printf("\n");
       }
-      
     }
-    
   }
   
   for(t= s->timestamplist; t; t= t->next) {
     EventAction_T a= t->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    if(t->test_changes)
-      printf(" %-20s = if changed %s then %s\n",
-        "Timestamp",
-        ratio1, a->failed->description);
-    else
-      printf(" %-20s = if %s %d second(s) %s then %s else if succeeded %s then %s\n",
-        "Timestamp", operatornames[t->operator], t->time,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-    
+    printf(" %-20s = ", "Timestamp");
+    if(t->test_changes) {
+      printf("if changed %s ", Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->failed, buf, sizeof(buf)));
+    } else {
+      printf("if %s %d second(s) %s ", operatornames[t->operator], t->time, Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+      printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+    }
+    printf("\n");
   }
 
   for(sl= s->sizelist; sl; sl= sl->next) {
     EventAction_T a= sl->action;
-    
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    if(sl->test_changes)
-      printf(" %-20s = if changed %s then %s\n",
-        "Size",
-        ratio1, a->failed->description);
-    else
-      printf(" %-20s = if %s %llu byte(s) %s then %s else if succeeded %s then %s\n",
-        "Size", operatornames[sl->operator], sl->size,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
+    printf(" %-20s = ", "Size");
+    if(sl->test_changes) {
+      printf("if changed %s ", Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->failed, buf, sizeof(buf)));
+    } else {
+      printf("if %s %llu byte(s) %s ", operatornames[sl->operator], sl->size, Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+      printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+    }
+    printf("\n");
     
   }
 
   if (s->type != TYPE_PROCESS) {
     for(ml= s->matchlist; ml; ml= ml->next) {
       EventAction_T a= ml->action;
-    
-      Util_getEventratio(a->failed, ratio1);
-      printf(" %-20s = if%s match \"%s\" %s then %s\n",
-        "Regex", ml->not?" not":"", ml->match_string,
-        ratio1, a->failed->description);
+      printf(" %-20s = ", "Regex");
+      printf("if%s match \"%s\" %s ", ml->not ? " not" : "", ml->match_string, Util_getEventratio(a->failed, buf, sizeof(buf)));
+      printf("then %s", Util_describeAction(a->failed, buf, sizeof(buf)));
+      printf("\n");
     }
   }
   
   for(dl= s->filesystemlist; dl; dl= dl->next) {
     EventAction_T a= dl->action;
-    
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
     if(dl->resource == RESOURCE_ID_INODE) {
-	    
+      printf(" %-20s = ", "Inodes usage limit");
       if(dl->limit_absolute > -1) {
-        printf(" %-20s = if %s %ld %s then %s else if succeeded %s then %s\n",
-          "Inodes usage limit",
-          operatornames[dl->operator],
-          dl->limit_absolute,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        printf("if %s %ld %s ", operatornames[dl->operator], dl->limit_absolute, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
       } else {
-        printf(" %-20s = if %s %.1f%% %s then %s else if succeeded %s then %s\n",
-          "Inodes usage limit",
-          operatornames[dl->operator],
-          dl->limit_percent/10.,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        printf("if %s %.1f%% %s ", operatornames[dl->operator], dl->limit_percent / 10., Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
       }
-      
+      printf("\n");
     } else if(dl->resource == RESOURCE_ID_SPACE) {
-	    
+      printf(" %-20s = ", "Space usage limit");
       if(dl->limit_absolute > -1) {
-        printf(" %-20s = if %s %ld blocks %s then %s else if succeeded %s then %s\n",
-          "Space usage limit",
-          operatornames[dl->operator],
-          dl->limit_absolute,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        printf("if %s %ld blocks %s ", operatornames[dl->operator], dl->limit_absolute, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
       } else {
-        printf(" %-20s = if %s %.1f%% %s then %s else if succeeded %s then %s\n",
-          "Space usage limit",
-          operatornames[dl->operator],
-          dl->limit_percent/10.,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        printf("if %s %.1f%% %s ", operatornames[dl->operator], dl->limit_percent / 10., Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
       }
-
+      printf("\n");
     }
-    
   }
 
   for(q= s->resourcelist; q; q= q->next) {
     EventAction_T a= q->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
     switch(q->resource_id) {
+      case RESOURCE_ID_CPU_PERCENT: 
+        printf(" %-20s = ", "CPU usage limit");
+        break;
 
-    case RESOURCE_ID_CPU_PERCENT: 
+      case RESOURCE_ID_TOTAL_CPU_PERCENT: 
+        printf(" %-20s = ", "CPU usage limit (incl. children)");
+        break;
 
-      printf(" %-20s = if %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n", 
-        "CPU usage limit", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_CPUUSER: 
+        printf(" %-20s = ", "CPU user limit");
+        break;
 
-    case RESOURCE_ID_TOTAL_CPU_PERCENT: 
+      case RESOURCE_ID_CPUSYSTEM: 
+        printf(" %-20s = ", "CPU system limit");
+        break;
 
-      printf(" %-20s = if %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n", 
-        "CPU usage limit (incl. children)", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_CPUWAIT: 
+        printf(" %-20s = ", "CPU wait limit");
+        break;
 
-    case RESOURCE_ID_CPUUSER: 
+      case RESOURCE_ID_MEM_PERCENT: 
+        printf(" %-20s = ", "Memory usage limit");
+        break;
 
-      printf(" %-20s = if %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n", 
-        "CPU user limit", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_MEM_KBYTE: 
+        printf(" %-20s = ", "Memory amount limit");
+        break;
 
-    case RESOURCE_ID_CPUSYSTEM: 
+      case RESOURCE_ID_SWAP_PERCENT: 
+        printf(" %-20s = ", "Swap usage limit");
+        break;
 
-      printf(" %-20s = if %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n", 
-        "CPU system limit", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_SWAP_KBYTE: 
+        printf(" %-20s = ", "Swap amount limit");
+        break;
 
-    case RESOURCE_ID_CPUWAIT: 
+      case RESOURCE_ID_LOAD1: 
+        printf(" %-20s = ", "Load avg. (1min)");
+        break;
 
-      printf(" %-20s = if %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n", 
-        "CPU wait limit", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_LOAD5: 
+        printf(" %-20s = ", "Load avg. (5min)");
+        break;
 
-    case RESOURCE_ID_MEM_PERCENT: 
+      case RESOURCE_ID_LOAD15: 
+        printf(" %-20s = ", "Load avg. (15min)");
+        break;
 
-      printf(" %-20s = if %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n", 
-        "Memory usage limit", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_CHILDREN:
+        printf(" %-20s = ", "Children");
+        break;
 
-    case RESOURCE_ID_MEM_KBYTE: 
+      case RESOURCE_ID_TOTAL_MEM_KBYTE:
+        printf(" %-20s = ", "Memory amount limit (incl. children)");
+        break;
 
-      printf(" %-20s = if %s %ldkB %s then %s "
-        "else if succeeded %s then %s\n", 
-        "Memory amount limit", 
-        operatornames[q->operator], q->limit,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_TOTAL_MEM_PERCENT:
+        printf(" %-20s = ", "Memory usage limit (incl. children)");
+        break;
+    }
+    switch(q->resource_id) {
+      case RESOURCE_ID_CPU_PERCENT: 
+      case RESOURCE_ID_TOTAL_CPU_PERCENT: 
+      case RESOURCE_ID_TOTAL_MEM_PERCENT:
+      case RESOURCE_ID_CPUUSER: 
+      case RESOURCE_ID_CPUSYSTEM: 
+      case RESOURCE_ID_CPUWAIT: 
+      case RESOURCE_ID_MEM_PERCENT: 
+      case RESOURCE_ID_SWAP_PERCENT: 
+        printf("if %s %.1f%% %s ", operatornames[q->operator], q->limit / 10.0, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+        break;
 
-    case RESOURCE_ID_SWAP_PERCENT: 
+      case RESOURCE_ID_MEM_KBYTE: 
+      case RESOURCE_ID_SWAP_KBYTE: 
+        printf("if %s %ldkB %s ", operatornames[q->operator], q->limit, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+        break;
 
-      printf(" %-20s = if %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n", 
-        "Swap usage limit", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
+      case RESOURCE_ID_LOAD1: 
+      case RESOURCE_ID_LOAD5: 
+      case RESOURCE_ID_LOAD15: 
+        printf("if %s %.1f %s ", operatornames[q->operator], q->limit / 10.0, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+        break;
 
-    case RESOURCE_ID_SWAP_KBYTE: 
-
-      printf(" %-20s = if %s %ldkB %s then %s "
-        "else if succeeded %s then %s\n", 
-        "Swap amount limit", 
-        operatornames[q->operator], q->limit,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
-
-    case RESOURCE_ID_LOAD1: 
-
-      printf(" %-20s = if %s %.1f %s then %s "
-        "else if succeeded %s then %s\n", 
-        "Load avg. (1min)", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
-
-    case RESOURCE_ID_LOAD5: 
-
-      printf(" %-20s = if %s %.1f %s then %s "
-        "else if succeeded %s then %s\n", 
-        "Load avg. (5min)", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
-
-    case RESOURCE_ID_LOAD15: 
-
-      printf(" %-20s = if %s %.1f %s then %s "
-        "else if succeeded %s then %s\n", 
-        "Load avg. (15min)", 
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
-
-    case RESOURCE_ID_CHILDREN:
-
-      printf(" %-20s = If %s %ld %s then %s "
-        "else if succeeded %s then %s\n",
-        "Children", operatornames[q->operator], q->limit,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
-
-    case RESOURCE_ID_TOTAL_MEM_KBYTE:
-
-      printf(" %-20s = If %s %ld %s then %s "
-        "else if succeeded %s then %s\n",
-        "Memory amount limit (incl. children)",
-        operatornames[q->operator], q->limit,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
-
-    case RESOURCE_ID_TOTAL_MEM_PERCENT:
-
-      printf(" %-20s = If %s %.1f%% %s then %s "
-        "else if succeeded %s then %s\n",
-        "Memory usage limit (incl. children)",
-        operatornames[q->operator], q->limit/10.0,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-      break;
-
-    }    
+      case RESOURCE_ID_CHILDREN:
+      case RESOURCE_ID_TOTAL_MEM_KBYTE:
+        printf("if %s %ld %s ", operatornames[q->operator], q->limit, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        printf("then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        printf("else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        printf("then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+        break;
+    }
+    printf("\n");
   }
 
   if(s->def_every)
     printf(" %-20s = Check service every %d cycles\n", "Every", s->every);
   
   for (ar = s->actionratelist; ar; ar = ar->next)
-    printf(" %-20s = If restarted %d times within %d cycle(s) then %s\n", "Timeout", ar->count, ar->cycle, ar->action->failed->description);
+    printf(" %-20s = If restarted %d times within %d cycle(s) then %s\n", "Timeout", ar->count, ar->cycle, Util_describeAction(ar->action->failed, buf, sizeof(buf)));
 
   for(r= s->maillist; r; r= r->next) {
     printf(" %-20s = %s\n", "Alert mail to", is_str_defined(r->to));
@@ -2206,25 +2110,37 @@ int Util_getAction(const char *action) {
 }
 
 
-/**
- * Print event ratio needed to trigger the action to the buffer
- * @param action A action string
- * @return the action id
- */
-char *Util_getEventratio(Action_T action, char *buf) {
-  snprintf(buf, STRLEN,
-    "%d times within %d cycle(s)",
-    action->count, action->cycles);
+char *Util_describeAction(Action_T A, char *buf, int bufsize) {
+  #define BUF_CURSOR    (buf + strlen(buf))
+  #define BUF_AVAILABLE (bufsize - strlen(buf) - 1)
+  snprintf(buf, bufsize, "%s", actionnames[A->id]);
+  if (A->id == ACTION_EXEC) {
+    int i = 0;
+    Command_T C = A->exec;
 
+    while (C->arg[i]) {
+      snprintf(BUF_CURSOR, BUF_AVAILABLE, "%s%s", i ? " " : " '", C->arg[i]);
+      i++;
+    }
+    snprintf(BUF_CURSOR, BUF_AVAILABLE, "'");
+    if (C->has_uid)
+      snprintf(BUF_CURSOR, BUF_AVAILABLE, " as uid %d", C->uid);
+    if (C->has_gid)
+      snprintf(BUF_CURSOR, BUF_AVAILABLE, " as gid %d", C->gid);
+    snprintf(BUF_CURSOR, BUF_AVAILABLE, " timeout %d cycle(s)", C->timeout);
+  }
+  return buf;
+  #undef BUF_CURSOR
+  #undef BUF_AVAILABLE
+}
+
+
+char *Util_getEventratio(Action_T action, char *buf, int bufsize) {
+  snprintf(buf, bufsize, "%d times within %d cycle(s)", action->count, action->cycles);
   return buf;
 }
 
 
-/**
- * Print port type description
- * @param p A port structure
- * @return the socket type description
- */
 char *Util_portTypeDescription(Port_T p) {
   switch(p->type) {
     case SOCK_STREAM:

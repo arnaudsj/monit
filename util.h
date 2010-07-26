@@ -450,12 +450,24 @@ void Util_monitorUnset(Service_T s);
 int Util_getAction(const char *action);
 
 
-/**
- * Print event ratio needed to trigger the action to the buffer
- * @param action A action string
- * @return the action id
+/*
+ * Write full action description to given buffer
+ * @param action An action object
+ * @param buf Buffer
+ * @param bufsize Buffer size
+ * @return the buffer
  */
-char *Util_getEventratio(Action_T action, char *buf);
+char *Util_describeAction(Action_T action, char *buf, int bufsize);
+
+
+/**
+ * Print event ratio needed to trigger the action to given buffer
+ * @param action A action string
+ * @param buf Buffer
+ * @param bufsize Buffer size
+ * @return the buffer
+ */
+char *Util_getEventratio(Action_T action, char *buf, int bufsize);
 
 
 /**

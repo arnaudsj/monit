@@ -333,34 +333,34 @@ static void do_runtime(HttpRequest req, HttpResponse res) {
   
   HEAD("_runtime", "Runtime", 1000)
   out_print(res,
-	    "<center><h3>Monit runtime status</h3><center><br>");
-  out_print(res,"<table cellspacing=0 cellpadding=3 border=1 width=\"90%%\" style=\"border:1px solid #ccc;border-collapse:collapse;\">"
-	    "<tr><td width=\"40%%\" bgcolor=\"#edf5ff\"><b>Parameter</b></td>"
-	    "<td width=\"60%%\" bgcolor=\"#edf5ff\"><b>Value</b></td></tr>");
+            "<center><h3>Monit runtime status</h3><center><br>");
+  out_print(res, "<table cellspacing=0 cellpadding=3 border=1 width=\"90%%\" style=\"border:1px solid #ccc;border-collapse:collapse;\">"
+            "<tr><td width=\"40%%\" bgcolor=\"#edf5ff\"><b>Parameter</b></td>"
+            "<td width=\"60%%\" bgcolor=\"#edf5ff\"><b>Value</b></td></tr>");
   out_print(res, "<tr><td>Monit ID</td><td>%s</td></tr>", Run.id);
   out_print(res, "<tr><td>Host</td><td>%s</td></tr>",  Run.localhostname);
   out_print(res,
-	    "<tr><td>Process id</td><td>%d</td></tr>", pid);
+            "<tr><td>Process id</td><td>%d</td></tr>", pid);
   out_print(res,
-	    "<tr><td>Effective user running Monit</td>"
-	    "<td>%s</td></tr>", Run.Env.user);
+            "<tr><td>Effective user running Monit</td>"
+            "<td>%s</td></tr>", Run.Env.user);
   out_print(res,
-	    "<tr><td>Controlfile</td><td>%s</td></tr>", Run.controlfile);
+            "<tr><td>Controlfile</td><td>%s</td></tr>", Run.controlfile);
   if(Run.logfile)
     out_print(res,
-	    "<tr><td>Logfile</td><td>%s</td></tr>", Run.logfile);
+            "<tr><td>Logfile</td><td>%s</td></tr>", Run.logfile);
   out_print(res,
-	    "<tr><td>Pidfile</td><td>%s</td></tr>", Run.pidfile);
+            "<tr><td>Pidfile</td><td>%s</td></tr>", Run.pidfile);
   out_print(res,
-	    "<tr><td>State file</td><td>%s</td></tr>", Run.statefile);
+            "<tr><td>State file</td><td>%s</td></tr>", Run.statefile);
   out_print(res,
-	    "<tr><td>Debug</td><td>%s</td></tr>",
-	    Run.debug?"True":"False");
+            "<tr><td>Debug</td><td>%s</td></tr>",
+            Run.debug?"True":"False");
   out_print(res,
-	    "<tr><td>Log</td><td>%s</td></tr>", Run.dolog?"True":"False");
+            "<tr><td>Log</td><td>%s</td></tr>", Run.dolog?"True":"False");
   out_print(res,
-	    "<tr><td>Use syslog</td><td>%s</td></tr>",
-	    Run.use_syslog?"True":"False");
+            "<tr><td>Use syslog</td><td>%s</td></tr>",
+            Run.use_syslog?"True":"False");
 
   if(Run.eventlist_dir) {
     char slots[STRLEN];
@@ -396,71 +396,71 @@ static void do_runtime(HttpRequest req, HttpResponse res) {
     MailServer_T mta= Run.mailservers;
     out_print(res, "<tr><td>Mail server(s)</td><td>");
     for(mta= Run.mailservers; mta; mta= mta->next)
-	out_print(res, "%s:%d%s&nbsp;",
+        out_print(res, "%s:%d%s&nbsp;",
           mta->host, mta->port, mta->ssl.use_ssl?"(ssl)":"");
     out_print(res, "</td></tr>");
   }
   
   if(Run.MailFormat.from)
     out_print(res,
-	    "<tr><td>Default mail from</td><td>%s</td></tr>",
-	    Run.MailFormat.from);
+            "<tr><td>Default mail from</td><td>%s</td></tr>",
+            Run.MailFormat.from);
   if(Run.MailFormat.subject)
     out_print(res,
-	    "<tr><td>Default mail subject</td><td>%s</td></tr>",
-	    Run.MailFormat.subject);
+            "<tr><td>Default mail subject</td><td>%s</td></tr>",
+            Run.MailFormat.subject);
   if(Run.MailFormat.message)
     out_print(res,
-	    "<tr><td>Default mail message</td><td>%s</td></tr>",
+            "<tr><td>Default mail message</td><td>%s</td></tr>",
             Run.MailFormat.message);
 
   out_print(res,
-	    "<tr><td>Poll time</td><td>%d seconds with start delay %d seconds</td></tr>",
-	    Run.polltime, Run.startdelay);
+            "<tr><td>Poll time</td><td>%d seconds with start delay %d seconds</td></tr>",
+            Run.polltime, Run.startdelay);
   out_print(res,
-	    "<tr><td>httpd bind address</td><td>%s</td></tr>",
-	    Run.bind_addr?Run.bind_addr:"Any/All");
+            "<tr><td>httpd bind address</td><td>%s</td></tr>",
+            Run.bind_addr?Run.bind_addr:"Any/All");
   out_print(res,
-	    "<tr><td>httpd portnumber</td><td>%d</td></tr>", Run.httpdport);
+            "<tr><td>httpd portnumber</td><td>%d</td></tr>", Run.httpdport);
   out_print(res,
-	    "<tr><td>httpd signature</td><td>%s</td></tr>",
-	    Run.httpdsig?"True":"False");
+            "<tr><td>httpd signature</td><td>%s</td></tr>",
+            Run.httpdsig?"True":"False");
   out_print(res,
-	    "<tr><td>Use ssl encryption</td><td>%s</td></tr>",
-	    Run.httpdssl?"True":"False");
+            "<tr><td>Use ssl encryption</td><td>%s</td></tr>",
+            Run.httpdssl?"True":"False");
   if (Run.httpdssl) {
     out_print(res,
-	      "<tr><td>PEM key/certificate file</td><td>%s</td></tr>",
-	      Run.httpsslpem);
+              "<tr><td>PEM key/certificate file</td><td>%s</td></tr>",
+              Run.httpsslpem);
     
     if (Run.httpsslclientpem!=NULL) {
       out_print(res,
-		"<tr><td>Client PEM key/certification"
-		"</td><td>%s</td></tr>", "Enabled");
+                "<tr><td>Client PEM key/certification"
+                "</td><td>%s</td></tr>", "Enabled");
       out_print(res,
-		"<tr><td>Client PEM key/certificate file"
-		"</td><td>%s</td></tr>", Run.httpsslclientpem);
+                "<tr><td>Client PEM key/certificate file"
+                "</td><td>%s</td></tr>", Run.httpsslclientpem);
     } else {
       out_print(res,
-		"<tr><td>Client PEM key/certification"
-		"</td><td>%s</td></tr>", "Disabled");
+                "<tr><td>Client PEM key/certification"
+                "</td><td>%s</td></tr>", "Disabled");
     }
     out_print(res,
-	      "<tr><td>Allow self certified certificates "
-	      "</td><td>%s</td></tr>", Run.allowselfcert?"True":"False");
+              "<tr><td>Allow self certified certificates "
+              "</td><td>%s</td></tr>", Run.allowselfcert?"True":"False");
   }
   
   out_print(res,
-	    "<tr><td>httpd auth. style</td><td>%s</td></tr>",
-	    (Run.credentials!=NULL)&&(has_hosts_allow())?
-	    "Basic Authentication and Host/Net allow list":
-	    (Run.credentials!=NULL)?"Basic Authentication":
-	    (has_hosts_allow())?"Host/Net allow list":
-	    "No authentication");
+            "<tr><td>httpd auth. style</td><td>%s</td></tr>",
+            (Run.credentials!=NULL)&&(has_hosts_allow())?
+            "Basic Authentication and Host/Net allow list":
+            (Run.credentials!=NULL)?"Basic Authentication":
+            (has_hosts_allow())?"Host/Net allow list":
+            "No authentication");
 
   print_alerts(res, Run.maillist);
 
-  out_print(res,"</table>");
+  out_print(res, "</table>");
 
   if(!is_readonly(req)) {
     out_print(res,
@@ -513,7 +513,7 @@ static void do_viewlog(HttpRequest req, HttpResponse res) {
   
   if(is_readonly(req)) {
     send_error(res, SC_FORBIDDEN,
-	       "You do not have sufficent privileges to access this page");
+               "You do not have sufficent privileges to access this page");
     return;
   }
   
@@ -527,28 +527,28 @@ static void do_viewlog(HttpRequest req, HttpResponse res) {
       
       FILE *f= fopen(Run.logfile, "r");
       if(f) {
-	
+        
         #define BUFSIZE 8192
 
-	int n;
-	char buf[BUFSIZE+1];
-	
-	out_print(res, "<br><p><form><textarea cols=120 rows=30 readonly>");
-	
-	while((n= fread(buf, sizeof(char), BUFSIZE, f)) > 0) {
-	  
-	  buf[n]= 0;
-	  out_print(res, "%s", buf);
-	  
-	}
-	
+        int n;
+        char buf[BUFSIZE+1];
+        
+        out_print(res, "<br><p><form><textarea cols=120 rows=30 readonly>");
+        
+        while((n= fread(buf, sizeof(char), BUFSIZE, f)) > 0) {
+          
+          buf[n]= 0;
+          out_print(res, "%s", buf);
+          
+        }
+        
         fclose(f);
-	out_print(res, "</textarea></form>");
-	
+        out_print(res, "</textarea></form>");
+        
       } else {
-	
-	out_print(res, "Error opening logfile: %s", STRERROR);
-	
+        
+        out_print(res, "Error opening logfile: %s", STRERROR);
+        
       }
       
     } else {
@@ -715,9 +715,7 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
   ServiceGroupMember_T sgm;
   char *svc;
   char *status;
-  char time[STRLEN];
-  char ratio1[STRLEN];
-  char ratio2[STRLEN];
+  char buf[STRLEN];
 
   ASSERT(s);
 
@@ -801,9 +799,10 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
   }
 
   if(s->type != TYPE_SYSTEM) {
-    out_print(res, "<tr><td>Existence</td><td>If doesn't exist %s then %s else if succeeded %s then %s</td></tr>",
-      Util_getEventratio(s->action_NONEXIST->failed, ratio1), s->action_NONEXIST->failed->description,
-      Util_getEventratio(s->action_NONEXIST->succeeded, ratio2), s->action_NONEXIST->succeeded->description);
+    out_print(res, "<tr><td>Existence</td><td>If doesn't exist %s ", Util_getEventratio(s->action_NONEXIST->failed, buf, sizeof(buf)));
+    out_print(res, "then %s ", Util_describeAction(s->action_NONEXIST->failed, buf, sizeof(buf)));
+    out_print(res, "else if succeeded %s ", Util_getEventratio(s->action_NONEXIST->succeeded, buf, sizeof(buf)));
+    out_print(res, "then %s</td></tr>", Util_describeAction(s->action_NONEXIST->succeeded, buf, sizeof(buf)));
   }
 
   out_print(res,
@@ -811,12 +810,12 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
     s->every?s->every:1);
 
   for (ar = s->actionratelist; ar; ar = ar->next)
-    out_print(res, "<tr><td>Timeout</td><td>If restarted %d times within %d cycle(s) then %s</td></tr>", ar->count, ar->cycle, ar->action->failed->description);
+    out_print(res, "<tr><td>Timeout</td><td>If restarted %d times within %d cycle(s) then %s</td></tr>", ar->count, ar->cycle, Util_describeAction(ar->action->failed, buf, sizeof(buf)));
 
-  ctime_r((const time_t *)&s->collected.tv_sec, time);
+  ctime_r((const time_t *)&s->collected.tv_sec, buf);
   out_print(res,
     "<tr><td>Data collected</td><td>%s</td></tr>",
-    time);
+    buf);
 
   /* Parameters */
   print_service_params_icmp(res, s);
@@ -1001,13 +1000,13 @@ static void do_home_process(HttpRequest req, HttpResponse res) {
 
       if(Run.doprocess) {
         out_print(res,
-	  "<td align=\"right\"><font%s>%.1f%%</font></td>",
+          "<td align=\"right\"><font%s>%.1f%%</font></td>",
           (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
-	  s->inf->cpu_percent/10.0);
+          s->inf->cpu_percent/10.0);
         out_print(res,
-	  "<td align=\"right\"><font%s>%.1f%% [%ld&nbsp;kB]</font></td></tr>",
+          "<td align=\"right\"><font%s>%.1f%% [%ld&nbsp;kB]</font></td></tr>",
           (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
-	  s->inf->mem_percent/10.0, s->inf->mem_kbyte);
+          s->inf->mem_percent/10.0, s->inf->mem_kbyte);
       }
 
     }
@@ -1038,14 +1037,14 @@ static void do_home_filesystem(HttpRequest req, HttpResponse res) {
     if(header) {
       
       out_print(res,
-	"<br><p>&nbsp;</p>"
-	"<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
-	"<tr>"
-	"<td width=\"20%%\"><h3><b>Filesystem</b></h3></td>"
-	"<td align=\"left\"><h3><b>Status</b></h3></td>"
-	"<td align=\"right\"><h3><b>Space usage</b></h3></td>"
-	"<td align=\"right\"><h3><b>Inodes usage</b></h3></td>"
-	"</tr>");
+        "<br><p>&nbsp;</p>"
+        "<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
+        "<tr>"
+        "<td width=\"20%%\"><h3><b>Filesystem</b></h3></td>"
+        "<td align=\"left\"><h3><b>Status</b></h3></td>"
+        "<td align=\"right\"><h3><b>Space usage</b></h3></td>"
+        "<td align=\"right\"><h3><b>Inodes usage</b></h3></td>"
+        "</tr>");
       
       header= FALSE;
       
@@ -1066,27 +1065,27 @@ static void do_home_filesystem(HttpRequest req, HttpResponse res) {
     if(!Util_hasServiceStatus(s)) {
 
       out_print(res,
-	"<td align=\"right\">- [-]</td>"
-	"<td align=\"right\">- [-]</td>");
+        "<td align=\"right\">- [-]</td>"
+        "<td align=\"right\">- [-]</td>");
 
     } else {
       
       out_print(res,
-	"<td align=\"right\">%.1f%% [%.1f&nbsp;MB]</td>",
+        "<td align=\"right\">%.1f%% [%.1f&nbsp;MB]</td>",
         s->inf->space_percent/10.,
-	(float)s->inf->space_total / (float)1048576 * (float)s->inf->f_bsize);
+        (float)s->inf->space_total / (float)1048576 * (float)s->inf->f_bsize);
 
       if(s->inf->f_files > 0) {
 
         out_print(res,
-	  "<td align=\"right\">%.1f%% [%ld&nbsp;objects]</td>",
+          "<td align=\"right\">%.1f%% [%ld&nbsp;objects]</td>",
           s->inf->inode_percent/10.,
-	  s->inf->inode_total);
+          s->inf->inode_total);
 
       } else {
 
         out_print(res,
-	  "<td align=\"right\">not supported by filesystem</td>");
+          "<td align=\"right\">not supported by filesystem</td>");
 
       }
 
@@ -1119,16 +1118,16 @@ static void do_home_file(HttpRequest req, HttpResponse res) {
     if(header) {
       
       out_print(res,
-	"<br><p>&nbsp;</p>"
-	"<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
-	"<tr>"
-	"<td width=\"20%%\"><h3><b>File</b></h3></td>"
-	"<td align=\"left\"><h3><b>Status</b></h3></td>"
-	"<td align=\"right\"><h3><b>Size</b></h3></td>"
-	"<td align=\"right\"><h3><b>Permission</b></h3></td>"
-	"<td align=\"right\"><h3><b>UID</b></h3></td>"
-	"<td align=\"right\"><h3><b>GID</b></h3></td>"
-	"</tr>");
+        "<br><p>&nbsp;</p>"
+        "<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
+        "<tr>"
+        "<td width=\"20%%\"><h3><b>File</b></h3></td>"
+        "<td align=\"left\"><h3><b>Status</b></h3></td>"
+        "<td align=\"right\"><h3><b>Size</b></h3></td>"
+        "<td align=\"right\"><h3><b>Permission</b></h3></td>"
+        "<td align=\"right\"><h3><b>UID</b></h3></td>"
+        "<td align=\"right\"><h3><b>GID</b></h3></td>"
+        "</tr>");
       
       header= FALSE;
       
@@ -1149,22 +1148,22 @@ static void do_home_file(HttpRequest req, HttpResponse res) {
     if(!Util_hasServiceStatus(s)) {
       
       out_print(res,
-	"<td align=\"right\">-</td>"
-	"<td align=\"right\">-</td>"
-	"<td align=\"right\">-</td>"
-	"<td align=\"right\">-</td>");
+        "<td align=\"right\">-</td>"
+        "<td align=\"right\">-</td>"
+        "<td align=\"right\">-</td>"
+        "<td align=\"right\">-</td>");
 
     } else {
       
       out_print(res,
-	"<td align=\"right\">%llu&nbsp;B</td>"
-	"<td align=\"right\">%04o</td>"
-	"<td align=\"right\">%d</td>"
-	"<td align=\"right\">%d</td>",
-	(unsigned long long)s->inf->st_size,
-	s->inf->st_mode & 07777,
-	s->inf->st_uid,
-	s->inf->st_gid);
+        "<td align=\"right\">%llu&nbsp;B</td>"
+        "<td align=\"right\">%04o</td>"
+        "<td align=\"right\">%d</td>"
+        "<td align=\"right\">%d</td>",
+        (unsigned long long)s->inf->st_size,
+        s->inf->st_mode & 07777,
+        s->inf->st_uid,
+        s->inf->st_gid);
 
     }
     
@@ -1195,15 +1194,15 @@ static void do_home_fifo(HttpRequest req, HttpResponse res) {
     if(header) {
       
       out_print(res,
-	"<br><p>&nbsp;</p>"
-	"<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
-	"<tr>"
-	"<td width=\"20%%\"><h3><b>Fifo</b></h3></td>"
-	"<td align=\"left\"><h3><b>Status</b></h3></td>"
-	"<td align=\"right\"><h3><b>Permission</b></h3></td>"
-	"<td align=\"right\"><h3><b>UID</b></h3></td>"
-	"<td align=\"right\"><h3><b>GID</b></h3></td>"
-	"</tr>");
+        "<br><p>&nbsp;</p>"
+        "<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
+        "<tr>"
+        "<td width=\"20%%\"><h3><b>Fifo</b></h3></td>"
+        "<td align=\"left\"><h3><b>Status</b></h3></td>"
+        "<td align=\"right\"><h3><b>Permission</b></h3></td>"
+        "<td align=\"right\"><h3><b>UID</b></h3></td>"
+        "<td align=\"right\"><h3><b>GID</b></h3></td>"
+        "</tr>");
       
       header= FALSE;
       
@@ -1224,19 +1223,19 @@ static void do_home_fifo(HttpRequest req, HttpResponse res) {
     if(!Util_hasServiceStatus(s)) {
       
       out_print(res,
-	"<td align=\"right\">-</td>"
-	"<td align=\"right\">-</td>"
-	"<td align=\"right\">-</td>");
+        "<td align=\"right\">-</td>"
+        "<td align=\"right\">-</td>"
+        "<td align=\"right\">-</td>");
 
     } else {
       
       out_print(res,
-	"<td align=\"right\">%o</td>"
-	"<td align=\"right\">%d</td>"
-	"<td align=\"right\">%d</td>",
-	s->inf->st_mode & 07777,
-	s->inf->st_uid,
-	s->inf->st_gid);
+        "<td align=\"right\">%o</td>"
+        "<td align=\"right\">%d</td>"
+        "<td align=\"right\">%d</td>",
+        s->inf->st_mode & 07777,
+        s->inf->st_uid,
+        s->inf->st_gid);
 
     }
     
@@ -1267,15 +1266,15 @@ static void do_home_directory(HttpRequest req, HttpResponse res) {
     if(header) {
 
       out_print(res,
-	"<br><p>&nbsp;</p>"
-	"<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
-	"<tr>"
-	"<td width=\"20%%\"><h3><b>Directory</b></h3></td>"
-	"<td align=\"left\"><h3><b>Status</b></h3></td>"
-	"<td align=\"right\"><h3><b>Permission</b></h3></td>"
-	"<td align=\"right\"><h3><b>UID</b></h3></td>"
-	"<td align=\"right\"><h3><b>GID</b></h3></td>"
-	"</tr>");
+        "<br><p>&nbsp;</p>"
+        "<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
+        "<tr>"
+        "<td width=\"20%%\"><h3><b>Directory</b></h3></td>"
+        "<td align=\"left\"><h3><b>Status</b></h3></td>"
+        "<td align=\"right\"><h3><b>Permission</b></h3></td>"
+        "<td align=\"right\"><h3><b>UID</b></h3></td>"
+        "<td align=\"right\"><h3><b>GID</b></h3></td>"
+        "</tr>");
       
       header= FALSE;
       
@@ -1296,19 +1295,19 @@ static void do_home_directory(HttpRequest req, HttpResponse res) {
     if(!Util_hasServiceStatus(s)) {
       
       out_print(res,
-	"<td align=\"right\">-</td>"
-	"<td align=\"right\">-</td>"
-	"<td align=\"right\">-</td>");
+        "<td align=\"right\">-</td>"
+        "<td align=\"right\">-</td>"
+        "<td align=\"right\">-</td>");
       
     } else {
       
       out_print(res,
-	"<td align=\"right\">%o</td>"
-	"<td align=\"right\">%d</td>"
-	"<td align=\"right\">%d</td>",
-	s->inf->st_mode & 07777,
-	s->inf->st_uid,
-	s->inf->st_gid);
+        "<td align=\"right\">%o</td>"
+        "<td align=\"right\">%d</td>"
+        "<td align=\"right\">%d</td>",
+        s->inf->st_mode & 07777,
+        s->inf->st_uid,
+        s->inf->st_gid);
       
     }
     
@@ -1341,13 +1340,13 @@ static void do_home_host(HttpRequest req, HttpResponse res) {
     if(header) {
       
       out_print(res,
-	"<br><p>&nbsp;</p>"
-	"<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
-	"<tr>"
-	"<td width=\"20%%\"><h3><b>Host</b></h3></td>"
-	"<td align=\"left\"><h3><b>Status</b></h3></td>"
-	"<td align=\"right\"><h3><b>Protocol(s)</b></h3></td>"
-	"</tr>");
+        "<br><p>&nbsp;</p>"
+        "<table cellspacing=0 cellpadding=3 border=0 width=\"90%%\">"
+        "<tr>"
+        "<td width=\"20%%\"><h3><b>Host</b></h3></td>"
+        "<td align=\"left\"><h3><b>Status</b></h3></td>"
+        "<td align=\"right\"><h3><b>Protocol(s)</b></h3></td>"
+        "</tr>");
       
       header= FALSE;
       
@@ -1377,9 +1376,9 @@ static void do_home_host(HttpRequest req, HttpResponse res) {
 
       if(s->icmplist) {
         for(icmp= s->icmplist; icmp; icmp= icmp->next) {
-	  if(icmp != s->icmplist)
-	    out_print(res, "&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;");
-	  out_print(res, "<font%s>[ICMP %s]</font>",
+          if(icmp != s->icmplist)
+            out_print(res, "&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;");
+          out_print(res, "<font%s>[ICMP %s]</font>",
             (icmp->is_available)?"":" color='#ff0000'",
             icmpnames[icmp->type]);
         }
@@ -1390,9 +1389,9 @@ static void do_home_host(HttpRequest req, HttpResponse res) {
       
       if(s->portlist) {
         for(port= s->portlist; port; port= port->next) {
-	  if(port != s->portlist)
-	    out_print(res, "&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;");
-	  out_print(res, "<font%s>[%s] at port %d</font>",
+          if(port != s->portlist)
+            out_print(res, "&nbsp;&nbsp;<b>|</b>&nbsp;&nbsp;");
+          out_print(res, "<font%s>[%s] at port %d</font>",
             (port->is_available)?"":" color='#ff0000'",
             port->protocol->name, port->port);
         }
@@ -1423,8 +1422,8 @@ static void print_alerts(HttpResponse res, Mail_T s) {
   
   for(r= s; r; r= r->next) {
     out_print(res,
-	      "<tr bgcolor=\"#EFEFEF\"><td>Alert mail to</td>"
-	      "<td>%s</td></tr>", r->to?r->to:"");
+              "<tr bgcolor=\"#EFEFEF\"><td>Alert mail to</td>"
+              "<td>%s</td></tr>", r->to?r->to:"");
     out_print(res, "<tr><td>Alert on</td><td>");
 
     if(r->events == EVENT_NULL) {
@@ -1433,45 +1432,45 @@ static void print_alerts(HttpResponse res, Mail_T s) {
       out_print(res, "All events");
     } else {
       if(IS_EVENT_SET(r->events, EVENT_ACTION))
-	  out_print(res, "Action ");
+          out_print(res, "Action ");
       if(IS_EVENT_SET(r->events, EVENT_CHECKSUM))
-	  out_print(res, "Checksum ");
+          out_print(res, "Checksum ");
       if(IS_EVENT_SET(r->events, EVENT_CONNECTION))
-	  out_print(res, "Connection ");
+          out_print(res, "Connection ");
       if(IS_EVENT_SET(r->events, EVENT_CONTENT))
-	  out_print(res, "Content ");
+          out_print(res, "Content ");
       if(IS_EVENT_SET(r->events, EVENT_DATA))
-	  out_print(res, "Data ");
+          out_print(res, "Data ");
       if(IS_EVENT_SET(r->events, EVENT_EXEC))
-	  out_print(res, "Exec ");
+          out_print(res, "Exec ");
       if(IS_EVENT_SET(r->events, EVENT_FSFLAG))
-	  out_print(res, "Fsflags ");
+          out_print(res, "Fsflags ");
       if(IS_EVENT_SET(r->events, EVENT_GID))
-	  out_print(res, "Gid ");
+          out_print(res, "Gid ");
       if(IS_EVENT_SET(r->events, EVENT_ICMP))
-	  out_print(res, "Icmp ");
+          out_print(res, "Icmp ");
       if(IS_EVENT_SET(r->events, EVENT_INSTANCE))
           out_print(res, "Instance ");
       if(IS_EVENT_SET(r->events, EVENT_INVALID))
-	  out_print(res, "Invalid ");
+          out_print(res, "Invalid ");
       if(IS_EVENT_SET(r->events, EVENT_NONEXIST))
-	  out_print(res, "Nonexist ");
+          out_print(res, "Nonexist ");
       if(IS_EVENT_SET(r->events, EVENT_PERMISSION))
-	  out_print(res, "Permission ");
+          out_print(res, "Permission ");
       if(IS_EVENT_SET(r->events, EVENT_PID))
-	  out_print(res, "PID ");
+          out_print(res, "PID ");
       if(IS_EVENT_SET(r->events, EVENT_PPID))
-	  out_print(res, "PPID ");
+          out_print(res, "PPID ");
       if(IS_EVENT_SET(r->events, EVENT_RESOURCE))
-	  out_print(res, "Resource ");
+          out_print(res, "Resource ");
       if(IS_EVENT_SET(r->events, EVENT_SIZE))
-	  out_print(res, "Size ");
+          out_print(res, "Size ");
       if(IS_EVENT_SET(r->events, EVENT_TIMEOUT))
-	  out_print(res, "Timeout ");
+          out_print(res, "Timeout ");
       if(IS_EVENT_SET(r->events, EVENT_TIMESTAMP))
-	  out_print(res, "Timestamp ");
+          out_print(res, "Timestamp ");
       if(IS_EVENT_SET(r->events, EVENT_UID))
-	  out_print(res, "Uid ");
+          out_print(res, "Uid ");
     }
       
     out_print(res, "</td></tr>");
@@ -1503,31 +1502,31 @@ static void print_buttons(HttpRequest req, HttpResponse res, Service_T s) {
   /* Start program */
   if(s->start)
       out_print(res, 
-		"<td><form method=POST action=%s>"
-		"<input type=hidden value='start' name=action>"
-		"<input type=submit value='Start service' style='font-size: "
-		"12pt'></form></td>", svc);
+                "<td><form method=POST action=%s>"
+                "<input type=hidden value='start' name=action>"
+                "<input type=submit value='Start service' style='font-size: "
+                "12pt'></form></td>", svc);
   /* Stop program */
   if(s->stop)
       out_print(res, 
-		"<td><form method=POST action=%s>"
-		"<input type=hidden value='stop' name=action>"
-		"<input type=submit value='Stop service' style='font-size: "
-		"12pt'></form></td>", svc);
+                "<td><form method=POST action=%s>"
+                "<input type=hidden value='stop' name=action>"
+                "<input type=submit value='Stop service' style='font-size: "
+                "12pt'></form></td>", svc);
   /* Restart program */
   if(s->start && s->stop)
       out_print(res, 
-		"<td><form method=POST action=%s>"
-		"<input type=hidden value='restart' name=action>"
-		"<input type=submit value='Restart service' style='font-size: "
-		"12pt'></form></td>", svc);
+                "<td><form method=POST action=%s>"
+                "<input type=hidden value='restart' name=action>"
+                "<input type=submit value='Restart service' style='font-size: "
+                "12pt'></form></td>", svc);
   /* (un)monitor */
   out_print(res, 
-	    "<td><form method=POST action=%s>"
-	    "<input type=hidden value='%s' name=action>"
-	    "<input type=submit value='%s' style='font-size: 12pt'>"
-	    "</form></td></tr></table>",
-	    svc,
+            "<td><form method=POST action=%s>"
+            "<input type=hidden value='%s' name=action>"
+            "<input type=submit value='%s' style='font-size: 12pt'>"
+            "</form></td></tr></table>",
+            svc,
             s->monitor?"unmonitor":"monitor",
             s->monitor?"Disable monitoring":"Enable monitoring");
 
@@ -1536,42 +1535,26 @@ static void print_buttons(HttpRequest req, HttpResponse res, Service_T s) {
 
 
 static void print_service_rules_port(HttpResponse res, Service_T s) {
-
   if(s->portlist) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     Port_T        p;
     EventAction_T a;
-
     for(p= s->portlist; p; p= p->next) {
       a= p->action;
-
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
       if(p->family == AF_INET) {
-        out_print(res,
-          "<tr><td>Port</td><td>"
-          "If failed %s:%d%s [%s via %s] with timeout %d seconds %s then %s "
-          "else if succeeded %s then %s</td></tr>",
-          p->hostname, p->port, p->request?p->request:"",
-          p->protocol->name, Util_portTypeDescription(p),
-          p->timeout,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        out_print(res, "<tr><td>Port</td><td>If failed %s:%d%s [%s via %s] with timeout %d seconds %s ", p->hostname, p->port, p->request ? p->request : "", p->protocol->name, Util_portTypeDescription(p), p->timeout, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        out_print(res, "then %s</td></tr>", Util_describeAction(a->succeeded, buf, sizeof(buf)));
         if(p->SSL.certmd5 != NULL)
           out_print(res,
             "<tr><td>Server certificate md5 sum</td><td>%s</td></tr>",
             p->SSL.certmd5);
       } else if(p->family == AF_UNIX) {
-        out_print(res,
-          "<tr><td>Unix Socket</td><td>"
-          "If failed %s [%s] with timeout %ds %s then %s else if succeeded %s then %s"
-          "</td></tr>",
-          p->pathname, p->protocol->name, p->timeout,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        out_print(res, "<tr><td>Unix Socket</td><td>If failed %s [%s] with timeout %ds %s ", p->pathname, p->protocol->name, p->timeout, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        out_print(res, "then %s</td></tr>", Util_describeAction(a->succeeded, buf, sizeof(buf)));
       }
     }
   }
@@ -1579,144 +1562,89 @@ static void print_service_rules_port(HttpResponse res, Service_T s) {
 
 
 static void print_service_rules_icmp(HttpResponse res, Service_T s) {
-
   if(s->icmplist) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     Icmp_T        i;
     EventAction_T a;
-
     for(i= s->icmplist; i; i= i->next) {
       a= i->action;
-      
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
-      out_print(res,
-        "<tr><td>ICMP</td><td>"
-        "If failed %s count %d with timeout %d seconds %s then %s else if succeeded %s then %s"
-        "</td></tr>",
-        icmpnames[i->type], i->count, i->timeout,
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
+      out_print(res, "<tr><td>ICMP</td><td>If failed %s count %d with timeout %d seconds %s ", icmpnames[i->type], i->count, i->timeout, Util_getEventratio(a->failed, buf, sizeof(buf)));
+      out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+      out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+      out_print(res, "then %s</td></tr>", Util_describeAction(a->succeeded, buf, sizeof(buf)));
     }
   }
 }
 
 
 static void print_service_rules_perm(HttpResponse res, Service_T s) {
-
   if(s->perm) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     EventAction_T a= s->perm->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    out_print(res, "<tr><td>Associated permission</td>"
-      "<td>If failed %o %s then %s else if succeeded %s then %s</td></tr>",
-      s->perm->perm,
-      ratio1, a->failed->description,
-      ratio2, a->succeeded->description);
-
+    out_print(res, "<tr><td>Associated permission</td><td>If failed %o %s ", s->perm->perm, Util_getEventratio(a->failed, buf, sizeof(buf)));
+    out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+    out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+    out_print(res, "then %s</td></tr>", Util_describeAction(a->succeeded, buf, sizeof(buf)));
   }
 }
 
 
 static void print_service_rules_uid(HttpResponse res, Service_T s) {
-
   if(s->uid) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     EventAction_T a= s->uid->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    out_print(res, "<tr><td>Associated UID</td>"
-      "<td>If failed %d %s then %s else if succeeded %s then %s</td></tr>",
-      (int)s->uid->uid,
-      ratio1, a->failed->description,
-      ratio2, a->succeeded->description);
+    out_print(res, "<tr><td>Associated UID</td><td>If failed %d %s ", (int)s->uid->uid, Util_getEventratio(a->failed, buf, sizeof(buf)));
+    out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+    out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+    out_print(res, "then %s</td></tr>", Util_describeAction(a->succeeded, buf, sizeof(buf)));
   }
 }
 
 
 static void print_service_rules_gid(HttpResponse res, Service_T s) {
-
   if(s->gid) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     EventAction_T a= s->gid->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
-    out_print(res, "<tr><td>Associated GID</td>"
-      "<td>If failed %d %s then %s else if succeeded %s then %s</td></tr>",
-      (int)s->gid->gid,
-      ratio1, a->failed->description,
-      ratio2, a->succeeded->description);
+    out_print(res, "<tr><td>Associated GID</td><td>If failed %d %s ", (int)s->gid->gid, Util_getEventratio(a->failed, buf, sizeof(buf)));
+    out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+    out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+    out_print(res, "then %s</td></tr>", Util_describeAction(a->succeeded, buf, sizeof(buf)));
   }
 }
 
 
 static void print_service_rules_timestamp(HttpResponse res, Service_T s) {
-
   if(s->timestamplist) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     Timestamp_T   t;
     EventAction_T a;
-
     for(t= s->timestamplist; t; t= t->next) {
-
       a= t->action;
-
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
+      out_print(res, "<tr><td>Associated timestamp</td><td>");
       if(t->test_changes) {
-
-        out_print(res,
-          "<tr><td>Associated timestamp</td><td>If changed %s then %s</td></tr>",
-          ratio1, a->failed->description);
-
+        out_print(res, "If changed %s ", Util_getEventratio(a->failed, buf, sizeof(buf)));
+        out_print(res, "then %s", Util_describeAction(a->failed, buf, sizeof(buf)));
       } else {
-
-        out_print(res,
-          "<tr><td>Associated timestamp</td>"
-          "<td>If %s %d second(s) %s then %s else if succeeded %s then %s</td></tr>",
-          operatornames[t->operator], t->time,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        out_print(res, "If %s %d second(s) %s ", operatornames[t->operator], t->time, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
       }
+      out_print(res, "</td></tr>");
     }
   }
 }
 
 
 static void print_service_rules_filesystem(HttpResponse res, Service_T s) {
+  char buf[STRLEN];
 
   if(s->type == TYPE_FILESYSTEM) {
-
-    char ratio1[STRLEN];
-
-    out_print(res, "<tr><td>Filesystem flags</td><td>If changed %s then %s</td></tr>\n",
-      Util_getEventratio(s->action_FSFLAG->failed, ratio1),
-      s->action_FSFLAG->failed->description);
+    out_print(res, "<tr><td>Filesystem flags</td><td>If changed %s ", Util_getEventratio(s->action_FSFLAG->failed, buf, sizeof(buf)));
+    out_print(res, "then %s</td></tr>", Util_describeAction(s->action_FSFLAG->failed, buf, sizeof(buf)));
   }
 
   if(s->filesystemlist) {
-      
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
     Filesystem_T  dl;
     EventAction_T a;
 
@@ -1724,48 +1652,34 @@ static void print_service_rules_filesystem(HttpResponse res, Service_T s) {
 
       a= dl->action;
 
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
       if(dl->resource == RESOURCE_ID_INODE) {
-	  
+        out_print(res, "<tr><td>Inodes usage limit</td><td>");
         if(dl->limit_absolute > -1) {
-          out_print(res,
-	    "<tr><td>Inodes usage limit</td><td>If %s %ld %s "
-	    "then %s else if succeeded %s then %s</td></tr>",
-	    operatornames[dl->operator],
-	    dl->limit_absolute,
-            ratio1, a->failed->description,
-            ratio2, a->succeeded->description);
+          out_print(res, "If %s %ld %s ", operatornames[dl->operator], dl->limit_absolute, Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
         } else {
-          out_print(res,
-	    "<tr><td>Inodes usage limit</td><td>If %s %.1f%% %s "
-	    "then %s else if succeeded %s then %s</td></tr>",
-	    operatornames[dl->operator],
-	    dl->limit_percent/10.,
-            ratio1, a->failed->description,
-            ratio2, a->succeeded->description);
+          out_print(res, "If %s %.1f%% %s ", operatornames[dl->operator], dl->limit_percent / 10., Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
         }
-	  
+        out_print(res, "</td></tr>");
       } else if(dl->resource == RESOURCE_ID_SPACE) {
-	  
+        out_print(res, "<tr><td>Space usage limit</td><td>");
         if(dl->limit_absolute > -1) {
-          out_print(res,
-	    "<tr><td>Space usage limit</td><td>If %s %ld blocks %s "
-	    "then %s else if succeeded %s then %s</td></tr>",
-            operatornames[dl->operator],
-	    dl->limit_absolute,
-            ratio1, a->failed->description,
-            ratio2, a->succeeded->description);
+          out_print(res, "If %s %ld blocks %s ", operatornames[dl->operator], dl->limit_absolute, Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
         } else {
-          out_print(res,
-	    "<tr><td>Space usage limit</td><td>If %s %.1f%% %s "
-	    "then %s else if succeeded %s then %s</td></tr>",
-            operatornames[dl->operator],
-	    dl->limit_percent/10.,
-            ratio1, a->failed->description,
-            ratio2, a->succeeded->description);
+          out_print(res, "If %s %.1f%% %s ", operatornames[dl->operator], dl->limit_percent / 10., Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
         }
+        out_print(res, "</td></tr>");
       }
     }
   }
@@ -1773,296 +1687,185 @@ static void print_service_rules_filesystem(HttpResponse res, Service_T s) {
       
 
 static void print_service_rules_size(HttpResponse res, Service_T s) {
-
   if(s->sizelist) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     Size_T        sl;
     EventAction_T a;
 
     for(sl= s->sizelist; sl; sl= sl->next) {
-
       a= sl->action;
-
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
+      out_print(res, "<tr><td>Associated size</td><td>");
       if(sl->test_changes) {
-
-        out_print(res,
-          "<tr><td>Associated size</td><td>If changed %s then %s</td></tr>",
-          ratio1, a->failed->description);
-
+        out_print(res, "If changed %s ", Util_getEventratio(a->failed, buf, sizeof(buf)));
+        out_print(res, "then %s", Util_describeAction(a->failed, buf, sizeof(buf)));
       } else {
-
-        out_print(res,
-          "<tr><td>Associated size</td>"
-          "<td>If %s %llu byte(s) %s then %s else if succeeded %s then %s</td></tr>",
-          operatornames[sl->operator], sl->size,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-
+        out_print(res, "If %s %llu byte(s) %s ", operatornames[sl->operator], sl->size, Util_getEventratio(a->failed, buf, sizeof(buf)));
+        out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+        out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+        out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
       }
+      out_print(res, "</td></tr>");
     }
   }
 }
 
 static void print_service_rules_match(HttpResponse res, Service_T s) {
-
   if(s->matchlist && s->type != TYPE_PROCESS) {
-    char          ratio1[STRLEN];
+    char buf[STRLEN];
     Match_T       ml;
     EventAction_T a;
-
     for(ml= s->matchlist; ml; ml= ml->next) {
-
       a= ml->action;
-
-      Util_getEventratio(a->failed, ratio1);
-
-      out_print(res,
-                "<tr><td>Associated regex</td><td>If %s match "
-                "\"%s\" %s then %s</td></tr>",
-                ml->not?"not ":"", ml->match_string,
-                ratio1, a->failed->description);
-      
+      out_print(res, "<tr><td>Associated regex</td><td>If If %smatch \"%s\" %s ", ml->not ? "not " : "", ml->match_string, Util_getEventratio(a->failed, buf, sizeof(buf)));
+      out_print(res, "then %s</td></tr>", Util_describeAction(a->failed, buf, sizeof(buf)));
     }
   }
 }
 
 
 static void print_service_rules_checksum(HttpResponse res, Service_T s) {
-
   if(s->checksum) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     Checksum_T     cs= s->checksum;
     EventAction_T  a= cs->action;
-
-    Util_getEventratio(a->failed, ratio1);
-    Util_getEventratio(a->succeeded, ratio2);
-
+    out_print(res, "<tr><td>Associated regex</td><td>");
     if(cs->test_changes) {
-
-      out_print(res,
-        "<tr><td>Associated checksum</td><td>if changed %s %s then %s</td></tr>",
-        checksumnames[cs->type],
-        ratio1, a->failed->description);
-
+      out_print(res, "If changed %s %s ", checksumnames[cs->type], Util_getEventratio(a->failed, buf, sizeof(buf)));
+      out_print(res, "then %s", Util_describeAction(a->failed, buf, sizeof(buf)));
     } else {
-
-      out_print(res, "<tr><td>Associated checksum</td><td>"
-        "if failed %s(%s) %s then %s else if succeeded %s then %s</td></tr>",
-        cs->hash, checksumnames[cs->type],
-        ratio1, a->failed->description,
-        ratio2, a->succeeded->description);
-
+      out_print(res, "If failed %s(%s) %s ", cs->hash, checksumnames[cs->type], Util_getEventratio(a->failed, buf, sizeof(buf)));
+      out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+      out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+      out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
     }
+    out_print(res, "</td></tr>");
   }
 }
   
 
 static void print_service_rules_process(HttpResponse res, Service_T s) {
-
   if(s->type == TYPE_PROCESS) {
-
-    char ratio1[STRLEN];
-
-    out_print(res, "<tr><td>Pid</td><td>If changed %s then %s</td></tr>\n",
-      Util_getEventratio(s->action_PID->failed, ratio1),
-      s->action_PID->failed->description);
-    out_print(res, "<tr><td>Ppid</td><td>If changed %s then %s</td></tr>\n",
-      Util_getEventratio(s->action_PPID->failed, ratio1),
-      s->action_PPID->failed->description);
+    char buf[STRLEN];
+    out_print(res, "<tr><td>Pid</td><td>If changed %s ", Util_getEventratio(s->action_PID->failed, buf, sizeof(buf)));
+    out_print(res, "then %s</td></tr>", Util_describeAction(s->action_PID->failed, buf, sizeof(buf)));
+    out_print(res, "<tr><td>Ppid</td><td>If changed %s ", Util_getEventratio(s->action_PPID->failed, buf, sizeof(buf)));
+    out_print(res, "then %s</td></tr>", Util_describeAction(s->action_PPID->failed, buf, sizeof(buf)));
   }
 }
 
 
 static void print_service_rules_resource(HttpResponse res, Service_T s) {
-
   if(s->resourcelist) {
-
-    char          ratio1[STRLEN];
-    char          ratio2[STRLEN];
+    char buf[STRLEN];
     Resource_T    q;
     EventAction_T a;
     
     for (q= s->resourcelist; q; q= q->next) {
-
       a= q->action;
-
-      Util_getEventratio(a->failed, ratio1);
-      Util_getEventratio(a->succeeded, ratio2);
-
+      out_print(res, "<tr><td>");
       switch (q->resource_id) {
-	
-      case RESOURCE_ID_CPU_PERCENT: 
-	  
-	out_print(res,"<tr><td>CPU usage limit</td>"
-	  "<td>If %s %.1f%% %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_TOTAL_CPU_PERCENT: 
-	  
-	out_print(res,"<tr><td>CPU usage limit (incl. children)</td>"
-	  "<td>If %s %.1f%% %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_CPUUSER: 
-	  
-	out_print(res,"<tr><td>CPU user limit</td>"
-	  "<td>If %s %.1f%% %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_CPUSYSTEM: 
-	  
-	out_print(res,"<tr><td>CPU system limit</td>"
-	  "<td>If %s %.1f%% %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_CPUWAIT: 
-	  
-	out_print(res,"<tr><td>CPU wait limit</td>"
-	  "<td>If %s %.1f%% %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_MEM_PERCENT: 
-	  
-	out_print(res,"<tr><td>Memory usage limit</td>"
-	  "<td>If %s %.1f%% %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_MEM_KBYTE: 
-	  
-	out_print(res,"<tr><td>Memory amount limit</td>"
-	  "<td>If %s %ld %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
+        case RESOURCE_ID_CPU_PERCENT: 
+          out_print(res, "CPU usage limit");
+          break;
+          
+        case RESOURCE_ID_TOTAL_CPU_PERCENT: 
+          out_print(res, "CPU usage limit (incl. children)");
+          break;
+          
+        case RESOURCE_ID_CPUUSER: 
+          out_print(res, "CPU user limit");
+          break;
+          
+        case RESOURCE_ID_CPUSYSTEM: 
+          out_print(res, "CPU system limit");
+          break;
+          
+        case RESOURCE_ID_CPUWAIT: 
+          out_print(res, "CPU wait limit");
+          break;
+          
+        case RESOURCE_ID_MEM_PERCENT: 
+          out_print(res, "Memory usage limit");
+          break;
+          
+        case RESOURCE_ID_MEM_KBYTE: 
+          out_print(res, "Memory amount limit");
+          break;
 
-      case RESOURCE_ID_SWAP_PERCENT: 
-	  
-	out_print(res,"<tr><td>Swap usage limit</td>"
-	  "<td>If %s %.1f%% %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_SWAP_KBYTE: 
-	  
-	out_print(res,"<tr><td>Swap amount limit</td>"
-	  "<td>If %s %ld %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_LOAD1: 
-	  
-	out_print(res,"<tr><td>Load average (1min)</td>"
-	  "<td>If %s %.1f %s then %s "
-          "else if succeeded %s then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_LOAD5: 
-	  
-	out_print(res,"<tr><td>Load average (5min)</td>"
-	  "<td>If %s %.1f %s then %s else if succeeded %s "
-          "then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_LOAD15: 
+        case RESOURCE_ID_SWAP_PERCENT: 
+          out_print(res, "Swap usage limit");
+          break;
+          
+        case RESOURCE_ID_SWAP_KBYTE: 
+          out_print(res, "Swap amount limit");
+          break;
+          
+        case RESOURCE_ID_LOAD1: 
+          out_print(res, "Load average (1min)");
+          break;
+          
+        case RESOURCE_ID_LOAD5: 
+          out_print(res, "Load average (5min)");
+          break;
+          
+        case RESOURCE_ID_LOAD15: 
+          out_print(res, "Load average (15min)");
+          break;
+          
+        case RESOURCE_ID_CHILDREN:
+          out_print(res, "Children");
+          break;
+          
+        case RESOURCE_ID_TOTAL_MEM_KBYTE:
+          out_print(res, "Memory amount limit (incl. children)");
+          break;
+          
+        case RESOURCE_ID_TOTAL_MEM_PERCENT:
+          out_print(res, "Memory usage limit (incl. children)");
+          break;
+      }
+      out_print(res, "</td><td>");
+      switch (q->resource_id) {
+        case RESOURCE_ID_CPU_PERCENT: 
+        case RESOURCE_ID_TOTAL_CPU_PERCENT:
+        case RESOURCE_ID_TOTAL_MEM_PERCENT:
+        case RESOURCE_ID_CPUUSER:
+        case RESOURCE_ID_CPUSYSTEM:
+        case RESOURCE_ID_CPUWAIT:
+        case RESOURCE_ID_MEM_PERCENT:
+        case RESOURCE_ID_SWAP_PERCENT:
+          out_print(res, "If %s %.1f%% %s ", operatornames[q->operator], q->limit / 10., Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+          break;
 
-	out_print(res,"<tr><td>Load average (15min)</td>"
-	  "<td>If %s %.1f %s then %s else if succeeded %s "
-          "then %s</td></tr>", 
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_CHILDREN:
+        case RESOURCE_ID_MEM_KBYTE:
+        case RESOURCE_ID_SWAP_KBYTE:
+          out_print(res, "If %s %ldkB %s ", operatornames[q->operator], q->limit, Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+          break;
 
-	out_print(res,"<tr><td>Children</td>"
-	  "<td>If %s %d %s then %s else if succeeded %s "
-          "then %s</td></tr>",
-	  operatornames[q->operator],
-	  q->limit,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_TOTAL_MEM_KBYTE:
+        case RESOURCE_ID_LOAD1:
+        case RESOURCE_ID_LOAD5:
+        case RESOURCE_ID_LOAD15:
+          out_print(res, "If %s %.1f %s ", operatornames[q->operator], q->limit / 10.0, Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+          break;
 
-	out_print(res,"<tr><td>Memory amount limit (incl. children)</td>"
-	  "<td>If %s %d %s then %s else if succeeded %s then %s"
-          "</td></tr>",
-	  operatornames[q->operator],
-	  q->limit,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      case RESOURCE_ID_TOTAL_MEM_PERCENT:
-
-	out_print(res,"<tr><td>Memory usage limit (incl. children)</td>"
-	  "<td>If %s %.1f%% %s then %s else if succeeded %s then %s"
-          "</td></tr>",
-	  operatornames[q->operator],
-	  q->limit/10.0,
-          ratio1, a->failed->description,
-          ratio2, a->succeeded->description);
-	break;
-	  
-      }    
+        case RESOURCE_ID_CHILDREN:
+        case RESOURCE_ID_TOTAL_MEM_KBYTE:
+          out_print(res, "If %s %ld %s ", operatornames[q->operator], q->limit, Util_getEventratio(a->failed, buf, sizeof(buf)));
+          out_print(res, "then %s ", Util_describeAction(a->failed, buf, sizeof(buf)));
+          out_print(res, "else if succeeded %s ", Util_getEventratio(a->succeeded, buf, sizeof(buf)));
+          out_print(res, "then %s", Util_describeAction(a->succeeded, buf, sizeof(buf)));
+          break;
+      }
+      out_print(res, "</td></tr>");
     }
   }
 }
@@ -2541,12 +2344,12 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
     char time[STRLEN];
 
     out_print(res,
-	    "%s '%s'\n"
-	    "  %-33s %s\n"
-	    "  %-33s %s\n",
-	    servicetypes[s->type], s->name,
-	    "status", status,
-	    "monitoring status", monitornames[s->monitor]);
+            "%s '%s'\n"
+            "  %-33s %s\n"
+            "  %-33s %s\n",
+            servicetypes[s->type], s->name,
+            "status", status,
+            "monitoring status", monitornames[s->monitor]);
 
     if(Util_hasServiceStatus(s)) {
       if(s->type == TYPE_FILE ||
@@ -2554,124 +2357,124 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
          s->type == TYPE_DIRECTORY || 
          s->type == TYPE_FILESYSTEM) {
         out_print(res,
-  		"  %-33s %o\n"
-  		"  %-33s %d\n"
-  		"  %-33s %d\n",
-  		"permission", s->inf->st_mode & 07777,
-  		"uid", (int)s->inf->st_uid,
-  		"gid", (int)s->inf->st_gid);
+                  "  %-33s %o\n"
+                  "  %-33s %d\n"
+                  "  %-33s %d\n",
+                  "permission", s->inf->st_mode & 07777,
+                  "uid", (int)s->inf->st_uid,
+                  "gid", (int)s->inf->st_gid);
       }
       if(s->type == TYPE_FILE ||
          s->type == TYPE_FIFO || 
          s->type == TYPE_DIRECTORY) {
         ctime_r((const time_t *)&s->inf->timestamp, time);
         out_print(res,
-  		"  %-33s %s",
-  		"timestamp", time);
+                  "  %-33s %s",
+                  "timestamp", time);
       }
       if(s->type == TYPE_FILE) {
         out_print(res,
-  		"  %-33s %llu B\n",
-  		"size", (unsigned long long) s->inf->st_size);
+                  "  %-33s %llu B\n",
+                  "size", (unsigned long long) s->inf->st_size);
         if(s->checksum) {
-  	out_print(res,
-  		  "  %-33s %s(%s)\n",
-  		  "checksum", s->inf->cs_sum, 
-  		  checksumnames[s->checksum->type]);
+          out_print(res,
+                    "  %-33s %s(%s)\n",
+                    "checksum", s->inf->cs_sum, 
+                    checksumnames[s->checksum->type]);
         }
       }
       if(s->type == TYPE_FILESYSTEM) {
         out_print(res,
-  		"  %-33s %#lx\n"
-  		"  %-33s %ld B\n"
-  		"  %-33s %ld [%.1f MB]\n"
-  		"  %-33s %ld [%.1f MB] [%.1f%%]\n"
-  		"  %-33s %ld [%.1f MB] [%.1f%%]\n",
-  		"filesystem flags",
-  		s->inf->flags,
-  		"block size",
-  		s->inf->f_bsize,
-  		"blocks total",
-  		s->inf->f_blocks,
-  		((float)s->inf->f_blocks/(float)1048576*
-  		 (float)s->inf->f_bsize),
-  		"blocks free for non superuser",
-  		s->inf->f_blocksfree,
-  		((float)s->inf->f_blocksfree/(float)1048576*
-  		 (float)s->inf->f_bsize),
-  		((float)100*(float)s->inf->f_blocksfree/
-  		 (float)s->inf->f_blocks),
-  		"blocks free total",
-  		s->inf->f_blocksfreetotal,
-  		((float)s->inf->f_blocksfreetotal/(float)1048576*
-  		 (float)s->inf->f_bsize),
-  		((float)100*(float)s->inf->f_blocksfreetotal/
-  		 (float)s->inf->f_blocks));
+                  "  %-33s %#lx\n"
+                  "  %-33s %ld B\n"
+                  "  %-33s %ld [%.1f MB]\n"
+                  "  %-33s %ld [%.1f MB] [%.1f%%]\n"
+                  "  %-33s %ld [%.1f MB] [%.1f%%]\n",
+                  "filesystem flags",
+                  s->inf->flags,
+                  "block size",
+                  s->inf->f_bsize,
+                  "blocks total",
+                  s->inf->f_blocks,
+                  ((float)s->inf->f_blocks/(float)1048576*
+                   (float)s->inf->f_bsize),
+                  "blocks free for non superuser",
+                  s->inf->f_blocksfree,
+                  ((float)s->inf->f_blocksfree/(float)1048576*
+                   (float)s->inf->f_bsize),
+                  ((float)100*(float)s->inf->f_blocksfree/
+                   (float)s->inf->f_blocks),
+                  "blocks free total",
+                  s->inf->f_blocksfreetotal,
+                  ((float)s->inf->f_blocksfreetotal/(float)1048576*
+                   (float)s->inf->f_bsize),
+                  ((float)100*(float)s->inf->f_blocksfreetotal/
+                   (float)s->inf->f_blocks));
         if(s->inf->f_files > 0) {
-  	out_print(res,
-  		  "  %-33s %ld\n"
-  		  "  %-33s %ld [%.1f%%]\n",
-  		  "inodes total",
-  		  s->inf->f_files,
-  		  "inodes free",
-  		  s->inf->f_filesfree,
-  		  ((float)100*(float)s->inf->f_filesfree/
-  		   (float)s->inf->f_files));
+          out_print(res,
+                    "  %-33s %ld\n"
+                    "  %-33s %ld [%.1f%%]\n",
+                    "inodes total",
+                    s->inf->f_files,
+                    "inodes free",
+                    s->inf->f_filesfree,
+                    ((float)100*(float)s->inf->f_filesfree/
+                     (float)s->inf->f_files));
         }
       }
       if(s->type == TYPE_PROCESS) {
         char *uptime= Util_getUptime(s->inf->uptime, " ");
         out_print(res,
-  		"  %-33s %d\n"
-  		"  %-33s %d\n"
-  		"  %-33s %s\n",
-    		"pid", s->inf->pid,
-  		"parent pid", s->inf->ppid,
-  		"uptime", uptime);
+                  "  %-33s %d\n"
+                  "  %-33s %d\n"
+                  "  %-33s %s\n",
+                    "pid", s->inf->pid,
+                  "parent pid", s->inf->ppid,
+                  "uptime", uptime);
         FREE(uptime);
-        if(Run.doprocess)	{
-  	out_print(res,
-  		  "  %-33s %d\n"
-  		  "  %-33s %ld\n"
-  		  "  %-33s %ld\n"
-  		  "  %-33s %.1f%%\n"
-		  "  %-33s %.1f%%\n"
-		  "  %-33s %.1f%%\n"
-		  "  %-33s %.1f%%\n",
-		  "children", s->inf->children,
-		  "memory kilobytes", s->inf->mem_kbyte,
-		  "memory kilobytes total", s->inf->total_mem_kbyte,
-		  "memory percent", s->inf->mem_percent/10.0,
-		  "memory percent total", s->inf->total_mem_percent/10.0,
-		  "cpu percent", s->inf->cpu_percent/10.0,
-  		  "cpu percent total", s->inf->total_cpu_percent/10.0);
+        if(Run.doprocess)        {
+          out_print(res,
+                    "  %-33s %d\n"
+                    "  %-33s %ld\n"
+                    "  %-33s %ld\n"
+                    "  %-33s %.1f%%\n"
+                  "  %-33s %.1f%%\n"
+                  "  %-33s %.1f%%\n"
+                  "  %-33s %.1f%%\n",
+                  "children", s->inf->children,
+                  "memory kilobytes", s->inf->mem_kbyte,
+                  "memory kilobytes total", s->inf->total_mem_kbyte,
+                  "memory percent", s->inf->mem_percent/10.0,
+                  "memory percent total", s->inf->total_mem_percent/10.0,
+                  "cpu percent", s->inf->cpu_percent/10.0,
+                    "cpu percent total", s->inf->total_cpu_percent/10.0);
         }
       }
       if(s->type == TYPE_HOST && s->icmplist) {
         Icmp_T i;
         for(i= s->icmplist; i; i= i->next) {
-  	out_print(res,
-  		  "  %-33s %.3fs [%s]\n",
-  		  "icmp response time", i->is_available?i->response:-1.,
-  		  icmpnames[i->type]);
+          out_print(res,
+                    "  %-33s %.3fs [%s]\n",
+                    "icmp response time", i->is_available?i->response:-1.,
+                    icmpnames[i->type]);
         }
       }
       if((s->type == TYPE_HOST || s->type == TYPE_PROCESS) && s-> portlist) {
         Port_T p;
         for(p= s->portlist; p; p= p->next) {
-  	if(p->family == AF_INET) {
-  	  out_print(res,
-  		    "  %-33s %.3fs to %s:%d%s [%s via %s]\n",
-  		    "port response time", p->is_available?p->response:-1., 
-  		    p->hostname,
-		    p->port, p->request?p->request:"", p->protocol->name,
+          if(p->family == AF_INET) {
+            out_print(res,
+                      "  %-33s %.3fs to %s:%d%s [%s via %s]\n",
+                      "port response time", p->is_available?p->response:-1., 
+                      p->hostname,
+                    p->port, p->request?p->request:"", p->protocol->name,
                     Util_portTypeDescription(p));
-  	} else if(p->family == AF_UNIX) {
-  	  out_print(res,
-  		    "  %-33s %.3fs to %s [%s]\n",
-  		    "unix socket response time", p->is_available?p->response:-1.,
-  		    p->pathname, p->protocol->name);
-  	}
+          } else if(p->family == AF_UNIX) {
+            out_print(res,
+                      "  %-33s %.3fs to %s [%s]\n",
+                      "unix socket response time", p->is_available?p->response:-1.,
+                      p->pathname, p->protocol->name);
+          }
         }
       }
       if(s->type == TYPE_SYSTEM && Run.doprocess) {

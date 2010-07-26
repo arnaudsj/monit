@@ -306,7 +306,6 @@ typedef struct myaction {
     Command_T exec;                    /**< Optional command to be executed  */
     unsigned  count;           /**< Event count needed to trigger the action */
     unsigned  cycles;    /**< Cycles during which count limit can be reached */
-    char description[PATH_MAX];               /**< Action description buffer */
 } *Action_T;
 
 
