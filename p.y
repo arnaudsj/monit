@@ -1618,7 +1618,7 @@ match           : IF matchflagnot MATCH PATH rate1 THEN action1 {
                 | IF matchflagnot MATCH STRING rate1 THEN action1 {
                     matchset.ignore = FALSE;
                     matchset.match_path = NULL;
-                    matchset.match_string = xstrdup($4);
+                    matchset.match_string = $4;
                     addmatch(&matchset, $<number>7, 0);
                   }
                 | IGNORE matchflagnot MATCH PATH {
@@ -1631,7 +1631,7 @@ match           : IF matchflagnot MATCH PATH rate1 THEN action1 {
                 | IGNORE matchflagnot MATCH STRING {
                     matchset.ignore = TRUE;
                     matchset.match_path = NULL;
-                    matchset.match_string = xstrdup($4);
+                    matchset.match_string = $4;
                     addmatch(&matchset, ACTION_IGNORE, 0);
                   }
                 ;
