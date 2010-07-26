@@ -90,6 +90,9 @@ BUGFIXES:
 
 * Fixed RADIUS procol test. Thanks to Alan DeKok for patch.
 
+* Fixed MONIT_DESCRIPTION environment variable. Thanks to Marco Roeland for
+  patch.
+
 * Fixed system load average monitoring on AIX
 
 * Fixed compilation on AIX 6.1

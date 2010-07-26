@@ -114,7 +114,7 @@ typedef struct En {
 static void put_monit_environment(Environment_T e);
 static void free_monit_environment(Environment_T *e);
 static void push_monit_environment(const char *env, Environment_T *list);
-static void set_monit_environment(Service_T s, const char *event, Environment_T *e);
+static void set_monit_environment(Service_T s, Command_T C, Event_T event, Environment_T *e);
 
 
 /* ------------------------------------------------------------------ Public */
@@ -125,11 +125,9 @@ static void set_monit_environment(Service_T s, const char *event, Environment_T 
  * thread in control.c should notice this and send an alert message.
  * @param P A Service object
  * @param C A Command object
- * @param E An optional event string, specifying why this function was
- * called. May be NULL.
+ * @param E An optional event object. May be NULL.
  */
-void spawn(Service_T S, Command_T C, const char *E) {
-
+void spawn(Service_T S, Command_T C, Event_T E) {
   pid_t pid;
   sigset_t mask;
   sigset_t save;
@@ -152,7 +150,7 @@ void spawn(Service_T S, Command_T C, const char *E) {
   sigaddset(&mask, SIGCHLD);
   pthread_sigmask(SIG_BLOCK, &mask, &save);
 
-  set_monit_environment(S, E, &environment);
+  set_monit_environment(S, C, E, &environment);
 
   pid= fork();
   if(pid < 0) {
@@ -259,10 +257,7 @@ void spawn(Service_T S, Command_T C, const char *E) {
  * Setup the environment with special MONIT_xxx variables. The program
  * executed may use such variable for various purposes.
  */
-static void set_monit_environment(Service_T s, 
-				  const char *event, 
-				  Environment_T *e) {
-  
+static void set_monit_environment(Service_T s, Command_T C, Event_T event, Environment_T *e) {
   char buf[STRLEN];
   char date[STRLEN];
   
@@ -277,13 +272,11 @@ static void set_monit_environment(Service_T s,
   snprintf(buf, STRLEN, "MONIT_HOST=%s", Run.localhostname);
   push_monit_environment(buf, e);
 
-  snprintf(buf, STRLEN, "MONIT_EVENT=%s", event?event:"No Event");
+  snprintf(buf, STRLEN, "MONIT_EVENT=%s", event ? Event_get_description(event) : C == s->start ? "Started" : C == s->stop ? "Stopped" : "No Event");
   push_monit_environment(buf, e);
   
-  if (s->eventlist) {
-    snprintf(buf, STRLEN, "MONIT_DESCRIPTION=%s", s->eventlist->message);
-    push_monit_environment(buf, e);
-  }
+  snprintf(buf, STRLEN, "MONIT_DESCRIPTION=%s", event ? Event_get_message(event) : C == s->start ? "Started" : C == s->stop ? "Stopped" : "No Event");
+  push_monit_environment(buf, e);
 
   if (s->type == TYPE_PROCESS) {
     snprintf(buf, STRLEN, "MONIT_PROCESS_PID=%d", Util_isProcessRunning(s));

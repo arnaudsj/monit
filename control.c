@@ -334,7 +334,7 @@ static void do_start(Service_T s) {
   
   if (s->start && (s->type!=TYPE_PROCESS || !Util_isProcessRunning(s))) {
     LogInfo("'%s' start: %s\n", s->name, s->start->arg[0]);
-    spawn(s, s->start, "Started");
+    spawn(s, s->start, NULL);
     /* We only wait for a process type, other service types does not have a pid file to watch */
     if (s->type == TYPE_PROCESS)
       wait_start(s);
@@ -364,7 +364,7 @@ static int do_stop(Service_T s) {
 
   if (s->stop && (s->type!=TYPE_PROCESS || Util_isProcessRunning(s))) {
     LogInfo("'%s' stop: %s\n", s->name, s->stop->arg[0]);
-    spawn(s, s->stop, "Stopped");
+    spawn(s, s->stop, NULL);
     if (s->type == TYPE_PROCESS) {
       /* Only wait for process service types */
       if (!wait_stop(s))

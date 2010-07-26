@@ -709,7 +709,7 @@ static void handle_action(Event_T E, Action_T A) {
     return;
   } else if (A->id == ACTION_EXEC) {
     LogInfo("'%s' exec: %s\n", s->name, A->exec->arg[0]);
-    spawn(s, A->exec, Event_get_description(E));
+    spawn(s, A->exec, E);
     return;
   } else {
     if (s->actionratelist && (A->id == ACTION_START || A->id == ACTION_RESTART))

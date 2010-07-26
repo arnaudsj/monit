@@ -907,7 +907,7 @@ int   control_service_string(const char *, const char *);
 int   control_service_daemon(const char *, const char *);
 void  setup_dependants();
 void  reset_depend();
-void  spawn(Service_T, Command_T, const char *);
+void  spawn(Service_T, Command_T, Event_T);
 int   status(char *);
 int   log_init();
 void  LogEmergency(const char *, ...);
