@@ -703,7 +703,7 @@ static void handle_action(Event_T E, Action_T A) {
   }
 
   /* Action event is handled already. For Instance events
-   * we don't wan't actions like stop to be executed
+   * we don't want actions like stop to be executed
    * to prevent the disabling of system service monitoring */
   if (A->id == ACTION_ALERT || E->id == EVENT_INSTANCE) {
     return;
