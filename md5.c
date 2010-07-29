@@ -162,15 +162,16 @@ md5_stream (stream, resblock)
 	  sum += n;
 	}
       while (sum < BLOCKSIZE && n != 0);
-      if (n == 0 && ferror (stream))
-        return 1;
+      if (n == 0) {
+        int error = ferror(stream);
+        if (error) {
+          LogError("md5_stream: stream error -- sum=%d, error=0x%x\n", sum, error);
+          return error;
+        } else
+          break; /* If end of file is reached, end the loop.  */
+      }
 
-      /* If end of file is reached, end the loop.  */
-      if (n == 0)
-	break;
-
-      /* Process buffer with BLOCKSIZE bytes.  Note that
-			BLOCKSIZE % 64 == 0
+      /* Process buffer with BLOCKSIZE bytes. Note that BLOCKSIZE % 64 == 0
        */
       md5_process_block (buffer, BLOCKSIZE, &ctx);
     }

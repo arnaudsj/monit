@@ -1440,6 +1440,7 @@ int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize) {
       hashlength = 20;
       break;
     default:
+      LogError("checksum: invalid hash type: 0x%x\n", hashtype);
       return FALSE;
   }
 
@@ -1462,14 +1463,18 @@ int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize) {
       }
 
       fclose(f);
-      if (fresult)
+      if (fresult) {
+        LogError("checksum: file %s stream error (0x%x)\n", file, fresult);
         return FALSE;
+      }
 
       Util_digest2Bytes(sum, hashlength, buf);
       return TRUE;
 
-    }
-  }
+    } else
+      LogError("checksum: failed to open file %s -- %s\n", file, STRERROR);
+  } else
+    LogError("checksum: file %s is not regular file\n", file);
   return FALSE;
 }
 
