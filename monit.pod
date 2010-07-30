@@ -3246,7 +3246,7 @@ I<unmonitor>, I<rdate>, I<rsync>, I<data>, I<invalid>, I<exec>,
 I<nonexist>, I<policy>, I<reminder>, I<instance>, I<eventqueue>,
 I<basedir>, I<slot(s)>, I<system>, I<idfile>, I<gps>, I<radius>,
 I<secret>, I<target>, I<maxforward>, I<hostheader>, I<register>,
-I<credentials> and I<failed>
+I<credentials>, I<fips> and I<failed>
 
 And here is a complete list of B<noise keywords> ignored by
 monit:
