@@ -313,7 +313,6 @@ int File_exist(char *file) {
  * @return TRUE if the test succeeded otherwise FALSE
  */
 int File_checkStat(char *filename, char *description, int permmask) {
-
   struct stat buf;
   errno= 0;
 
@@ -390,7 +389,6 @@ int File_checkStat(char *filename, char *description, int permmask) {
  * @return TRUE if the succeeded otherwise FALSE
  */
 int File_checkQueueDirectory(char *path, mode_t mode) {
-
   struct stat st;
 
   if(stat(path, &st)) {
@@ -400,17 +398,17 @@ int File_checkQueueDirectory(char *path, mode_t mode) {
       rv = mkdir(path, mode);
       umask(mask);
       if(rv) {
-        LogError("%s: cannot create the directory %s -- %s\n",
+        LogError("%s: cannot create the event queue directory %s -- %s\n",
           prog, path, STRERROR);
         return FALSE;
       }
     } else {
-      LogError("%s: cannot read the directory %s -- %s\n",
+      LogError("%s: cannot read the event queue directory %s -- %s\n",
         prog, path, STRERROR);
       return FALSE;
     }
   } else if(! S_ISDIR(st.st_mode)) {
-    LogError("%s: the %s is not the directory\n", prog, path);
+    LogError("%s: event queue: the %s is not the directory\n", prog, path);
     return FALSE;
   }
   return TRUE;
@@ -424,7 +422,6 @@ int File_checkQueueDirectory(char *path, mode_t mode) {
  * @return TRUE if the succeeded otherwise FALSE
  */
 int File_checkQueueLimit(char *path, int limit) {
-
   int            used = 0;
   DIR           *dir = NULL;
   struct dirent *de = NULL;
@@ -433,7 +430,7 @@ int File_checkQueueLimit(char *path, int limit) {
     return TRUE;
 
   if(! (dir = opendir(path)) ) {
-    LogError("%s: cannot open the directory %s -- %s\n", prog, path, STRERROR);
+    LogError("%s: cannot open the event queue directory %s -- %s\n", prog, path, STRERROR);
     return FALSE;
   }
   while( (de = readdir(dir)) ) {
@@ -458,23 +455,31 @@ int File_checkQueueLimit(char *path, int limit) {
  * @return TRUE if the succeeded otherwise FALSE
  */
 int File_writeQueue(FILE *file, void *data, int size) {
+  int rv;
 
   ASSERT(file);
 
   /* write size */
-  if(fwrite(&size, 1, sizeof(int), file) != sizeof(int) || ferror(file))
-    goto error;
+  if((rv = fwrite(&size, 1, sizeof(int), file)) != sizeof(int)) {
+    if (feof(file) || ferror(file))
+      LogError("%s: queued event file: unable to write event size -- %s\n", prog, feof(file) ? "end of file" : "stream error");
+    else
+      LogError("%s: queued event file: unable to write event size -- read returned %d bytes\n", prog, rv);
+    return FALSE;
+  }
 
   /* write data if any */
-  if(size > 0)
-    if(fwrite(data, 1, size, file) != size || ferror(file))
-      goto error;
+  if(size > 0) {
+    if((rv = fwrite(data, 1, size, file)) != size) {
+      if (feof(file) || ferror(file))
+        LogError("%s: queued event file: unable to write event size -- %s\n", prog, feof(file) ? "end of file" : "stream error");
+      else
+        LogError("%s: queued event file: unable to write event size -- read returned %d bytes\n", prog, rv);
+      return FALSE;
+    }
+  }
 
   return TRUE;
-
-  error:
-  LogError("%s: unable to write data to the file\n", prog);
-  return FALSE;
 }
 
 
@@ -486,28 +491,32 @@ int File_writeQueue(FILE *file, void *data, int size) {
  * appropriately.
  */
 void *File_readQueue(FILE *file, int *size) {
-
+  int rv;
   void *data = NULL;
 
   ASSERT(file);
 
   /* read size */
-  if(fread(size, 1, sizeof(int), file) != sizeof(int) || ferror(file))
-    goto error;
+  if((rv = fread(size, 1, sizeof(int), file)) != sizeof(int)) {
+    if (feof(file) || ferror(file))
+      LogError("%s: queued event file: unable to read event size -- %s\n", prog, feof(file) ? "end of file" : "stream error");
+    else
+      LogError("%s: queued event file: unable to read event size -- read returned %d bytes\n", prog, rv);
+    return NULL;
+  }
 
   /* read data if any (allow 1MB at maximum to prevent enormous memory allocation) */
   if(*size > 0 && *size < 1048576) {
     data = xcalloc(1, *size);
-    if(fread(data, 1, *size, file) != *size || ferror(file)) {
+    if((rv = fread(data, 1, *size, file)) != *size) {
       FREE(data);
-      goto error;
+      if (feof(file) || ferror(file))
+        LogError("%s: queued event file: unable to read event data -- %s\n", prog, feof(file) ? "end of file" : "stream error");
+      else
+        LogError("%s: queued event file: unable to read event data -- read returned %d bytes\n", prog, rv);
+      return NULL;
     }
   }
-
   return data;
-
-  error:
-  LogError("%s: unable to read data from the file\n", prog);
-  return FALSE;
 }
 

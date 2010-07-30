@@ -499,21 +499,21 @@ void Event_queue_process() {
       DEBUG("%s: processing queued event %s\n", prog, file_name);
 
       if (! (file = fopen(file_name, "r")) ) {
-        LogError("%s: Processing failed - cannot open the event file %s -- %s\n", prog, file_name, STRERROR);
+        LogError("%s: queued event processing failed - cannot open the file %s -- %s\n", prog, file_name, STRERROR);
         goto error1;
       }
 
       /* read event structure version */
       if (!(version = File_readQueue(file, &size))) {
-        LogError("skipping %s - unknown data format\n", file_name);
+        LogError("skipping queued event %s - unknown data format\n", file_name);
         goto error2;
       }
       if (size != sizeof(int)) {
-        LogError("Aborting event %s - invalid size %d\n", file_name, size);
+        LogError("Aborting queued event %s - invalid size %d\n", file_name, size);
         goto error3;
       }
       if (*version != EVENT_VERSION) {
-        LogError("Aborting event %s - incompatible data format version %d\n", file_name, *version);
+        LogError("Aborting queued event %s - incompatible data format version %d\n", file_name, *version);
         goto error3;
       }
 
@@ -579,7 +579,7 @@ void Event_queue_process() {
 
       /* If no error persists, remove it from the queue */
       if (e->flag == HANDLER_SUCCEEDED) {
-        DEBUG("Removing event %s from the queue for later external delivery\n", file_name);
+        DEBUG("Removing queued event %s\n", file_name);
         if (unlink(file_name) < 0)
           LogError("Failed to remove queued event file '%s' -- %s\n", file_name, STRERROR);
       } else if (handlers_passed > 0) {
@@ -749,7 +749,7 @@ static void Event_queue_add(Event_T E) {
   }
     
   /* compose the file name of actual timestamp and service name */
-  snprintf(file_name, STRLEN, "%s/%ld_%s", Run.eventlist_dir, (long int)time(NULL), E->source);
+  snprintf(file_name, STRLEN, "%s/%ld_%lx", Run.eventlist_dir, (long int)time(NULL), (long unsigned)E->source);
 
   DEBUG("%s: Adding event to the queue file %s for later delivery\n", prog, file_name);
 
