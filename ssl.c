@@ -328,7 +328,7 @@ void delete_ssl_socket(ssl_connection *ssl) {
  * @return An ssl connection, or NULL if an error occured.
  */
 ssl_server_connection *init_ssl_server(char *pemfile, char *clientpemfile) {
-  SSL_METHOD *server_method = NULL;
+  const SSL_METHOD *server_method = NULL;
   ssl_server_connection *ssl_server;
 
   ASSERT(pemfile);

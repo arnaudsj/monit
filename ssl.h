@@ -61,19 +61,19 @@ typedef struct myssl {
 
 
 typedef struct my_ssl_connection {
-  int            socket;
-  int            accepted;
-  SSL           *handler;
-  SSL_CTX       *ctx;
-  X509          *cert;
-  SSL_METHOD    *method;
-  BIO           *socket_bio;
-  const char    *cipher;
-  char          *cert_subject;
-  char          *cert_issuer;
-  unsigned char *cert_md5;
-  unsigned int   cert_md5_len;
-  char          *clientpemfile;
+  int               socket;
+  int               accepted;
+  SSL              *handler;
+  SSL_CTX          *ctx;
+  X509             *cert;
+  const SSL_METHOD *method;
+  BIO              *socket_bio;
+  const char       *cipher;
+  char             *cert_subject;
+  char             *cert_issuer;
+  unsigned char    *cert_md5;
+  unsigned int      cert_md5_len;
+  char             *clientpemfile;
 
   struct my_ssl_connection *prev;
   struct my_ssl_connection *next;
@@ -81,12 +81,12 @@ typedef struct my_ssl_connection {
 
 
 typedef struct my_ssl_server_connection {
-  int             server_socket;
-  SSL_METHOD     *method;
-  SSL_CTX        *ctx;
-  char           *pemfile;
-  char           *clientpemfile;
-  ssl_connection *ssl_conn_list;
+  int               server_socket;
+  const SSL_METHOD *method;
+  SSL_CTX          *ctx;
+  char             *pemfile;
+  char             *clientpemfile;
+  ssl_connection   *ssl_conn_list;
 } ssl_server_connection;
 
 
