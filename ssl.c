@@ -328,7 +328,7 @@ void delete_ssl_socket(ssl_connection *ssl) {
  * @return An ssl connection, or NULL if an error occured.
  */
 ssl_server_connection *init_ssl_server(char *pemfile, char *clientpemfile) {
-  const SSL_METHOD *server_method = NULL;
+  SSL_METHOD *server_method = NULL;
   ssl_server_connection *ssl_server;
 
   ASSERT(pemfile);
@@ -728,7 +728,7 @@ ssl_connection *new_ssl_connection(char *clientpemfile, int sslversion) {
     goto sslerror;
   } 
 
-  if(!(ssl->ctx= SSL_CTX_new (ssl->method))) {
+  if(!(ssl->ctx= SSL_CTX_new(ssl->method))) {
     LogError("%s: Cannot initialize SSL server certificate handler -- %s\n",
              prog, SSLERROR);
     goto sslerror;
