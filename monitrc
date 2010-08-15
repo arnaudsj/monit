@@ -64,16 +64,16 @@
 #
 #
 ## Send status and events to M/Monit (for more informations about M/Monit 
-## see http://mmonit.com/).
+## see http://mmonit.com/). By default Monit registers credentials with 
+## M/Monit so M/Monit can smoothly communicate back to Monit and you don't
+## have to register Monit credentials manually in M/Monit. It is possible to
+## disable credential registration using the commented out option below. 
+## Though, if safety is a concern we recommend instead using https when
+## communicating with M/Monit and send credentials encrypted.
 #
 # set mmonit http://monit:monit@192.168.1.10:8080/collector
-#     # and register without credentials     # By default Monit registers credentials
-#                                            # with M/Monit so M/Monit can smoothly
-#                                            # communicate back to Monit. It is
-#                                            # possible to disable credentials
-#                                            # registration with this option. 
-#                                            # Alternatively use https when 
-#                                            # communicating with M/Monit
+#     # and register without credentials     # Don't register credentials
+#
 #
 #
 ## Monit by default uses the following alert mail format:
