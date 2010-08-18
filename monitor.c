@@ -727,7 +727,6 @@ static void *heartbeat(void *args) {
   LOCK(heartbeatMutex)
   {
     while (! Run.stopped && ! Run.doreload) {
-      DEBUG("Sending M/Monit heartbeat\n");
       if ((status = handle_mmonit(NULL)) == HANDLER_SUCCEEDED)
         wait.tv_sec = time(NULL) + Run.polltime;
       else
