@@ -115,6 +115,7 @@ AC_CHECK_HEADERS([ \
 	setjmp.h \
 	signal.h \
 	stdarg.h \
+        stddef.h \
 	stdio.h \
 	string.h \
 	strings.h \

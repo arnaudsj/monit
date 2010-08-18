@@ -121,6 +121,12 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_STDDEF_H
+#include <stddef.h>
+#else
+#define offsetof(st, m) ((size_t) ( (char *)&((st *)(0))->m - (char *)0 ))
+#endif
+
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
