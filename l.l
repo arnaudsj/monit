@@ -223,6 +223,7 @@ pgsql             { return PGSQL; }
 sip               { return SIP; } 
 gps               { return GPS; } 
 radius            { return RADIUS; }
+memcache          { return MEMCACHE; }
 target            { return TARGET; }
 maxforward        { return MAXFORWARD; }
 mode              { return MODE; }

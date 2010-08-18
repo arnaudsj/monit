@@ -70,6 +70,7 @@ static Protocol_T mypgsql= NULL;
 static Protocol_T mysip= NULL;
 static Protocol_T mygps= NULL;
 static Protocol_T myradius= NULL;
+static Protocol_T mymemcache= NULL;
 
 
 /**
@@ -113,6 +114,7 @@ void gc_protocols() {
   FREE(mysip);
   FREE(mygps);
   FREE(myradius);
+  FREE(mymemcache);
 
 }
 
@@ -370,5 +372,14 @@ void *create_radius() {
     myradius->check= check_radius;
   }
   return myradius;
+}
+
+void *create_memcache() {
+  if(mymemcache == NULL) {
+    NEW(mymemcache);
+    mymemcache->name= "MEMCACHE";
+    mymemcache->check= check_memcache;
+  }
+  return mymemcache;
 }
 

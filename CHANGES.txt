@@ -41,15 +41,16 @@ NEW FEATURES AND FUNCTIONS:
   CPU usage on MacOSX still requires monit to run as root, otherwise it will display
   process' cpu usage as 0.
 
-* Remove configuration limit of 20 ICMP requests per cycle.
+* Remove the configuration limit of 20 ICMP requests per cycle.
 
 * Monit now registers credentials with M/Monit automatically, so it's not
   necessary to set it manually in M/Monit anymore in order to manage services
   on Monit host. The automatic credentials registration can be disabled:
      set mmonit http://monit:monit@192.168.1.10:8080/collector and register without credentials
 
-* Added FIPS OpenSSL module to Monit httpd. Many thanks to Lior Okman
-  for providing the patch. 
+* Added MEMCACHE protocol test. Thanks to Sébastien Debrard for the patch.
+
+* Added FIPS OpenSSL module to Monit httpd. Thanks to Lior Okman for the patch. 
 
 BUGFIXES:
 

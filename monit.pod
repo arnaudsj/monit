@@ -1961,6 +1961,7 @@ moment Monit knows how to speak:
  I<LDAP2>
  I<LDAP3>
  I<LMTP>
+ I<MEMCACHE>
  I<MYSQL>
  I<NNTP>
  I<NTP3>

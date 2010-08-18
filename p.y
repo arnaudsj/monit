@@ -279,7 +279,7 @@
 %token ALERT NOALERT MAILFORMAT UNIXSOCKET SIGNATURE
 %token TIMEOUT RESTART CHECKSUM EVERY 
 %token DEFAULT HTTP APACHESTATUS FTP SMTP POP IMAP CLAMAV NNTP NTP3 MYSQL DNS
-%token SSH DWP LDAP2 LDAP3 RDATE RSYNC TNS PGSQL POSTFIXPOLICY SIP LMTP GPS RADIUS
+%token SSH DWP LDAP2 LDAP3 RDATE RSYNC TNS PGSQL POSTFIXPOLICY SIP LMTP GPS RADIUS MEMCACHE
 %token <string> STRING PATH MAILADDR MAILFROM MAILSUBJECT
 %token <string> MAILBODY SERVICENAME STRINGNAME
 %token <number> NUMBER PERCENT LOGLIMIT CLOSELIMIT DNSLIMIT KEEPALIVELIMIT 
@@ -1062,6 +1062,9 @@ protocol        : /* EMPTY */  {
                   }
                 | PROTOCOL RADIUS secret {
                     portset.protocol = addprotocol(P_RADIUS);
+                  }
+                | PROTOCOL MEMCACHE {
+                    portset.protocol = addprotocol(P_MEMCACHE);
                   }
                 | sendexpectlist {
                     portset.protocol = addprotocol(P_GENERIC);
@@ -2648,6 +2651,7 @@ static void *addprotocol(int protocol) {
   case P_LMTP:          return create_lmtp();
   case P_GPS:           return create_gps();
   case P_RADIUS:        return create_radius();
+  case P_MEMCACHE:      return create_memcache();
   }
 
   return create_default();
