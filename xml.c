@@ -67,9 +67,10 @@
 /* -------------------------------------------------------------- Prototypes */
 
 
-static void document_head(Buffer_T *);
+static void document_head(Buffer_T *, int);
 static void document_foot(Buffer_T *);
 static void status_service(Service_T, Buffer_T *, short);
+static void status_servicegroup(ServiceGroup_T, Buffer_T *, short);
 static void status_event(Event_T, Buffer_T *);
 
 
@@ -87,16 +88,21 @@ static void status_event(Event_T, Buffer_T *);
 char *status_xml(Event_T E, short L) {
   Buffer_T  B;
   Service_T S;
+  ServiceGroup_T SG;
 
   memset(&B, 0, sizeof(Buffer_T));
 
-  document_head(&B);
 
-  if (E)
+  if (E) {
+    document_head(&B, MSGTYPE_EVENT);
     status_event(E, &B);
-  else
+  } else {
+    document_head(&B, MSGTYPE_STATUS);
     for (S = servicelist_conf; S; S = S->next_conf)
       status_service(S, &B, L);
+    for (SG = servicegrouplist; SG; SG = SG->next)
+      status_servicegroup(SG, &B, L);
+  }
 
   document_foot(&B);
 
@@ -112,15 +118,12 @@ char *status_xml(Event_T E, short L) {
  * Prints a document header into the given buffer.
  * @param B Buffer object
  */
-static void document_head(Buffer_T *B) {
+static void document_head(Buffer_T *B, int msgtype) {
 
   Util_stringbuffer(B,
    "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
-   "<monit>"
+   "<monit id=\"%s\" incarnation=\"%lld\" version=\"%s\" msgtype=\"%d\">"
    "<server>"
-   "<id>%s</id>"
-   "<incarnation>%lld</incarnation>"
-   "<version>%s</version>"
    "<uptime>%ld</uptime>"
    "<poll>%d</poll>"
    "<startdelay>%d</startdelay>"
@@ -129,6 +132,7 @@ static void document_head(Buffer_T *B) {
    Run.id,
    (long long)Run.incarnation,
    VERSION,
+   msgtype,
    (long)Util_getProcessUptime(Run.pidfile),
    Run.polltime,
    Run.startdelay,
@@ -196,36 +200,27 @@ static void document_foot(Buffer_T *B) {
  * @param L Status information level
  */
 static void status_service(Service_T S, Buffer_T *B, short L) {
-  ServiceGroup_T sg;
-  ServiceGroupMember_T sgm;
   Event_T E = S->eventlist;
 
   Util_stringbuffer(B,
-	    "<service type=\"%d\">"
+	    "<service name=\"%s\">"
 	    "<collected_sec>%ld</collected_sec>"
 	    "<collected_usec>%ld</collected_usec>"
-	    "<name>%s</name>"
+	    "<type>%d</type>"
 	    "<status>%llu</status>"
 	    "<status_hint>%llu</status_hint>"
 	    "<monitor>%d</monitor>"
 	    "<monitormode>%d</monitormode>"
 	    "<pendingaction>%d</pendingaction>",
-	    S->type,
+	    S->name ? S->name : "",
 	    S->collected.tv_sec,
 	    S->collected.tv_usec,
-	    S->name ? S->name : "",
+	    S->type,
 	    S->error,
 	    S->error_hint,
 	    S->monitor,
 	    S->mode,
 	    S->doaction);
-
-  Util_stringbuffer(B, "<groups>");
-  for (sg = servicegrouplist; sg; sg = sg->next)
-    for (sgm = sg->members; sgm; sgm = sgm->next)
-      if (S->name && ! strcasecmp(sgm->name, S->name))
-        Util_stringbuffer(B, "<name>%s</name>", sg->name);
-  Util_stringbuffer(B, "</groups>");
 
   /* if the service is in error state, display first active error message to provide more details */
   while (E) {
@@ -406,6 +401,22 @@ static void status_service(Service_T S, Buffer_T *B, short L) {
     }
   }
   Util_stringbuffer(B, "</service>");
+}
+
+
+/**
+ * Prints a servicegroups into the given buffer.
+ * @param SG ServiceGroup object
+ * @param B Buffer object
+ * @param L Status information level
+ */
+static void status_servicegroup(ServiceGroup_T SG, Buffer_T *B, short L) {
+  ServiceGroupMember_T SGM;
+
+  Util_stringbuffer(B, "<servicegroup name=\"%s\">", SG->name);
+  for (SGM = SG->members; SGM; SGM = SGM->next)
+    Util_stringbuffer(B, "<service>%s</service>", SGM->name);
+  Util_stringbuffer(B, "</servicegroup>");
 }
 
 
