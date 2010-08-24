@@ -67,7 +67,7 @@
 /* -------------------------------------------------------------- Prototypes */
 
 
-static void document_head(Buffer_T *, int);
+static void document_head(Buffer_T *);
 static void document_foot(Buffer_T *);
 static void status_service(Service_T, Buffer_T *, short);
 static void status_servicegroup(ServiceGroup_T, Buffer_T *, short);
@@ -92,16 +92,19 @@ char *status_xml(Event_T E, short L) {
 
   memset(&B, 0, sizeof(Buffer_T));
 
+  document_head(&B);
 
   if (E) {
-    document_head(&B, MSGTYPE_EVENT);
     status_event(E, &B);
   } else {
-    document_head(&B, MSGTYPE_STATUS);
+    Util_stringbuffer(&B, "<services>");
     for (S = servicelist_conf; S; S = S->next_conf)
       status_service(S, &B, L);
+    Util_stringbuffer(&B, "</services>");
+    Util_stringbuffer(&B, "<servicegroups>");
     for (SG = servicegrouplist; SG; SG = SG->next)
       status_servicegroup(SG, &B, L);
+    Util_stringbuffer(&B, "</servicegroups>");
   }
 
   document_foot(&B);
@@ -118,11 +121,11 @@ char *status_xml(Event_T E, short L) {
  * Prints a document header into the given buffer.
  * @param B Buffer object
  */
-static void document_head(Buffer_T *B, int msgtype) {
+static void document_head(Buffer_T *B) {
 
   Util_stringbuffer(B,
    "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
-   "<monit id=\"%s\" incarnation=\"%lld\" version=\"%s\" msgtype=\"%d\">"
+   "<monit id=\"%s\" incarnation=\"%lld\" version=\"%s\">"
    "<server>"
    "<uptime>%ld</uptime>"
    "<poll>%d</poll>"
@@ -132,7 +135,6 @@ static void document_head(Buffer_T *B, int msgtype) {
    Run.id,
    (long long)Run.incarnation,
    VERSION,
-   msgtype,
    (long)Util_getProcessUptime(Run.pidfile),
    Run.polltime,
    Run.startdelay,

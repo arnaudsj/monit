@@ -139,9 +139,6 @@
 #define MODE_PASSIVE       1
 #define MODE_MANUAL        2
 
-#define MSGTYPE_STATUS     0
-#define MSGTYPE_EVENT      1
-
 #define OPERATOR_GREATER   0
 #define OPERATOR_LESS      1
 #define OPERATOR_EQUAL     2
