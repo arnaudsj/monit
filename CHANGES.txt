@@ -52,6 +52,8 @@ NEW FEATURES AND FUNCTIONS:
 
 * Added FIPS OpenSSL module to Monit httpd. Thanks to Lior Okman for the patch. 
 
+* Allow use of start/stop program statements in 'check system'
+
 BUGFIXES:
 
 * Show real process uptime - formerly the presented uptime was based on create/modify

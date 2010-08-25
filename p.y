@@ -443,7 +443,9 @@ optsystemlist   : /* EMPTY */
                 | optsystemlist optsystem
                 ;
 
-optsystem       : actionrate
+optsystem       : start
+                | stop
+                | actionrate
                 | alert
                 | every
                 | group
