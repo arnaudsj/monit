@@ -67,9 +67,9 @@
 /* -------------------------------------------------------------- Prototypes */
 
 
-static void document_head(Buffer_T *);
+static void document_head(Buffer_T *, int);
 static void document_foot(Buffer_T *);
-static void status_service(Service_T, Buffer_T *, short);
+static void status_service(Service_T, Buffer_T *, short, int);
 static void status_servicegroup(ServiceGroup_T, Buffer_T *, short);
 static void status_event(Event_T, Buffer_T *);
 
@@ -82,24 +82,25 @@ static void status_event(Event_T, Buffer_T *);
  * of monitored services and resources.
  * @param E An event object or NULL for general status
  * @param L Status information level
+ * @param V Format version
  * @return XML document or NULL in the case of error. The caller must free
 *  the memory.
  */
-char *status_xml(Event_T E, short L) {
+char *status_xml(Event_T E, short L, int V) {
   Buffer_T  B;
   Service_T S;
   ServiceGroup_T SG;
 
   memset(&B, 0, sizeof(Buffer_T));
 
-  document_head(&B);
+  document_head(&B, V);
 
   if (E) {
     status_event(E, &B);
   } else {
     Util_stringbuffer(&B, "<services>");
     for (S = servicelist_conf; S; S = S->next_conf)
-      status_service(S, &B, L);
+      status_service(S, &B, L, V);
     Util_stringbuffer(&B, "</services>");
     Util_stringbuffer(&B, "<servicegroups>");
     for (SG = servicegrouplist; SG; SG = SG->next)
@@ -120,26 +121,40 @@ char *status_xml(Event_T E, short L) {
 /**
  * Prints a document header into the given buffer.
  * @param B Buffer object
+ * @param V Format version
  */
-static void document_head(Buffer_T *B) {
-
+static void document_head(Buffer_T *B, int V) {
   Util_stringbuffer(B,
-   "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
-   "<monit id=\"%s\" incarnation=\"%lld\" version=\"%s\">"
-   "<server>"
-   "<uptime>%ld</uptime>"
-   "<poll>%d</poll>"
-   "<startdelay>%d</startdelay>"
-   "<localhostname>%s</localhostname>"
-   "<controlfile>%s</controlfile>",
-   Run.id,
-   (long long)Run.incarnation,
-   VERSION,
-   (long)Util_getProcessUptime(Run.pidfile),
-   Run.polltime,
-   Run.startdelay,
-   Run.localhostname ? Run.localhostname : "",
-   Run.controlfile ? Run.controlfile : "");
+    "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
+  if (V == 2) {
+    Util_stringbuffer(B,
+      "<monit id=\"%s\" incarnation=\"%lld\" version=\"%s\">"
+      "<server>",
+      Run.id,
+      (long long)Run.incarnation,
+      VERSION);
+  } else {
+    Util_stringbuffer(B,
+      "<monit>"
+      "<server>"
+      "<id>%s</id>"
+      "<incarnation>%lld</incarnation>"
+      "<version>%s</version>",
+      Run.id,
+      (long long)Run.incarnation,
+      VERSION);
+  }
+  Util_stringbuffer(B,
+    "<uptime>%ld</uptime>"
+    "<poll>%d</poll>"
+    "<startdelay>%d</startdelay>"
+    "<localhostname>%s</localhostname>"
+    "<controlfile>%s</controlfile>",
+    (long)Util_getProcessUptime(Run.pidfile),
+    Run.polltime,
+    Run.startdelay,
+    Run.localhostname ? Run.localhostname : "",
+    Run.controlfile ? Run.controlfile : "");
 
   if(Run.dohttpd) {
     Util_stringbuffer(B,
@@ -200,29 +215,38 @@ static void document_foot(Buffer_T *B) {
  * @param S Service object
  * @param B Buffer object
  * @param L Status information level
+ * @param V Format version
  */
-static void status_service(Service_T S, Buffer_T *B, short L) {
+static void status_service(Service_T S, Buffer_T *B, short L, int V) {
   Event_T E = S->eventlist;
 
+  if (V == 2)
+    Util_stringbuffer(B,
+      "<service name=\"%s\">"
+      "<type>%d</type>",
+      S->name ? S->name : "",
+      S->type);
+  else
+    Util_stringbuffer(B,
+      "<service type=\"%d\">"
+      "<name>%s</name>",
+      S->type,
+      S->name ? S->name : "");
   Util_stringbuffer(B,
-	    "<service name=\"%s\">"
-	    "<collected_sec>%ld</collected_sec>"
-	    "<collected_usec>%ld</collected_usec>"
-	    "<type>%d</type>"
-	    "<status>%llu</status>"
-	    "<status_hint>%llu</status_hint>"
-	    "<monitor>%d</monitor>"
-	    "<monitormode>%d</monitormode>"
-	    "<pendingaction>%d</pendingaction>",
-	    S->name ? S->name : "",
-	    S->collected.tv_sec,
-	    S->collected.tv_usec,
-	    S->type,
-	    S->error,
-	    S->error_hint,
-	    S->monitor,
-	    S->mode,
-	    S->doaction);
+    "<collected_sec>%ld</collected_sec>"
+    "<collected_usec>%ld</collected_usec>"
+    "<status>%llu</status>"
+    "<status_hint>%llu</status_hint>"
+    "<monitor>%d</monitor>"
+    "<monitormode>%d</monitormode>"
+    "<pendingaction>%d</pendingaction>",
+    S->collected.tv_sec,
+    S->collected.tv_usec,
+    S->error,
+    S->error_hint,
+    S->monitor,
+    S->mode,
+    S->doaction);
 
   /* if the service is in error state, display first active error message to provide more details */
   while (E) {

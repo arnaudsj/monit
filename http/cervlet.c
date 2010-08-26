@@ -89,6 +89,7 @@
 #define GETID       "/_getid"
 #define PIXEL       "/_pixel"
 #define STATUS      "/_status"
+#define STATUS2     "/_status2"
 #define RUN         "/_runtime"
 #define VIEWLOG     "/_viewlog"
 #define DOACTION    "/_doaction"
@@ -142,7 +143,7 @@ static void print_service_params_match(HttpResponse, Service_T);
 static void print_service_params_checksum(HttpResponse, Service_T);
 static void print_service_params_process(HttpResponse, Service_T);
 static void print_service_params_resource(HttpResponse, Service_T);
-static void print_status(HttpRequest, HttpResponse);
+static void print_status(HttpRequest, HttpResponse, int);
 static void status_service_txt(Service_T, HttpResponse, short);
 static char *get_service_status_html(Service_T);
 static char *get_service_status_text(Service_T);
@@ -225,7 +226,9 @@ static void doGet(HttpRequest req, HttpResponse res) {
   } else if(ACTION(PIXEL)) {
     printPixel(res);
   } else if(ACTION(STATUS)) {
-    print_status(req, res);
+    print_status(req, res, 1);
+  } else if(ACTION(STATUS2)) {
+    print_status(req, res, 2);
   } else if(ACTION(DOACTION)) {
     handle_do_action(req, res);
   } else {
@@ -2295,7 +2298,7 @@ static int is_readonly(HttpRequest req) {
 
 
 /* Print status in the given format. Text status is default. */
-static void print_status(HttpRequest req, HttpResponse res)
+static void print_status(HttpRequest req, HttpResponse res, int version)
 {
   Service_T s;
   short level = LEVEL_FULL;
@@ -2309,7 +2312,7 @@ static void print_status(HttpRequest req, HttpResponse res)
 
   if(stringFormat && Util_startsWith(stringFormat, "xml"))
   {
-    char *D = status_xml(NULL, level);
+    char *D = status_xml(NULL, level, version);
     out_print(res, "%s", D);
     FREE(D);
     set_content_type(res, "text/xml");
