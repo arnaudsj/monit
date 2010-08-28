@@ -98,14 +98,17 @@ char *status_xml(Event_T E, short L, int V) {
   if (E) {
     status_event(E, &B);
   } else {
-    Util_stringbuffer(&B, "<services>");
+    if (V == 2)
+            Util_stringbuffer(&B, "<services>");
     for (S = servicelist_conf; S; S = S->next_conf)
       status_service(S, &B, L, V);
-    Util_stringbuffer(&B, "</services>");
-    Util_stringbuffer(&B, "<servicegroups>");
-    for (SG = servicegrouplist; SG; SG = SG->next)
-      status_servicegroup(SG, &B, L);
-    Util_stringbuffer(&B, "</servicegroups>");
+    if (V == 2) {
+            Util_stringbuffer(&B, "</services>"
+                                  "<servicegroups>");
+            for (SG = servicegrouplist; SG; SG = SG->next)
+              status_servicegroup(SG, &B, L);
+            Util_stringbuffer(&B, "</servicegroups>");
+    }
   }
 
   document_foot(&B);
