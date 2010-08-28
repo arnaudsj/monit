@@ -194,7 +194,7 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     pt[i].cputime   = (long)(pinfo[i].kp_proc.p_runtime / 100000);
     pt[i].mem_kbyte = (unsigned long)(pinfo[i].kp_eproc.e_vm.vm_rssize * pagesize_kbyte);
     flags           = pinfo[i].kp_proc.p_stat;
-    args            = kvm_getargv(kvm_handle, &pinfo[i].kp_proc, 0);
+    args            = kvm_getargv(kvm_handle, &pinfo[i], 0);
     procname        = pinfo[i].kp_proc.p_comm;
 #endif
     if (flags == SZOMB)
