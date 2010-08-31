@@ -3484,11 +3484,10 @@ Application Servers. So if we want to keep the poll-cycle low
 (i.e. < 60 seconds) but allow some services to take its time to
 start, the B<every> statement is handy:
 
- check process dynamo with pidfile /etc/dynamo.pid
+ check process dynamo with pidfile /etc/dynamo.pid every 2 cycles
        start program = "/etc/init.d/dynamo start"
        stop program  = "/etc/init.d/dynamo stop"
        if failed port 8840 then alert
-       every 2 cycles
 
 Here is an example where we group together two database entries
 so you can manage them together, e.g.; 'Monit -g database start
