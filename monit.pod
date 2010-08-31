@@ -2472,10 +2472,10 @@ RADIUS example:
 
 Each service is polled in sequence as they are written in
 I<.monitrc> file, unless they are part of a dependecy chain.
-However, each service may have its individual poll time set.
-Meaning that instead of checking the service on each poll cycle,
-the cycle check can be specified individually per service using
-the I<every> statement. The syntax of which is:
+However, a service may specify an individual poll time. Meaning
+that instead of checking the service on each poll cycle, the
+cycle check can be specified individually per service using the
+I<every> statement. The syntax of which is:
 
 =over 4
 
