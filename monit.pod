@@ -2468,6 +2468,33 @@ RADIUS example:
        if 5 restarts within 5 cycles then timeout
 
 
+=head1 SERVICE POLL TIME
+
+Each service is polled in sequence as they are written in
+I<.monitrc> file, unless they are part of a dependecy chain.
+However, each service may have its individual poll time set.
+Meaning that instead of checking the service on each poll cycle,
+the cycle check can be specified individually per service using
+the I<every> statement. The syntax of which is:
+
+=over 4
+
+=item EVERY [number] CYCLES
+
+=back
+
+Example:
+
+ check process nginx with pidfile /var/run/nginx.pid every 2 cycles
+ start program = "/etc/init.d/nginx start"
+ stop program  = "/etc/init.d/nginx stop"
+ [...]
+
+In the above example, if the global poll time set by I<set
+daemon> is 20 seconds, then the nginx process will be checked
+every 40 second. This is because the every statement specify that
+this process should only be checked every other cycle
+
 =head1 MONIT HTTPD
 
 If specified in the control file, Monit will start a Monit daemon
@@ -2879,7 +2906,7 @@ Comments begin with a '#' and extend through the end of the line.
 Otherwise the file consists of a series of service entries or
 global option statements in a free-format, token-oriented syntax.
 
-There are three kinds of tokens: grammar keywords, numbers (i.e.
+There are three kinds of tokens: grammar  , numbers (i.e.
 decimal digit sequences) and strings. Strings can be either
 quoted or unquoted. A quoted string is bounded by double quotes
 and may contain whitespace (and quoted digits are treated as a
@@ -3266,7 +3293,6 @@ I<stop> entries by using a string of shell-commands. Like so:
 
  start="/bin/bash -c 'echo $$ > pidfile; exec program'"
  stop="/bin/bash -c 'kill -s SIGTERM `cat pidfile`'"
-
 
 
 =head2 CONFIGURATION EXAMPLES
