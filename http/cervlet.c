@@ -602,7 +602,7 @@ static void handle_action(HttpRequest req, HttpResponse res) {
       return;
     }
     if(s->doaction != ACTION_IGNORE) {
-      send_error(res, SC_SERVICE_UNAVAILABLE, "Other action in progress already -- try again later");
+      send_error(res, SC_SERVICE_UNAVAILABLE, "Other action already in progress -- please try again later");
       return;
     }
     s->doaction = doaction;
@@ -649,7 +649,7 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
           return;
         }
         if(s->doaction != ACTION_IGNORE) {
-          send_error(res, SC_SERVICE_UNAVAILABLE, "Other action in progress already -- try again later");
+          send_error(res, SC_SERVICE_UNAVAILABLE, "Other action already in progress -- please try again later");
           return;
         }
 
