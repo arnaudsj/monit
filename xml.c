@@ -95,21 +95,19 @@ char *status_xml(Event_T E, short L, int V) {
 
   document_head(&B, V);
 
-  if (E) {
-    status_event(E, &B);
-  } else {
-    if (V == 2)
-            Util_stringbuffer(&B, "<services>");
-    for (S = servicelist_conf; S; S = S->next_conf)
-      status_service(S, &B, L, V);
-    if (V == 2) {
-            Util_stringbuffer(&B, "</services>"
-                                  "<servicegroups>");
-            for (SG = servicegrouplist; SG; SG = SG->next)
-              status_servicegroup(SG, &B, L);
-            Util_stringbuffer(&B, "</servicegroups>");
-    }
+  if (V == 2)
+    Util_stringbuffer(&B, "<services>");
+  for (S = servicelist_conf; S; S = S->next_conf)
+    status_service(S, &B, L, V);
+  if (V == 2) {
+    Util_stringbuffer(&B, "</services>"
+                          "<servicegroups>");
+    for (SG = servicegrouplist; SG; SG = SG->next)
+      status_servicegroup(SG, &B, L);
+    Util_stringbuffer(&B, "</servicegroups>");
   }
+  if (E)
+    status_event(E, &B);
 
   document_foot(&B);
 
@@ -207,9 +205,7 @@ static void document_head(Buffer_T *B, int V) {
  * @param B Buffer object
  */
 static void document_foot(Buffer_T *B) {
-
   Util_stringbuffer(B, "</monit>");
-
 }
 
 
