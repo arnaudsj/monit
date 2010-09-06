@@ -80,29 +80,29 @@
 /* ------------------------------------------------------------- Definitions */
 
 EventTable_T Event_Table[]= {
-  {EVENT_ACTION,     "Action done",             "Action done",                "Action done",              "Action done"},
-  {EVENT_CHECKSUM,   "Checksum failed",         "Checksum succeeded",         "Checksum changed",         "Checksum not changed"},
-  {EVENT_CONNECTION, "Connection failed",       "Connection succeeded",       "Connection changed",       "Connection not changed"},
-  {EVENT_CONTENT,    "Content failed",          "Content succeeded",          "Content match",            "Content doesn't match"},
-  {EVENT_DATA,       "Data access error",       "Data access succeeded",      "Data access changed",      "Data access not changed"},
-  {EVENT_EXEC,       "Execution failed",        "Execution succeeded",        "Execution changed",        "Execution not changed"},
-  {EVENT_FSFLAG,     "Filesystem flags failed", "Filesystem flags succeeded", "Filesystem flags changed", "Filesystem flags not changed"},
-  {EVENT_GID,        "GID failed",              "GID succeeded",              "GID changed",              "GID not changed"},
-  {EVENT_HEARTBEAT,  "Heartbeat failed",        "Heartbeat succeeded",        "Heartbeat changed",        "Heartbeat not changed"},
-  {EVENT_ICMP,       "ICMP failed",             "ICMP succeeded",             "ICMP changed",             "ICMP not changed"},
-  {EVENT_INSTANCE,   "Monit instance failed",   "Monit instance succeeded",   "Monit instance changed",   "Monit instance not changed"},
-  {EVENT_INVALID,    "Invalid type",            "Type succeeded",             "Type changed",             "Type not changed"},
-  {EVENT_NONEXIST,   "Does not exist",          "Exists",                     "Existence changed",        "Existence not changed"},
-  {EVENT_PERMISSION, "Permission failed",       "Permission succeeded",       "Permission changed",       "Permission not changed"},
-  {EVENT_PID,        "PID failed",              "PID succeeded",              "PID changed",              "PID not changed"},
-  {EVENT_PPID,       "PPID failed",             "PPID succeeded",             "PPID changed",             "PPID not changed"},
-  {EVENT_RESOURCE,   "Resource limit matched",  "Resource limit succeeded",   "Resource limit changed",   "Resource limit not changed"},
-  {EVENT_SIZE,       "Size failed",             "Size succeeded",             "Size changed",             "Size not changed"},
-  {EVENT_TIMEOUT,    "Timeout",                 "Timeout recovery",           "Timeout changed",          "Timeout not changed"},
-  {EVENT_TIMESTAMP,  "Timestamp failed",        "Timestamp succeeded",        "Timestamp changed",        "Timestamp not changed"},
-  {EVENT_UID,        "UID failed",              "UID succeeded",              "UID changed",              "UID not changed"},
+  {Event_Action,     "Action done",             "Action done",                "Action done",              "Action done"},
+  {Event_Checksum,   "Checksum failed",         "Checksum succeeded",         "Checksum changed",         "Checksum not changed"},
+  {Event_Connection, "Connection failed",       "Connection succeeded",       "Connection changed",       "Connection not changed"},
+  {Event_Content,    "Content failed",          "Content succeeded",          "Content match",            "Content doesn't match"},
+  {Event_Data,       "Data access error",       "Data access succeeded",      "Data access changed",      "Data access not changed"},
+  {Event_Exec,       "Execution failed",        "Execution succeeded",        "Execution changed",        "Execution not changed"},
+  {Event_Fsflag,     "Filesystem flags failed", "Filesystem flags succeeded", "Filesystem flags changed", "Filesystem flags not changed"},
+  {Event_Gid,        "GID failed",              "GID succeeded",              "GID changed",              "GID not changed"},
+  {Event_Heartbeat,  "Heartbeat failed",        "Heartbeat succeeded",        "Heartbeat changed",        "Heartbeat not changed"},
+  {Event_Icmp,       "ICMP failed",             "ICMP succeeded",             "ICMP changed",             "ICMP not changed"},
+  {Event_Instance,   "Monit instance failed",   "Monit instance succeeded",   "Monit instance changed",   "Monit instance not changed"},
+  {Event_Invalid,    "Invalid type",            "Type succeeded",             "Type changed",             "Type not changed"},
+  {Event_Nonexist,   "Does not exist",          "Exists",                     "Existence changed",        "Existence not changed"},
+  {Event_Permission, "Permission failed",       "Permission succeeded",       "Permission changed",       "Permission not changed"},
+  {Event_Pid,        "PID failed",              "PID succeeded",              "PID changed",              "PID not changed"},
+  {Event_PPid,       "PPID failed",             "PPID succeeded",             "PPID changed",             "PPID not changed"},
+  {Event_Resource,   "Resource limit matched",  "Resource limit succeeded",   "Resource limit changed",   "Resource limit not changed"},
+  {Event_Size,       "Size failed",             "Size succeeded",             "Size changed",             "Size not changed"},
+  {Event_Timeout,    "Timeout",                 "Timeout recovery",           "Timeout changed",          "Timeout not changed"},
+  {Event_Timestamp,  "Timestamp failed",        "Timestamp succeeded",        "Timestamp changed",        "Timestamp not changed"},
+  {Event_Uid,        "UID failed",              "UID succeeded",              "UID changed",              "UID not changed"},
   /* Virtual events */
-  {EVENT_NULL,       "No Event",                "No Event",                   "No Event",                 "No Event"}
+  {Event_Null,       "No Event",                "No Event",                   "No Event",                 "No Event"}
 };
 
 
@@ -336,7 +336,7 @@ short Event_check_state(Event_T E, short S) {
   }
 
   /* the internal instance and action events are handled as changed any time since we need to deliver alert whenever it occurs */
-  if (E->id == EVENT_INSTANCE || E->id == EVENT_ACTION || (count >= action->count && (S != E->state || S == STATE_CHANGED)))
+  if (E->id == Event_Instance || E->id == Event_Action || (count >= action->count && (S != E->state || S == STATE_CHANGED)))
     return TRUE;
   
   return FALSE;
@@ -438,9 +438,9 @@ short Event_get_action(Event_T E) {
 
 /**
  * Get a textual description of actual event action. For instance if the
- * event type is possitive EVENT_NONEXIST, the textual description of
+ * event type is possitive Event_Nonexist, the textual description of
  * failed state related action is "restart". Likewise if the event type is
- * negative EVENT_CHECKSUM the textual description of recovery related action
+ * negative Event_Checksumthe textual description of recovery related action
  * is "alert" and so on.
  * @param E An event object
  * @return A string describing the event type in clear text. If the
@@ -644,7 +644,7 @@ static void handle_event(Event_T E) {
      * logged. Instance and action events are logged always with priority
      * info. */
     if (E->state != STATE_INIT || E->state_map & 0x1) {
-      if (E->state == STATE_SUCCEEDED || E->state == STATE_CHANGEDNOT || E->id == EVENT_INSTANCE || E->id == EVENT_ACTION)
+      if (E->state == STATE_SUCCEEDED || E->state == STATE_CHANGEDNOT || E->id == Event_Instance || E->id == Event_Action)
         LogInfo("'%s' %s\n", S->name, E->message);
       else
         LogError("'%s' %s\n", S->name, E->message);
@@ -654,7 +654,7 @@ static void handle_event(Event_T E) {
   }
 
   if (E->state == STATE_FAILED || E->state == STATE_CHANGED) {
-    if (E->id != EVENT_INSTANCE && E->id != EVENT_ACTION) { // We are not interested in setting error flag for instance and action events
+    if (E->id != Event_Instance && E->id != Event_Action) { // We are not interested in setting error flag for instance and action events
       S->error |= E->id;
       /* The error hint provides second dimension for error bitmap and differentiates between failed/changed event states (failed=0, chaged=1) */
       if (E->state == STATE_CHANGED)
@@ -705,7 +705,7 @@ static void handle_action(Event_T E, Action_T A) {
   /* Action event is handled already. For Instance events
    * we don't want actions like stop to be executed
    * to prevent the disabling of system service monitoring */
-  if (A->id == ACTION_ALERT || E->id == EVENT_INSTANCE) {
+  if (A->id == ACTION_ALERT || E->id == Event_Instance) {
     return;
   } else if (A->id == ACTION_EXEC) {
     LogInfo("'%s' exec: %s\n", s->name, A->exec->arg[0]);

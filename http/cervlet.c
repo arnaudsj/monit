@@ -1002,11 +1002,11 @@ static void do_home_process(HttpRequest req, HttpResponse res) {
       if(Run.doprocess) {
         out_print(res,
           "<td align=\"right\"><font%s>%.1f%%</font></td>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->cpu_percent/10.0);
         out_print(res,
           "<td align=\"right\"><font%s>%.1f%% [%ld&nbsp;kB]</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->mem_percent/10.0, s->inf->mem_kbyte);
       }
 
@@ -1427,50 +1427,50 @@ static void print_alerts(HttpResponse res, Mail_T s) {
               "<td>%s</td></tr>", r->to?r->to:"");
     out_print(res, "<tr><td>Alert on</td><td>");
 
-    if(r->events == EVENT_NULL) {
+    if(r->events == Event_Null) {
       out_print(res, "No events");
-    } else if(r->events == EVENT_ALL) {
+    } else if(r->events == Event_All) {
       out_print(res, "All events");
     } else {
-      if(IS_EVENT_SET(r->events, EVENT_ACTION))
+      if(IS_EVENT_SET(r->events, Event_Action))
           out_print(res, "Action ");
-      if(IS_EVENT_SET(r->events, EVENT_CHECKSUM))
+      if(IS_EVENT_SET(r->events, Event_Checksum))
           out_print(res, "Checksum ");
-      if(IS_EVENT_SET(r->events, EVENT_CONNECTION))
+      if(IS_EVENT_SET(r->events, Event_Connection))
           out_print(res, "Connection ");
-      if(IS_EVENT_SET(r->events, EVENT_CONTENT))
+      if(IS_EVENT_SET(r->events, Event_Content))
           out_print(res, "Content ");
-      if(IS_EVENT_SET(r->events, EVENT_DATA))
+      if(IS_EVENT_SET(r->events, Event_Data))
           out_print(res, "Data ");
-      if(IS_EVENT_SET(r->events, EVENT_EXEC))
+      if(IS_EVENT_SET(r->events, Event_Exec))
           out_print(res, "Exec ");
-      if(IS_EVENT_SET(r->events, EVENT_FSFLAG))
+      if(IS_EVENT_SET(r->events, Event_Fsflag))
           out_print(res, "Fsflags ");
-      if(IS_EVENT_SET(r->events, EVENT_GID))
+      if(IS_EVENT_SET(r->events, Event_Gid))
           out_print(res, "Gid ");
-      if(IS_EVENT_SET(r->events, EVENT_ICMP))
+      if(IS_EVENT_SET(r->events, Event_Icmp))
           out_print(res, "Icmp ");
-      if(IS_EVENT_SET(r->events, EVENT_INSTANCE))
+      if(IS_EVENT_SET(r->events, Event_Instance))
           out_print(res, "Instance ");
-      if(IS_EVENT_SET(r->events, EVENT_INVALID))
+      if(IS_EVENT_SET(r->events, Event_Invalid))
           out_print(res, "Invalid ");
-      if(IS_EVENT_SET(r->events, EVENT_NONEXIST))
+      if(IS_EVENT_SET(r->events, Event_Nonexist))
           out_print(res, "Nonexist ");
-      if(IS_EVENT_SET(r->events, EVENT_PERMISSION))
+      if(IS_EVENT_SET(r->events, Event_Permission))
           out_print(res, "Permission ");
-      if(IS_EVENT_SET(r->events, EVENT_PID))
+      if(IS_EVENT_SET(r->events, Event_Pid))
           out_print(res, "PID ");
-      if(IS_EVENT_SET(r->events, EVENT_PPID))
+      if(IS_EVENT_SET(r->events, Event_PPid))
           out_print(res, "PPID ");
-      if(IS_EVENT_SET(r->events, EVENT_RESOURCE))
+      if(IS_EVENT_SET(r->events, Event_Resource))
           out_print(res, "Resource ");
-      if(IS_EVENT_SET(r->events, EVENT_SIZE))
+      if(IS_EVENT_SET(r->events, Event_Size))
           out_print(res, "Size ");
-      if(IS_EVENT_SET(r->events, EVENT_TIMEOUT))
+      if(IS_EVENT_SET(r->events, Event_Timeout))
           out_print(res, "Timeout ");
-      if(IS_EVENT_SET(r->events, EVENT_TIMESTAMP))
+      if(IS_EVENT_SET(r->events, Event_Timestamp))
           out_print(res, "Timestamp ");
-      if(IS_EVENT_SET(r->events, EVENT_UID))
+      if(IS_EVENT_SET(r->events, Event_Uid))
           out_print(res, "Uid ");
     }
       
@@ -1969,7 +1969,7 @@ static void print_service_params_perm(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Permission</td><td><font%s>%o</font></td></tr>",
-        (s->error & EVENT_PERMISSION)?" color='#ff0000'":"",
+        (s->error & Event_Permission)?" color='#ff0000'":"",
         s->inf->st_mode & 07777);
 
     }
@@ -1992,7 +1992,7 @@ static void print_service_params_uid(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>UID</td><td><font%s>%d</font></td></tr>",
-        (s->error & EVENT_UID)?" color='#ff0000'":"",
+        (s->error & Event_Uid)?" color='#ff0000'":"",
         (int)s->inf->st_uid);
 
     }
@@ -2015,7 +2015,7 @@ static void print_service_params_gid(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>GID</td><td><font%s>%d</font></td></tr>",
-        (s->error & EVENT_GID)?" color='#ff0000'":"",
+        (s->error & Event_Gid)?" color='#ff0000'":"",
         (int)s->inf->st_gid);
 
     }
@@ -2040,7 +2040,7 @@ static void print_service_params_timestamp(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Timestamp</td><td><font%s>%s</font></td></tr>",
-        (s->error & EVENT_TIMESTAMP)?" color='#ff0000'":"", time);
+        (s->error & Event_Timestamp)?" color='#ff0000'":"", time);
 
     }
   }
@@ -2086,7 +2086,7 @@ static void print_service_params_filesystem(HttpResponse res, Service_T s) {
       out_print(res,
         "<tr><td>Blocks free total</td>"
         "<td><font%s>%ld [%.1f MB] [%.1f%%]</font></td></tr>",
-        (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+        (s->error & Event_Resource)?" color='#ff0000'":"",
         s->inf->f_blocksfreetotal,
         (float)s->inf->f_blocksfreetotal / (float)1048576 * (float)s->inf->f_bsize,
         (float)100 * (float)s->inf->f_blocksfreetotal / (float)s->inf->f_blocks);
@@ -2099,7 +2099,7 @@ static void print_service_params_filesystem(HttpResponse res, Service_T s) {
           "<tr><td>Inodes total</td><td>%ld</td></tr>", s->inf->f_files);
         out_print(res,
           "<tr><td>Inodes free</td><td><font%s>%ld [%.1f%%]</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->f_filesfree,
           (float)100 * (float)s->inf->f_filesfree / (float)s->inf->f_files);
 
@@ -2122,7 +2122,7 @@ static void print_service_params_size(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Size</td><td><font%s>%llu B</td></tr>",
-        (s->error & EVENT_SIZE)?" color='#ff0000'":"",
+        (s->error & Event_Size)?" color='#ff0000'":"",
         (unsigned long long) s->inf->st_size);
 
     }
@@ -2142,8 +2142,8 @@ static void print_service_params_match(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Match regex</td><td><font%s>%s</td></tr>",
-        (s->error & EVENT_CONTENT)?" color='#ff0000'":"",
-        (s->error & EVENT_CONTENT)?"yes":"no");
+        (s->error & Event_Content)?" color='#ff0000'":"",
+        (s->error & Event_Content)?"yes":"no");
     }
   }
 }
@@ -2161,7 +2161,7 @@ static void print_service_params_checksum(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Checksum</td><td><font%s>%s(%s)</font></td></tr>",
-        (s->error & EVENT_CHECKSUM)?" color='#ff0000'":"", s->inf->cs_sum,
+        (s->error & Event_Checksum)?" color='#ff0000'":"", s->inf->cs_sum,
         checksumnames[s->checksum->type]);
 
     }
@@ -2224,30 +2224,30 @@ static void print_service_params_resource(HttpResponse res, Service_T s) {
       if(s->type == TYPE_PROCESS) {
         out_print(res,
           "<tr><td>CPU usage</td><td><font%s>%.1f%%</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->cpu_percent/10.0);
         out_print(res,
           "<tr><td>Memory usage</td><td><font%s>%.1f%% [%ldkB]</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->mem_percent/10.0, s->inf->mem_kbyte);
         out_print(res,
           "<tr><td>Children</td><td><font%s>%d</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->children);
         out_print(res,
           "<tr><td>Total CPU usage (incl. children)</td><td><font%s>%.1f%%"
           "</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->total_cpu_percent/10.0);
         out_print(res,
           "<tr><td>Total memory usage (incl. children)</td>"
           "<td><font%s>%.1f%% [%ldkB]</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           s->inf->total_mem_percent/10.0, s->inf->total_mem_kbyte);
       } else if(s->type == TYPE_SYSTEM) {
         out_print(res,
           "<tr><td>Load average</td><td><font%s>[%.2f] [%.2f] [%.2f]</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           systeminfo.loadavg[0],
           systeminfo.loadavg[1],
           systeminfo.loadavg[2]);
@@ -2257,7 +2257,7 @@ static void print_service_params_resource(HttpResponse res, Service_T s) {
           " %.1f%%wa"
         #endif
           "%s",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           systeminfo.total_cpu_user_percent/10.,
           systeminfo.total_cpu_syst_percent/10.,
         #ifdef HAVE_CPU_WAIT
@@ -2266,12 +2266,12 @@ static void print_service_params_resource(HttpResponse res, Service_T s) {
           "</font></td></tr>");
         out_print(res,
           "<tr><td>Memory usage</td><td><font%s>%ld kB [%.1f%%]</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           systeminfo.total_mem_kbyte,
           systeminfo.total_mem_percent/10.);
         out_print(res,
           "<tr><td>Swap usage</td><td><font%s>%ld kB [%.1f%%]</font></td></tr>",
-          (s->error & EVENT_RESOURCE)?" color='#ff0000'":"",
+          (s->error & Event_Resource)?" color='#ff0000'":"",
           systeminfo.total_swap_kbyte,
           systeminfo.total_swap_percent/10.);
       }

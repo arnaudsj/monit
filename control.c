@@ -473,9 +473,9 @@ static void wait_start(Service_T s) {
   }
   
   if (!Util_isProcessRunning(s))
-    Event_post(s, EVENT_EXEC, STATE_FAILED, s->action_EXEC, "failed to start");
+    Event_post(s, Event_Exec, STATE_FAILED, s->action_EXEC, "failed to start");
   else
-    Event_post(s, EVENT_EXEC, STATE_SUCCEEDED, s->action_EXEC, "started");
+    Event_post(s, Event_Exec, STATE_SUCCEEDED, s->action_EXEC, "started");
 
   return;
 }
@@ -502,10 +502,10 @@ static int wait_stop(Service_T s) {
   }
 
   if (Util_isProcessRunning(s)) {
-    Event_post(s, EVENT_EXEC, STATE_FAILED, s->action_EXEC, "failed to stop");
+    Event_post(s, Event_Exec, STATE_FAILED, s->action_EXEC, "failed to stop");
     return FALSE;
   } else {
-    Event_post(s, EVENT_EXEC, STATE_SUCCEEDED, s->action_EXEC, "stopped");
+    Event_post(s, Event_Exec, STATE_SUCCEEDED, s->action_EXEC, "stopped");
   }
 
   return TRUE;

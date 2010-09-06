@@ -754,8 +754,8 @@ typedef struct myservice {
   EventAction_T action_ACTION;           /**< Action requested by CLI or GUI */
 
   /** Runtime parameters */
-  unsigned long long error;                          /**< Error flags bitmap */
-  unsigned long long error_hint;   /**< Failed/Changed hint for error bitmap */
+  int                error;                          /**< Error flags bitmap */
+  int                error_hint;   /**< Failed/Changed hint for error bitmap */
   Info_T             inf;                          /**< Service check result */
   struct timeval     collected;                /**< When were data collected */
   int                doaction;          /**< Action scheduled by http thread */

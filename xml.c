@@ -234,8 +234,8 @@ static void status_service(Service_T S, Buffer_T *B, short L, int V) {
   Util_stringbuffer(B,
     "<collected_sec>%ld</collected_sec>"
     "<collected_usec>%ld</collected_usec>"
-    "<status>%llu</status>"
-    "<status_hint>%llu</status_hint>"
+    "<status>%d</status>"
+    "<status_hint>%d</status_hint>"
     "<monitor>%d</monitor>"
     "<monitormode>%d</monitormode>"
     "<pendingaction>%d</pendingaction>",
@@ -470,7 +470,7 @@ static void status_event(Event_T E, Buffer_T *B) {
     "<message><![CDATA[%s]]></message>",
     tv->tv_sec,
     tv->tv_usec,
-    Event_get_id(E) == EVENT_INSTANCE ? "Monit" : Event_get_source_name(E),
+    Event_get_id(E) == Event_Instance ? "Monit" : Event_get_source_name(E),
     Event_get_source_type(E),
     Event_get_id(E),
     Event_get_state(E),

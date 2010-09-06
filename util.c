@@ -1992,8 +1992,8 @@ void Util_resetInfo(Service_T s) {
  */
 int Util_hasServiceStatus(Service_T s) {
   return(!((s->monitor!=MONITOR_YES)||
-	   (s->error&EVENT_NONEXIST)||
-	   (s->error&EVENT_DATA) ));
+	   (s->error&Event_Nonexist)||
+	   (s->error&Event_Data) ));
 }
 
 
@@ -2082,7 +2082,7 @@ void Util_monitorUnset(Service_T s) {
   }
   s->nstart= 0;
   s->ncycle= 0;
-  s->error = EVENT_NULL;
+  s->error = Event_Null;
   if(s->eventlist)
     gc_event(&s->eventlist);
   Util_resetInfo(s);
@@ -2235,50 +2235,50 @@ static char x2c(char *hex) {
  * Print registered events list
  */
 static void printevents(unsigned int events) {
-  if(events == EVENT_NULL) {
+  if(events == Event_Null) {
     printf("No events");
-  } else if(events == EVENT_ALL) {
+  } else if(events == Event_All) {
     printf("All events");
   } else {
-    if(IS_EVENT_SET(events, EVENT_ACTION))
+    if(IS_EVENT_SET(events, Event_Action))
       printf("Action ");
-    if(IS_EVENT_SET(events, EVENT_CHECKSUM))
+    if(IS_EVENT_SET(events, Event_Checksum))
       printf("Checksum ");
-    if(IS_EVENT_SET(events, EVENT_CONNECTION))
+    if(IS_EVENT_SET(events, Event_Connection))
       printf("Connection ");
-    if(IS_EVENT_SET(events, EVENT_CONTENT))
+    if(IS_EVENT_SET(events, Event_Content))
       printf("Content ");
-    if(IS_EVENT_SET(events, EVENT_DATA))
+    if(IS_EVENT_SET(events, Event_Data))
       printf("Data ");
-    if(IS_EVENT_SET(events, EVENT_EXEC))
+    if(IS_EVENT_SET(events, Event_Exec))
       printf("Exec ");
-    if(IS_EVENT_SET(events, EVENT_FSFLAG))
+    if(IS_EVENT_SET(events, Event_Fsflag))
       printf("Fsflags ");
-    if(IS_EVENT_SET(events, EVENT_GID))
+    if(IS_EVENT_SET(events, Event_Gid))
       printf("Gid ");
-    if(IS_EVENT_SET(events, EVENT_ICMP))
+    if(IS_EVENT_SET(events, Event_Icmp))
       printf("Icmp ");
-    if(IS_EVENT_SET(events, EVENT_INSTANCE))
+    if(IS_EVENT_SET(events, Event_Instance))
       printf("Instance ");
-    if(IS_EVENT_SET(events, EVENT_INVALID))
+    if(IS_EVENT_SET(events, Event_Invalid))
       printf("Invalid ");
-    if(IS_EVENT_SET(events, EVENT_NONEXIST))
+    if(IS_EVENT_SET(events, Event_Nonexist))
       printf("Nonexist ");
-    if(IS_EVENT_SET(events, EVENT_PERMISSION))
+    if(IS_EVENT_SET(events, Event_Permission))
       printf("Permission ");
-    if(IS_EVENT_SET(events, EVENT_PID))
+    if(IS_EVENT_SET(events, Event_Pid))
       printf("PID ");
-    if(IS_EVENT_SET(events, EVENT_PPID))
+    if(IS_EVENT_SET(events, Event_PPid))
       printf("PPID ");
-    if(IS_EVENT_SET(events, EVENT_RESOURCE))
+    if(IS_EVENT_SET(events, Event_Resource))
       printf("Resource ");
-    if(IS_EVENT_SET(events, EVENT_SIZE))
+    if(IS_EVENT_SET(events, Event_Size))
       printf("Size ");
-    if(IS_EVENT_SET(events, EVENT_TIMEOUT))
+    if(IS_EVENT_SET(events, Event_Timeout))
       printf("Timeout ");
-    if(IS_EVENT_SET(events, EVENT_TIMESTAMP))
+    if(IS_EVENT_SET(events, Event_Timestamp))
     printf("Timestamp ");
-    if(IS_EVENT_SET(events, EVENT_UID))
+    if(IS_EVENT_SET(events, Event_Uid))
       printf("Uid ");
   }
   printf("\n");

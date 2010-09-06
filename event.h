@@ -32,29 +32,33 @@
 
 #include "monitor.h"
 
-#define EVENT_NULL            0x0
-#define EVENT_CHECKSUM        0x1
-#define EVENT_RESOURCE        0x2
-#define EVENT_TIMEOUT         0x4
-#define EVENT_TIMESTAMP       0x8
-#define EVENT_SIZE            0x10
-#define EVENT_CONNECTION      0x20
-#define EVENT_PERMISSION      0x40
-#define EVENT_UID             0x80
-#define EVENT_GID             0x100
-#define EVENT_NONEXIST        0x200
-#define EVENT_INVALID         0x400
-#define EVENT_DATA            0x800
-#define EVENT_EXEC            0x1000
-#define EVENT_FSFLAG          0x2000
-#define EVENT_ICMP            0x4000
-#define EVENT_CONTENT         0x8000
-#define EVENT_INSTANCE        0x10000
-#define EVENT_ACTION          0x20000
-#define EVENT_PID             0x40000
-#define EVENT_PPID            0x80000
-#define EVENT_HEARTBEAT       0x100000
-#define EVENT_ALL             0xFFFFFFFF
+
+typedef enum {
+        Event_Null       = 0x0,
+        Event_Checksum   = 0x1,
+        Event_Resource   = 0x2,
+        Event_Timeout    = 0x4,
+        Event_Timestamp  = 0x8,
+        Event_Size       = 0x10,
+        Event_Connection = 0x20,
+        Event_Permission = 0x40,
+        Event_Uid        = 0x80,
+        Event_Gid        = 0x100,
+        Event_Nonexist   = 0x200,
+        Event_Invalid    = 0x400,
+        Event_Data       = 0x800,
+        Event_Exec       = 0x1000,
+        Event_Fsflag     = 0x2000,
+        Event_Icmp       = 0x4000,
+        Event_Content    = 0x8000,
+        Event_Instance   = 0x10000,
+        Event_Action     = 0x20000,
+        Event_Pid        = 0x40000,
+        Event_PPid       = 0x80000,
+        Event_Heartbeat  = 0x100000,
+        Event_All        = 0xFFFFFFFF
+} Event_Type;
+
 
 #define IS_EVENT_SET(value, mask) ((value & mask) != 0)
 
@@ -164,8 +168,8 @@ const char *Event_get_message(Event_T E);
 
 /**
  * Get a textual description of actual event type. For instance if the
- * event type is possitive EVENT_TIMESTAMP, the textual description is
- * "Timestamp error". Likewise if the event type is negative EVENT_CHECKSUM
+ * event type is possitive Event_Timestamp, the textual description is
+ * "Timestamp error". Likewise if the event type is negative Event_Checksum 
  * the textual description is "Checksum recovery" and so on.
  * @param E An event object
  * @return A string describing the event type in clear text. If the
@@ -184,9 +188,9 @@ short Event_get_action(Event_T E);
 
 /**
  * Get a textual description of actual event action. For instance if the
- * event type is possitive EVENT_NONEXIST, the textual description of
+ * event type is possitive Event_Nonexist, the textual description of
  * failed state related action is "restart". Likewise if the event type is
- * negative EVENT_CHECKSUM the textual description of recovery related action
+ * negative Event_Checksum the textual description of recovery related action
  * is "alert" and so on.
  * @param E An event object
  * @return A string describing the event type in clear text. If the

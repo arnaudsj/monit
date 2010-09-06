@@ -488,7 +488,7 @@ setalert        : SET alertmail '{' eventoptionlist '}' formatlist reminder {
                     addmail($<string>2, &mailset, &Run.maillist, eventset, $<number>7);
                   }
                 | SET alertmail formatlist reminder {
-                    addmail($<string>2, &mailset, &Run.maillist, EVENT_ALL, $<number>4);
+                    addmail($<string>2, &mailset, &Run.maillist, Event_All, $<number>4);
                   }
                 | SET alertmail NOT '{' eventoptionlist '}' formatlist reminder {
                    addmail($<string>2, &mailset, &Run.maillist, ~eventset, $<number>8);
@@ -1234,13 +1234,13 @@ alert           : alertmail '{' eventoptionlist '}' formatlist reminder {
                    addmail($<string>1, &mailset, &current->maillist, eventset, $<number>6);
                   }
                 | alertmail formatlist reminder {
-                   addmail($<string>1, &mailset, &current->maillist, EVENT_ALL, $<number>3);
+                   addmail($<string>1, &mailset, &current->maillist, Event_All, $<number>3);
                   }
                 | alertmail NOT '{' eventoptionlist '}' formatlist reminder {
                    addmail($<string>1, &mailset, &current->maillist, ~eventset, $<number>7);
                   }
                 | noalertmail {
-                   addmail($<string>1, &mailset, &current->maillist, EVENT_NULL, 0);
+                   addmail($<string>1, &mailset, &current->maillist, Event_Null, 0);
                   }
                 ;
 
@@ -1254,26 +1254,26 @@ eventoptionlist : eventoption
                 | eventoptionlist eventoption
                 ;
 
-eventoption     : ACTION          { eventset |= EVENT_ACTION; }
-                | CHECKSUM        { eventset |= EVENT_CHECKSUM; }
-                | CONNECTION      { eventset |= EVENT_CONNECTION; }
-                | CONTENT         { eventset |= EVENT_CONTENT; }
-                | DATA            { eventset |= EVENT_DATA; }
-                | EXEC            { eventset |= EVENT_EXEC; }
-                | FSFLAG          { eventset |= EVENT_FSFLAG; }
-                | GID             { eventset |= EVENT_GID; }
-                | ICMP            { eventset |= EVENT_ICMP; }
-                | INSTANCE        { eventset |= EVENT_INSTANCE; }
-                | INVALID         { eventset |= EVENT_INVALID; }
-                | NONEXIST        { eventset |= EVENT_NONEXIST; }
-                | PERMISSION      { eventset |= EVENT_PERMISSION; }
-                | PID             { eventset |= EVENT_PID; }
-                | PPID            { eventset |= EVENT_PPID; }
-                | RESOURCE        { eventset |= EVENT_RESOURCE; }
-                | SIZE            { eventset |= EVENT_SIZE; }
-                | TIMEOUT         { eventset |= EVENT_TIMEOUT; }
-                | TIMESTAMP       { eventset |= EVENT_TIMESTAMP; }
-                | UID             { eventset |= EVENT_UID; }
+eventoption     : ACTION          { eventset |= Event_Action; }
+                | CHECKSUM        { eventset |= Event_Checksum; }
+                | CONNECTION      { eventset |= Event_Connection; }
+                | CONTENT         { eventset |= Event_Content; }
+                | DATA            { eventset |= Event_Data; }
+                | EXEC            { eventset |= Event_Exec; }
+                | FSFLAG          { eventset |= Event_Fsflag; }
+                | GID             { eventset |= Event_Gid; }
+                | ICMP            { eventset |= Event_Icmp; }
+                | INSTANCE        { eventset |= Event_Instance; }
+                | INVALID         { eventset |= Event_Invalid; }
+                | NONEXIST        { eventset |= Event_Nonexist; }
+                | PERMISSION      { eventset |= Event_Permission; }
+                | PID             { eventset |= Event_Pid; }
+                | PPID            { eventset |= Event_PPid; }
+                | RESOURCE        { eventset |= Event_Resource; }
+                | SIZE            { eventset |= Event_Size; }
+                | TIMEOUT         { eventset |= Event_Timeout; }
+                | TIMESTAMP       { eventset |= Event_Timestamp; }
+                | UID             { eventset |= Event_Uid; }
                 ;
 
 formatlist      : /* EMPTY */
@@ -3179,7 +3179,7 @@ static void setsyslog(char *facility) {
  */
 static void reset_mailset() {
   memset(&mailset, 0, sizeof(struct mymail));
-  eventset = EVENT_NULL;
+  eventset = Event_Null;
 }
 
 

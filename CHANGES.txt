@@ -399,7 +399,7 @@ NEW FEATURES AND FUNCTIONS:
   override option is:
   set mailserver foo.bar.baz using hostname "my.monit.host"
 
-* A new EVENT_ACTION type was added which reports actions
+* A new Event_Action type was added which reports actions
   performed on Monit's administrator request (either via web
   interface or CLI). If you don't want to received these events,
   you can set the mail-filter for "action" event type.
