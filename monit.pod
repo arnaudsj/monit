@@ -1995,22 +1995,31 @@ The protocol statement is:
 
  PROTO(COL) {name}
 
-HTTP protocol supports additional options:
- o REQUEST
- o HOSTHEADER
- o CHECKSUM
+The HTTP protocol supports in addition:
+
+=over 4
+
+=item * REQUEST
+
+=item * HOSTHEADER
+
+=item * CHECKSUM
+
+=back
 
  PROTO(COL) HTTP [REQUEST {"/path"} [with HOSTHEADER "string"] [with CHECKSUM checksum]
 
-When the Host header option is not specified, for HTTP protocol, by default
-the content of host option which specifies the target host to connect to is used.
-The Host header can be used when you need to test 
+The Host header option can be used to explict specify the HTTP
+host header in the request. If not used, Monit will use the
+hostname or IP-address of the host as specified in the statement.
+Specifiying a host header is useful if you want to connect to the
+host using an IP-address, and the web-server handle name based
+virtual hosts. Examples:
 
-Examples:
-
-  if failed host 192.168.1.100 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
-  if failed host 192.168.1.101 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
-  if failed host 192.168.1.102 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
+  if failed host 192.168.1.100 port 8080 protocol http 
+     and request '/testing' hostheader 'example.com' 
+     with timeout 20 seconds for 2 cycles 
+  then alert
 
 In addition to the standard protocols, the I<APACHE-STATUS>
 protocol is a test of a specific server type, rather than a
