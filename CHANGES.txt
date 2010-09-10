@@ -108,6 +108,10 @@ BUGFIXES:
   with string "system_" so conflict with existing service is less likely. Thanks to
   Thorsten Kampe for report and help.
 
+* Remove extra NL characters from message when resource succeeded event is sent.
+  The extra NL character may break the mail headers. Thanks to Hanno Boeck for
+  report and patch.
+
 
 
 Version 5.1.1
