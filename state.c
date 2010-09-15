@@ -270,5 +270,7 @@ static void clone_state(Service_T service, State_T *state) {
 static void update_service_state(Service_T service, State_T *state) {
   service->nstart= state->nstart;
   service->ncycle= state->ncycle;
-  service->monitor= state->monitor;
+  /* Keep services in initializing state unless the monitoring should be disabled */
+  if (state->monitor == MONITOR_NOT)
+        service->monitor= state->monitor;
 }

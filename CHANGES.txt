@@ -116,11 +116,10 @@ BUGFIXES:
   between two monitoring cycles while cpu monitoring was initializing. Thanks to
   Marcus Muelbuesch for report.
 
-* Fixed division by zero when 'monit status' was called immediately after monit
-  start before service was initialized.
-
 * Fixed display of port response time as -1 in 'monit status' if it was called in
   the middle of service test.
+
+* Fixed display of initializing state for services after monit start or reload.
 
 
 
