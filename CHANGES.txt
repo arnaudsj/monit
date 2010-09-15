@@ -116,6 +116,9 @@ BUGFIXES:
   between two monitoring cycles while cpu monitoring was initializing. Thanks to
   Marcus Muelbuesch for report.
 
+* Fixed division by zero when 'monit status' was called immediately after monit
+  start before service was initialized.
+
 
 
 Version 5.1.1
