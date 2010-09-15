@@ -920,9 +920,10 @@ static void do_home_system(HttpRequest req, HttpResponse res) {
       "<td align=\"right\" width=\"20%%\">%.1f%% [%ld&nbsp;kB]</td>"
       "<td align=\"right\" width=\"20%%\">%.1f%% [%ld&nbsp;kB]</td>",
       systeminfo.loadavg[0], systeminfo.loadavg[1], systeminfo.loadavg[2],
-      systeminfo.total_cpu_user_percent/10., systeminfo.total_cpu_syst_percent/10.,
+      systeminfo.total_cpu_user_percent > 0 ? systeminfo.total_cpu_user_percent/10. : 0,
+      systeminfo.total_cpu_syst_percent > 0 ? systeminfo.total_cpu_syst_percent/10. : 0,
     #ifdef HAVE_CPU_WAIT
-      systeminfo.total_cpu_wait_percent/10.,
+      systeminfo.total_cpu_wait_percent > 0 ? systeminfo.total_cpu_wait_percent/10. : 0,
     #endif
       systeminfo.total_mem_percent/10., systeminfo.total_mem_kbyte,
       systeminfo.total_swap_percent/10., systeminfo.total_swap_kbyte);
@@ -2258,10 +2259,10 @@ static void print_service_params_resource(HttpResponse res, Service_T s) {
         #endif
           "%s",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          systeminfo.total_cpu_user_percent/10.,
-          systeminfo.total_cpu_syst_percent/10.,
+          systeminfo.total_cpu_user_percent > 0 ? systeminfo.total_cpu_user_percent/10. : 0,
+          systeminfo.total_cpu_syst_percent > 0 ? systeminfo.total_cpu_syst_percent/10. : 0,
         #ifdef HAVE_CPU_WAIT
-          systeminfo.total_cpu_wait_percent/10.,
+          systeminfo.total_cpu_wait_percent > 0 ? systeminfo.total_cpu_wait_percent/10. : 0,
         #endif
           "</font></td></tr>");
         out_print(res,
@@ -2493,10 +2494,10 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
           systeminfo.loadavg[1],
           systeminfo.loadavg[2],
           "cpu",
-          systeminfo.total_cpu_user_percent/10.,
-          systeminfo.total_cpu_syst_percent/10.,
+          systeminfo.total_cpu_user_percent > 0 ? systeminfo.total_cpu_user_percent/10. : 0,
+          systeminfo.total_cpu_syst_percent > 0 ? systeminfo.total_cpu_syst_percent/10. : 0,
         #ifdef HAVE_CPU_WAIT
-          systeminfo.total_cpu_wait_percent/10.,
+          systeminfo.total_cpu_wait_percent > 0 ? systeminfo.total_cpu_wait_percent/10. : 0,
         #endif
           "memory usage",
           systeminfo.total_mem_kbyte,

@@ -413,10 +413,10 @@ static void status_service(Service_T S, Buffer_T *B, short L, int V) {
 					systeminfo.loadavg[0],
 					systeminfo.loadavg[1],
 					systeminfo.loadavg[2],
-					systeminfo.total_cpu_user_percent/10.,
-					systeminfo.total_cpu_syst_percent/10.,
+					systeminfo.total_cpu_user_percent > 0 ? systeminfo.total_cpu_user_percent/10. : 0,
+					systeminfo.total_cpu_syst_percent > 0 ? systeminfo.total_cpu_syst_percent/10. : 0,
 					#ifdef HAVE_CPU_WAIT
-					systeminfo.total_cpu_wait_percent/10.,
+					systeminfo.total_cpu_wait_percent > 0 ? systeminfo.total_cpu_wait_percent/10. : 0,
 					#endif
 					systeminfo.total_mem_percent/10.,
 					systeminfo.total_mem_kbyte,

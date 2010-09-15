@@ -112,6 +112,10 @@ BUGFIXES:
   The extra NL character may break the mail headers. Thanks to Hanno Boeck for
   report and patch.
 
+* Fixed display of cpu user/system/wait usage which temporarily displayed -1.0%
+  between two monitoring cycles while cpu monitoring was initializing. Thanks to
+  Marcus Muelbuesch for report.
+
 
 
 Version 5.1.1
