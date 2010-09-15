@@ -2187,10 +2187,10 @@ static void print_service_params_process(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Process id </td><td>%d</td></tr>",
-        s->inf->pid);
+        s->inf->pid > 0 ? s->inf->pid : 0);
       out_print(res,
         "<tr><td>Parent process id </td><td>%d</td></tr>",
-        s->inf->ppid);
+        s->inf->ppid > 0 ? s->inf->ppid : 0);
 
       uptime= Util_getUptime(s->inf->uptime, "&nbsp;");
       out_print(res,
@@ -2424,8 +2424,8 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
                   "  %-33s %d\n"
                   "  %-33s %d\n"
                   "  %-33s %s\n",
-                    "pid", s->inf->pid,
-                  "parent pid", s->inf->ppid,
+                    "pid", s->inf->pid > 0 ? s->inf->pid : 0,
+                  "parent pid", s->inf->ppid > 0 ? s->inf->ppid : 0,
                   "uptime", uptime);
         FREE(uptime);
         if(Run.doprocess)        {
@@ -2451,7 +2451,7 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
         for(i= s->icmplist; i; i= i->next) {
           out_print(res,
                     "  %-33s %.3fs [%s]\n",
-                    "icmp response time", i->is_available?i->response:-1.,
+                    "icmp response time", i->is_available ? i->response : 0.,
                     icmpnames[i->type]);
         }
       }
@@ -2461,14 +2461,14 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
           if(p->family == AF_INET) {
             out_print(res,
                       "  %-33s %.3fs to %s:%d%s [%s via %s]\n",
-                      "port response time", p->is_available?p->response:-1., 
+                      "port response time", p->is_available ? p->response : 0., 
                       p->hostname,
                     p->port, p->request?p->request:"", p->protocol->name,
                     Util_portTypeDescription(p));
           } else if(p->family == AF_UNIX) {
             out_print(res,
                       "  %-33s %.3fs to %s [%s]\n",
-                      "unix socket response time", p->is_available?p->response:-1.,
+                      "unix socket response time", p->is_available ? p->response : 0.,
                       p->pathname, p->protocol->name);
           }
         }

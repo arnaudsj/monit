@@ -557,8 +557,6 @@ static void check_connection(Service_T s, Port_T p) {
 
   ASSERT(s && p);
 
-  p->response = -1;
-
   /* Get time of connection attempt beginning */
   gettimeofday(&t1, NULL);
 
@@ -596,9 +594,11 @@ static void check_connection(Service_T s, Port_T p) {
   p->response = (double)(t2.tv_sec - t1.tv_sec) + (double)(t2.tv_usec - t1.tv_usec)/1000000;
 
   error:
-  if (socket) socket_free(&socket);
+  if (socket)
+    socket_free(&socket);
 
   if (!rv) {
+    p->response = -1;
     p->is_available = FALSE;
     Event_post(s, Event_Connection, STATE_FAILED, p->action, report);
   } else {
