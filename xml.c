@@ -297,8 +297,8 @@ static void status_service(Service_T S, Buffer_T *B, short L, int V) {
   		"</block>",
   		S->inf->flags,
   		S->inf->space_percent/10.,
-  		(float)S->inf->space_total / (float)1048576 * (float)S->inf->f_bsize,
-                (float)S->inf->f_blocks / (float)1048576 * (float)S->inf->f_bsize);
+  		S->inf->f_bsize > 0 ? (float)S->inf->space_total / (float)1048576 * (float)S->inf->f_bsize : 0,
+                S->inf->f_bsize > 0 ? (float)S->inf->f_blocks / (float)1048576 * (float)S->inf->f_bsize : 0);
         if(S->inf->f_files > 0) {
           Util_stringbuffer(B,
   		  "<inode>"

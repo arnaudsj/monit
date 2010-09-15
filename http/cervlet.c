@@ -1075,7 +1075,7 @@ static void do_home_filesystem(HttpRequest req, HttpResponse res) {
       out_print(res,
         "<td align=\"right\">%.1f%% [%.1f&nbsp;MB]</td>",
         s->inf->space_percent/10.,
-        (float)s->inf->space_total / (float)1048576 * (float)s->inf->f_bsize);
+        s->inf->f_bsize > 0 ? ((float)s->inf->space_total / (float)1048576 * (float)s->inf->f_bsize) : 0);
 
       if(s->inf->f_files > 0) {
 
@@ -2077,20 +2077,20 @@ static void print_service_params_filesystem(HttpResponse res, Service_T s) {
       out_print(res,
         "<tr><td>Blocks total</td><td>%ld [%.1f MB]</td></tr>",
         s->inf->f_blocks,
-        (float) s->inf->f_blocks/1048576*s->inf->f_bsize);
+        s->inf->f_bsize > 0 ? ((float) s->inf->f_blocks/1048576*s->inf->f_bsize) : 0);
       out_print(res,
         "<tr><td>Blocks free for non superuser</td>"
         "<td>%ld [%.1f MB] [%.1f%%]</td></tr>",
         s->inf->f_blocksfree,
-        (float)s->inf->f_blocksfree / (float)1048576 * (float)s->inf->f_bsize,
-        (float)100 * (float)s->inf->f_blocksfree / (float)s->inf->f_blocks);
+        s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfree / (float)1048576 * (float)s->inf->f_bsize) : 0,
+        s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfree / (float)s->inf->f_blocks) : 0);
       out_print(res,
         "<tr><td>Blocks free total</td>"
         "<td><font%s>%ld [%.1f MB] [%.1f%%]</font></td></tr>",
         (s->error & Event_Resource)?" color='#ff0000'":"",
         s->inf->f_blocksfreetotal,
-        (float)s->inf->f_blocksfreetotal / (float)1048576 * (float)s->inf->f_bsize,
-        (float)100 * (float)s->inf->f_blocksfreetotal / (float)s->inf->f_blocks);
+        s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfreetotal / (float)1048576 * (float)s->inf->f_bsize) : 0,
+        s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfreetotal / (float)s->inf->f_blocks) : 0);
       out_print(res,
         "<tr><td>Block size</td><td>%ld B</td></tr>", s->inf->f_bsize);
 
@@ -2398,20 +2398,15 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
                   s->inf->f_bsize,
                   "blocks total",
                   s->inf->f_blocks,
-                  ((float)s->inf->f_blocks/(float)1048576*
-                   (float)s->inf->f_bsize),
+                  s->inf->f_bsize > 0 ? ((float)s->inf->f_blocks / (float)1048576* (float)s->inf->f_bsize) : 0,
                   "blocks free for non superuser",
                   s->inf->f_blocksfree,
-                  ((float)s->inf->f_blocksfree/(float)1048576*
-                   (float)s->inf->f_bsize),
-                  ((float)100*(float)s->inf->f_blocksfree/
-                   (float)s->inf->f_blocks),
+                  s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfree / (float)1048576* (float)s->inf->f_bsize) : 0,
+                  s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfree / (float)s->inf->f_blocks) : 0,
                   "blocks free total",
                   s->inf->f_blocksfreetotal,
-                  ((float)s->inf->f_blocksfreetotal/(float)1048576*
-                   (float)s->inf->f_bsize),
-                  ((float)100*(float)s->inf->f_blocksfreetotal/
-                   (float)s->inf->f_blocks));
+                  s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfreetotal/(float)1048576* (float)s->inf->f_bsize) : 0,
+                  s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfreetotal / (float)s->inf->f_blocks) : 0);
         if(s->inf->f_files > 0) {
           out_print(res,
                     "  %-33s %ld\n"
@@ -2420,8 +2415,7 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
                     s->inf->f_files,
                     "inodes free",
                     s->inf->f_filesfree,
-                    ((float)100*(float)s->inf->f_filesfree/
-                     (float)s->inf->f_files));
+                    ((float)100*(float)s->inf->f_filesfree/ (float)s->inf->f_files));
         }
       }
       if(s->type == TYPE_PROCESS) {

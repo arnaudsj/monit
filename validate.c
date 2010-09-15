@@ -276,8 +276,8 @@ int check_filesystem(Service_T s) {
     Event_post(s, Event_Data, STATE_FAILED, s->action_DATA, "unable to read filesystem %s state", p);
     return FALSE;
   }
-  s->inf->inode_percent = (int)((1000.0 * (s->inf->f_files - s->inf->f_filesfree)) / (float)s->inf->f_files);
-  s->inf->space_percent = (int)((1000.0 * (s->inf->f_blocks - s->inf->f_blocksfree)) / (float)s->inf->f_blocks);
+  s->inf->inode_percent = s->inf->f_files > 0 ? (int)((1000.0 * (s->inf->f_files - s->inf->f_filesfree)) / (float)s->inf->f_files) : 0;
+  s->inf->space_percent = s->inf->f_blocks > 0 ? (int)((1000.0 * (s->inf->f_blocks - s->inf->f_blocksfree)) / (float)s->inf->f_blocks) : 0;
   s->inf->inode_total   = s->inf->f_files - s->inf->f_filesfree;
   s->inf->space_total   = s->inf->f_blocks - s->inf->f_blocksfreetotal;
   Event_post(s, Event_Data, STATE_SUCCEEDED, s->action_DATA, "succeeded getting filesystem statistic for %s", p);
