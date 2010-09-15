@@ -1307,20 +1307,29 @@ int Util_isProcessRunning(Service_T s) {
   errno = 0;
 
   if (s->matchlist) {
-    for (i = 0; i < ptreesize; i++) {
-      int found = FALSE;
+    /* The process table read may sporadically fail during read, because we're using glob on some platforms which may fail if the proc filesystem
+     * which it traverses is changed during glob (process stopped). Note that the glob failure is rare and temporary - it will be OK on next cycle.
+     * We skip the process matching that cycle however because we don't have process informations - will retry next cycle */
+    if (Run.doprocess) {
+      for (i = 0; i < ptreesize; i++) {
+        int found = FALSE;
 
-      if (ptree[i].cmdline) {
+        if (ptree[i].cmdline) {
 #ifdef HAVE_REGEX_H
-        found = regexec(s->matchlist->regex_comp, ptree[i].cmdline, 0, NULL, 0) ? FALSE : TRUE;
+          found = regexec(s->matchlist->regex_comp, ptree[i].cmdline, 0, NULL, 0) ? FALSE : TRUE;
 #else
-        found = strstr(ptree[i].cmdline, s->matchlist->match_string) ? TRUE : FALSE;
+          found = strstr(ptree[i].cmdline, s->matchlist->match_string) ? TRUE : FALSE;
 #endif
+        }
+        if (found) {
+          pid = ptree[i].pid;
+          break;
+        }
       }
-      if (found) {
-        pid = ptree[i].pid;
-        break;
-      }
+    } else {
+        DEBUG("Process informations not available -- skipping service %s process existence check for this cycle\n", s->name);
+        /* Return value is NOOP - it is based on existing errors bitmap so we don't generate false recovery/failures */
+        return ! (s->error & Event_Nonexist);
     }
   } else {
     pid = Util_getPid(s->path);
