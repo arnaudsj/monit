@@ -445,8 +445,7 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
 int close_socket(int socket) {
   int r;
 
-  if ((r = shutdown(socket, 2)) < 0)
-    LogError("%s: Socket %d shutdown failed -- %s\n", prog, socket, STRERROR);
+  shutdown(socket, 2);
   
   /* Try to close even if shutdown failed so we won't leak file descriptors */
   do {
