@@ -778,7 +778,7 @@ static void check_process_resources(Service_T s, Resource_T r) {
 
   case RESOURCE_ID_LOAD1:
     if (Util_evalQExpression(r->operator, (int)(systeminfo.loadavg[0]*10.0), r->limit)) {
-      snprintf(report, STRLEN, "loadavg(1min) of %.1f matches resource limit " "[loadavg(1min)%s%.1f]", systeminfo.loadavg[0], operatorshortnames[r->operator], r->limit/10.0);
+      snprintf(report, STRLEN, "loadavg(1min) of %.1f matches resource limit [loadavg(1min)%s%.1f]", systeminfo.loadavg[0], operatorshortnames[r->operator], r->limit/10.0);
       okay = FALSE;
     } else
       snprintf(report, STRLEN, "'%s' loadavg(1min) check succeeded [current loadavg(1min)=%.1f]", s->name, systeminfo.loadavg[0]);
@@ -786,7 +786,7 @@ static void check_process_resources(Service_T s, Resource_T r) {
 
   case RESOURCE_ID_LOAD5:
     if (Util_evalQExpression(r->operator, (int)(systeminfo.loadavg[1]*10.0), r->limit)) {
-      snprintf(report, STRLEN, "loadavg(5min) of %.1f matches resource limit " "[loadavg(5min)%s%.1f]", systeminfo.loadavg[1], operatorshortnames[r->operator], r->limit/10.0);
+      snprintf(report, STRLEN, "loadavg(5min) of %.1f matches resource limit [loadavg(5min)%s%.1f]", systeminfo.loadavg[1], operatorshortnames[r->operator], r->limit/10.0);
       okay = FALSE;
     } else
       snprintf(report, STRLEN, "'%s' loadavg(5min) check succeeded [current loadavg(5min)=%.1f]", s->name, systeminfo.loadavg[1]);
@@ -794,7 +794,7 @@ static void check_process_resources(Service_T s, Resource_T r) {
 
   case RESOURCE_ID_LOAD15:
     if (Util_evalQExpression(r->operator, (int)(systeminfo.loadavg[2]*10.0), r->limit)) {
-      snprintf(report, STRLEN, "loadavg(15min) of %.1f matches resource limit " "[loadavg(15min)%s%.1f]", systeminfo.loadavg[2], operatorshortnames[r->operator], r->limit/10.0);
+      snprintf(report, STRLEN, "loadavg(15min) of %.1f matches resource limit [loadavg(15min)%s%.1f]", systeminfo.loadavg[2], operatorshortnames[r->operator], r->limit/10.0);
       okay = FALSE;
     } else
       snprintf(report, STRLEN, "'%s' loadavg(15min) check succeeded [current loadavg(15min)=%.1f]", s->name, systeminfo.loadavg[2]);
@@ -810,18 +810,18 @@ static void check_process_resources(Service_T s, Resource_T r) {
 
   case RESOURCE_ID_TOTAL_MEM_KBYTE:
     if (Util_evalQExpression(r->operator, s->inf->total_mem_kbyte, r->limit)) {
-      snprintf(report, STRLEN, "total mem amount of %ldkB matches resource limit" " [total mem amount%s%ldkB]", s->inf->total_mem_kbyte, operatorshortnames[r->operator], r->limit);
+      snprintf(report, STRLEN, "total mem amount of %ldkB matches resource limit [total mem amount%s%ldkB]", s->inf->total_mem_kbyte, operatorshortnames[r->operator], r->limit);
       okay = FALSE;
     } else
-      snprintf(report, STRLEN, "'%s' total mem amount check succeeded " "[current total mem amount=%ldkB]", s->name, s->inf->total_mem_kbyte);
+      snprintf(report, STRLEN, "'%s' total mem amount check succeeded [current total mem amount=%ldkB]", s->name, s->inf->total_mem_kbyte);
     break;
 
   case RESOURCE_ID_TOTAL_MEM_PERCENT:
     if (Util_evalQExpression(r->operator, s->inf->total_mem_percent, r->limit)) {
-      snprintf(report, STRLEN, "total mem amount of %.1f%% matches resource limit" " [total mem amount%s%.1f%%]", (float)s->inf->total_mem_percent/10.0, operatorshortnames[r->operator], (float)r->limit/10.0);
+      snprintf(report, STRLEN, "total mem amount of %.1f%% matches resource limit [total mem amount%s%.1f%%]", (float)s->inf->total_mem_percent/10.0, operatorshortnames[r->operator], (float)r->limit/10.0);
       okay = FALSE;
     } else
-      snprintf(report, STRLEN, "'%s' total mem amount check succeeded " "[current total mem amount=%.1f%%]", s->name, s->inf->total_mem_percent/10.0);
+      snprintf(report, STRLEN, "'%s' total mem amount check succeeded [current total mem amount=%.1f%%]", s->name, s->inf->total_mem_percent/10.0);
     break;
 
   default:
@@ -1249,7 +1249,7 @@ static void check_filesystem_resources(Service_T s, Filesystem_T td) {
         }
       } else {
         if (Util_evalQExpression(td->operator, s->inf->space_total, td->limit_absolute)) {
-          Event_post(s, Event_Resource, STATE_FAILED, td->action, "space usage %ld blocks matches resource limit " "[space usage%s%ld blocks]", s->inf->space_total, operatorshortnames[td->operator], td->limit_absolute);
+          Event_post(s, Event_Resource, STATE_FAILED, td->action, "space usage %ld blocks matches resource limit [space usage%s%ld blocks]", s->inf->space_total, operatorshortnames[td->operator], td->limit_absolute);
 	  return;
         }
       }
