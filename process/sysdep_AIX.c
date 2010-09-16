@@ -235,11 +235,11 @@ int initprocesstree_sysdep(ProcessTree_T ** reference) {
 
     snprintf(filename, sizeof(filename), "/proc/%d/psinfo", pt[i].pid);
     if ((fd = open(filename, O_RDONLY)) < 0) {
-      LogError("%s: Cannot open proc file %s -- %s\n", prog, filename, STRERROR);
+      DEBUG("%s: Cannot open proc file %s -- %s\n", prog, filename, STRERROR);
       continue;
     }
     if (read(fd, &ps, sizeof(ps)) < 0) {
-      LogError("%s: Cannot read proc file %s -- %s\n", prog, filename, STRERROR);
+      DEBUG("%s: Cannot read proc file %s -- %s\n", prog, filename, STRERROR);
       if (close(fd) < 0)
         LogError("%s: Socket close failed -- %s\n", prog, STRERROR);
       return FALSE;

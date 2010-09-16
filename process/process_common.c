@@ -104,12 +104,12 @@ int read_proc_file(char *buf, int buf_size, char *name, int pid, int *bytes_read
     snprintf(filename, STRLEN, "/proc/%d/%s", pid, name);
     
   if ((fd = open(filename, O_RDONLY)) < 0) {
-    LogError("%s: Cannot open proc file %s -- %s\n", prog, filename, STRERROR);
+    DEBUG("%s: Cannot open proc file %s -- %s\n", prog, filename, STRERROR);
     return rv;
   }
 
   if ((bytes = read(fd, buf, buf_size-1)) < 0) {
-    LogError("%s: Cannot read proc file %s -- %s\n", prog, filename, STRERROR);
+    DEBUG("%s: Cannot read proc file %s -- %s\n", prog, filename, STRERROR);
     goto error;
   }
   if (bytes_read)
