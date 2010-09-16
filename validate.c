@@ -833,7 +833,8 @@ static void check_process_resources(Service_T s, Resource_T r) {
     Event_post(s, Event_Resource, STATE_FAILED, r->action, "%s", report);
   else {
     Event_post(s, Event_Resource, STATE_SUCCEEDED, r->action, "%s", report);
-    DEBUG("%s\n", report);
+    if (*report)
+        DEBUG("%s\n", report);
   }
 }
 
