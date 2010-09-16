@@ -430,7 +430,7 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
 
   error:
   if (close(s) < 0)
-    LogError("%s: Socket close failed -- %s\n", prog, STRERROR);
+    LogError("%s: Socket %d close failed -- %s\n", prog, s, STRERROR);
 
   return -1;
 
@@ -446,14 +446,14 @@ int close_socket(int socket) {
   int r;
 
   if ((r = shutdown(socket, 2)) < 0)
-    LogError("%s: Socket shutdown failed -- %s\n", prog, STRERROR);
+    LogError("%s: Socket %d shutdown failed -- %s\n", prog, socket, STRERROR);
   
   /* Try to close even if shutdown failed so we won't leak file descriptors */
   do {
     r = close(socket);
   } while(r == -1 && errno == EINTR);
   if (r == -1)
-    LogError("%s: Socket close failed -- %s\n", prog, STRERROR);
+    LogError("%s: Socket %d close failed -- %s\n", prog, socket, STRERROR);
   
   return r;
 }
