@@ -245,7 +245,7 @@ void socket_free(Socket_T *S) {
     } else if((*S)->connection_type==TYPE_ACCEPT && (*S)->sslserver) {
       close_accepted_ssl_socket((*S)->sslserver, (*S)->ssl);
     }
-  }
+  } else
 #endif
   
   close_socket((*S)->socket);

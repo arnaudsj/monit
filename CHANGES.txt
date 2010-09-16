@@ -76,6 +76,8 @@ BUGFIXES:
 
 * Fixed ICMP echo test on AIX and NETBSD.
 
+* Fixed sporadic connection failures when SSL sockets were used.
+
 * DNS protocol test now accepts request refusal as correct response - the test is based
   on query for NS root record which may be prohibited on server side, whereas the negative
   response means that the server reacts to requests.
