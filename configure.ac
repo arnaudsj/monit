@@ -401,6 +401,7 @@ elif test `uname` = "Linux"
 then
    ARCH="LINUX"
    CFLAGS="$CFLAGS -D _REENTRANT"
+   LDFLAGS="$LDFLAGS -rdynamic"
    if test `uname -r | awk -F '.' '{print$1$2}'` -ge "26"
    then
    	AC_DEFINE([HAVE_CPU_WAIT], [1], [Define to 1 if CPU wait information is available.])
