@@ -54,6 +54,9 @@ NEW FEATURES AND FUNCTIONS:
 
 * Allow use of start/stop program statements in 'check system'
 
+* Display backtrace on error if debug mode is enabled. The backtrace is available if the OS
+  supports it (for example Linux, MacOSX, Solaris do support it).
+
 BUGFIXES:
 
 * Show real process uptime - formerly the presented uptime was based on create/modify

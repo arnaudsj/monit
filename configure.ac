@@ -83,6 +83,7 @@ AC_CHECK_HEADERS([ \
 	crypt.h \
 	dirent.h \
 	errno.h \
+	execinfo.h \
 	fcntl.h \
 	getopt.h \
 	glob.h \
@@ -316,6 +317,7 @@ AC_CHECK_FUNCS(setlocale)
 AC_CHECK_FUNCS(getaddrinfo)
 AC_CHECK_FUNCS(syslog)
 AC_CHECK_FUNCS(vsyslog)
+AC_CHECK_FUNCS(backtrace)
 
 # Check if we do need external GNU replacements
 AC_FUNC_GETLOADAVG

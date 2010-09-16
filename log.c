@@ -72,6 +72,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_EXECINFO_H
+#include <execinfo.h>
+#endif
+
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -89,6 +93,7 @@
   *  logfile.
   *
   *  @author Jan-Henrik Haukeland, <hauk@tildeslash.com>
+  *  @author Martin Pala, <martinp@tildeslash.com>
   *
   *  @file
  */
@@ -124,6 +129,7 @@ static int  open_log();
 static char *timefmt(char *t, int size);
 static const char *logPriorityDescription(int p);
 static void log_log(int priority, const char *s, va_list ap);
+static void log_backtrace();
 
 
 /* ------------------------------------------------------------------ Public */
@@ -164,6 +170,7 @@ void LogEmergency(const char *s, ...) {
   va_start(ap, s);
   log_log(LOG_EMERG, s, ap);
   va_end(ap);
+  log_backtrace();
 }
 
 
@@ -179,6 +186,7 @@ void LogAlert(const char *s, ...) {
   va_start(ap, s);
   log_log(LOG_ALERT, s, ap);
   va_end(ap);
+  log_backtrace();
 }
 
 
@@ -194,6 +202,7 @@ void LogCritical(const char *s, ...) {
   va_start(ap, s);
   log_log(LOG_CRIT, s, ap);
   va_end(ap);
+  log_backtrace();
 }
 
 
@@ -209,6 +218,7 @@ void LogError(const char *s, ...) {
   va_start(ap, s);
   log_log(LOG_ERR, s, ap);
   va_end(ap);
+  log_backtrace();
 }
 
 
@@ -288,6 +298,18 @@ void log_close() {
   LOG= NULL;
 
 }
+
+
+#ifndef HAVE_VSYSLOG
+#ifdef HAVE_SYSLOG
+void vsyslog (int facility_priority, const char *format, va_list arglist) {
+  char msg[STRLEN+1];
+
+  vsnprintf(msg, STRLEN, format, arglist);
+  syslog(facility_priority, "%s", msg);
+}
+#endif /* HAVE_SYSLOG */
+#endif /* HAVE_VSYSLOG */
 
 
 /* ----------------------------------------------------------------- Private */
@@ -405,14 +427,21 @@ static void log_log(int priority, const char *s, va_list ap) {
 }
 
 
-#ifndef HAVE_VSYSLOG
-#ifdef HAVE_SYSLOG
-void vsyslog (int facility_priority, const char *format, va_list arglist) {
-  char msg[STRLEN+1];
+static void log_backtrace() {
+#ifdef HAVE_BACKTRACE
+  int i, frames;
+  void *callstack[128];
+  char **strs;
 
-  vsnprintf(msg, STRLEN, format, arglist);
-  syslog(facility_priority, "%s", msg);
+  if (Run.debug) {
+    frames = backtrace(callstack, sizeof(callstack));
+    strs = backtrace_symbols(callstack, frames);
+    LogDebug("-------------------------------------------------------------------------------\n");
+    for (i = 0; i < frames; ++i)
+      LogDebug("    %s\n", strs[i]);
+    LogDebug("-------------------------------------------------------------------------------\n");
+    FREE(strs);
+  }
+#endif
 }
-#endif /* HAVE_SYSLOG */
-#endif /* HAVE_VSYSLOG */
 
