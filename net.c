@@ -373,10 +373,10 @@ int create_unix_socket(const char *pathname, int timeout) {
 int create_server_socket(int port, int backlog, const char *bindAddr) {
   int s;
   int status;
-  int flag= 1;
+  int flag = 1;
   struct sockaddr_in myaddr;
 
-  if((s= socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+  if((s = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     LogError("%s: Cannot create socket -- %s\n", prog, STRERROR);
     return -1;
   }
@@ -429,7 +429,8 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
   return s;
 
   error:
-  close(s);
+  if (close(s) < 0)
+    LogError("%s: Socket close failed -- %s\n", prog, STRERROR);
 
   return -1;
 
@@ -442,17 +443,19 @@ int create_server_socket(int port, int backlog, const char *bindAddr) {
  * @return TRUE if the close succeed otherwise FALSE
  */
 int close_socket(int socket) {
-
   int r;
 
-  shutdown(socket, 2);
+  if ((r = shutdown(socket, 2)) < 0)
+    LogError("%s: Socket shutdown failed -- %s\n", prog, STRERROR);
   
+  /* Try to close even if shutdown failed so we won't leak file descriptors */
   do {
-    r= close(socket);
+    r = close(socket);
   } while(r == -1 && errno == EINTR);
+  if (r == -1)
+    LogError("%s: Socket close failed -- %s\n", prog, STRERROR);
   
   return r;
-
 }
 
 

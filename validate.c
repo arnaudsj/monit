@@ -1109,7 +1109,8 @@ static void check_match(Service_T s) {
   }
 
   final:
-  fclose(file);
+  if (fclose(file))
+    LogError("'%s' cannot close file %s: %s\n", s->name, s->path, STRERROR);
 }
 
 /**

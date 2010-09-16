@@ -81,7 +81,7 @@
 
 
 /**
- * Reads an process dependent entry or the proc files system
+ * Reads an process dependent entry or the proc filesystem
  * @param buf buffer to write to
  * @param buf_size size of buffer "buf"
  * @param name name of proc service
@@ -93,6 +93,7 @@ int read_proc_file(char *buf, int buf_size, char *name, int pid, int *bytes_read
   int fd;
   char filename[STRLEN];
   int bytes;
+  int rv = FALSE;
 
   ASSERT(buf);
   ASSERT(name);
@@ -103,24 +104,26 @@ int read_proc_file(char *buf, int buf_size, char *name, int pid, int *bytes_read
     snprintf(filename, STRLEN, "/proc/%d/%s", pid, name);
     
   if ((fd = open(filename, O_RDONLY)) < 0) {
-    DEBUG("cannot open file %s -- %s\n", filename, STRERROR);
-    return FALSE;
+    LogError("%s: Cannot open proc file %s -- %s\n", prog, filename, STRERROR);
+    return rv;
   }
 
   if ((bytes = read(fd, buf, buf_size-1)) < 0) {
-    close(fd);
-    DEBUG("cannot read file %s -- %s\n", filename, STRERROR);
-    return FALSE;
+    LogError("%s: Cannot read proc file %s -- %s\n", prog, filename, STRERROR);
+    goto error;
   }
   if (bytes_read)
     *bytes_read = bytes;
        
   /* In case it is a string we have to 0 terminate it our self */
   buf[bytes]='\0';
+  rv = TRUE;
 
-  close(fd);
+error:
+  if (close(fd) < 0)
+    LogError("%s: Socket close failed -- %s\n", prog, STRERROR);
 
-  return TRUE;
+  return rv;
 }
 
 /**

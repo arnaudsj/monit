@@ -1162,48 +1162,35 @@ void Util_printServiceList() {
  * Print file hashes from stdin or from the given file
  */
 void Util_printHash(char *filename) {
-  
   unsigned char buf[STRLEN], buf2[STRLEN];
-  FILE * fhandle;
+  FILE *fhandle = NULL;
   int fresult;
   int i;
 
-  if (filename == NULL) {
-    fhandle = stdin;
-  } else {
-    fhandle = fopen(filename, "r");
-    if ( fhandle == NULL ) {
-      goto fileerror;
-    }
-  }
-  fresult=Util_getStreamDigests(fhandle, buf, buf2);
-  if(fresult) {
+  if (! (fhandle = filename ? fopen(filename, "r") : stdin))
     goto fileerror;
-  }
-  if (filename==NULL) {
-    printf("SHA1(stdin) = ");
-  } else {
-    printf("SHA1(%s) = ", filename);
-    fclose(fhandle);
-  }
-  for(i= 0; i < 20; ++i) {
+  if ((fresult = Util_getStreamDigests(fhandle, buf, buf2)))
+    goto fileerror;
+  if (filename && fclose(fhandle))
+    goto fileerror;
+
+  /* SHA1 */
+  printf("SHA1(%s) = ", filename ? filename : "stdin");
+  for (i = 0; i < 20; i++)
     printf("%02x", buf[i]);
-  }
-  if (filename==NULL) {
-    printf("\nMD5(stdin)  = ");
-  } else {
-    printf("\nMD5(%s)  = ", filename);
-  }
-  for(i= 0; i < 16; ++i) {
+  printf("\n");
+
+  /* MD5 */
+  printf("MD5(%s)  = ", filename ? filename : "stdin");
+  for (i = 0; i < 16; i++)
     printf("%02x", buf2[i]);
-  }
   printf("\n");
 
   return;
 
 fileerror:
 
-  printf("monit: %s: %s\n", filename, strerror(errno));
+  printf("monit: %s: %s\n", filename, STRERROR);
   exit(1);
 }
 
@@ -1246,11 +1233,13 @@ char *Util_monitId(char *idfile) {
     }
     if(fscanf(file, "%256s", Run.id) != 1) {
       LogError("%s: Error reading id from file '%s'\n", prog, idfile);
-      fclose(file);
+      if (fclose(file))
+        LogError("%s: Error closing file '%s' -- %s\n", prog, idfile, STRERROR);
       return NULL;
     }
   }
-  fclose(file);
+  if (fclose(file))
+    LogError("%s: Error closing file '%s' -- %s\n", prog, idfile, STRERROR);
 
   return Run.id;
 }
@@ -1275,16 +1264,18 @@ pid_t Util_getPid(char *pidfile) {
     LogError("%s: pidfile '%s' is not a regular file\n",prog, pidfile);
     return FALSE;
   }
-  if((file= fopen(pidfile,"r")) == (FILE *)NULL) {
+  if((file = fopen(pidfile,"r")) == (FILE *)NULL) {
     LogError("%s: Error opening the pidfile '%s' -- %s\n", prog, pidfile, STRERROR);
     return FALSE;
   }
   if(fscanf(file, "%d", &pid) != 1) {
     LogError("%s: Error reading pid from file '%s'\n", prog, pidfile);
-    fclose(file);
+    if (fclose(file))
+      LogError("%s: Error closing file '%s' -- %s\n", prog, pidfile, STRERROR);
     return FALSE;
   }
-  fclose(file);
+  if (fclose(file))
+    LogError("%s: Error closing file '%s' -- %s\n", prog, pidfile, STRERROR);
 
   if(pid < 0)
     return(FALSE);
@@ -1471,7 +1462,9 @@ int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize) {
           break;
       }
 
-      fclose(f);
+      if (fclose(f))
+        LogError("%s: Error closing file '%s' -- %s\n", prog, file, STRERROR);
+
       if (fresult) {
         LogError("checksum: file %s stream error (0x%x)\n", file, fresult);
         return FALSE;
@@ -1685,7 +1678,7 @@ void Util_closeFds() {
   int max_descriptors = 1024;
 #endif
   for(i = 3; i < max_descriptors; i++)
-    (void) close(i);
+    close(i);
   errno= 0;
 }
 
