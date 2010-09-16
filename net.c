@@ -662,7 +662,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   struct icmp *icmpin = NULL;
   struct icmp *icmpout = NULL;
   uint16_t id_out;
-  int i, s, n = 0;
+  int r, i, s, n = 0;
   struct timeval t_out;
   struct timeval t_in;
   char buf[STRLEN];
@@ -772,7 +772,12 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   }
 
   error1:
-  close_socket(s);
+  do {
+    r = close(s);
+  } while(r == -1 && errno == EINTR);
+  if (r == -1)
+    LogError("%s: Socket %d close failed -- %s\n", prog, s, STRERROR);
+
   error2:
   freeaddrinfo(result);
 
