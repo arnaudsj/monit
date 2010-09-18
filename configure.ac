@@ -599,6 +599,7 @@ AC_ARG_WITH(ssl-static,
             checkssllibdirstatic "$dir" && break 2
         done
         use_sslstatic=1
+        LDFLAGS="`echo $LDFLAGS | sed -e 's/-rdynamic/-ldl/g'`"
         AC_MSG_RESULT([enabled])
         AC_DEFINE([HAVE_OPENSSL], 1, [Define to 1 if you have openssl.])
         AC_SUBST(sslincldir)
