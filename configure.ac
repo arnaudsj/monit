@@ -43,7 +43,6 @@ AC_CHECK_LIB([inet],   [socket])
 AC_CHECK_LIB([nsl],    [inet_addr])
 AC_CHECK_LIB([resolv], [inet_aton])
 AC_CHECK_LIB([crypt],  [crypt])
-AC_CHECK_LIB([pam],    [pam_start])
 
 # Wacky pthread madness
 pthread_libs=""
@@ -525,6 +524,35 @@ fi
 
 
 # ------------------------------------------------------------------------
+# PAM Code
+# ------------------------------------------------------------------------
+
+AC_MSG_CHECKING([for PAM support])
+AC_ARG_WITH(pam,
+    [  --without-pam           disable the use of pam (default: enabled)],
+    [
+        dnl Check the withvalue                
+        if test "x$withval" = "xno" ; then
+            use_pam=0
+            AC_MSG_RESULT([disabled])
+        fi
+        if test "x$withval" = "xyes" ; then
+            use_pam=1
+            AC_MSG_RESULT([enabled])
+        fi
+    ],
+    [
+        use_pam=1
+        AC_MSG_RESULT([enabled])
+    ]
+)
+
+if test "$use_pam" = "1"; then
+        AC_CHECK_LIB([pam],    [pam_start])
+fi
+
+
+# ------------------------------------------------------------------------
 # SSL Code
 # ------------------------------------------------------------------------
 
@@ -702,6 +730,11 @@ echo ""
 echo "monit has been configured with the following options:"
 
 echo "                Architecture: ${ARCH}"
+if test "$use_pam" = "1"; then
+    echo "                 PAM support: enabled"
+else
+    echo "                 PAM support: disabled"
+fi
 if test "$use_ssl" = "1"; then
     echo "                 SSL support: enabled"
     echo "       SSL include directory: ${sslincldir}"
