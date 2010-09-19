@@ -1327,6 +1327,7 @@ static int check_skip(Service_T s) {
 static int do_scheduled_action(Service_T s) {
   int rv = FALSE;
   if (s->doaction != ACTION_IGNORE) {
+    // FIXME: let the event engine do the action directly? (just replace s->action_ACTION with s->doaction and drop control_service call)
     rv = control_service(s->name, s->doaction);
     Event_post(s, Event_Action, STATE_CHANGED, s->action_ACTION, "%s action done", actionnames[s->doaction]);
     s->doaction = ACTION_IGNORE;
