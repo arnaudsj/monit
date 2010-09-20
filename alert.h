@@ -49,7 +49,7 @@
 	              "\tDescription: $DESCRIPTION\r\n"\
 		      "\r\n"\
 		      "Your faithful employee,\r\n"\
-	              "monit\r\n"
+	              "Monit\r\n"
 
 
 /**
