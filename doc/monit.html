@@ -79,9 +79,11 @@
 
 	</ul>
 
+	<li><a href="#service_poll_time">SERVICE POLL TIME</a></li>
 	<li><a href="#monit_httpd">MONIT HTTPD</a></li>
 	<ul>
 
+		<li><a href="#fips_support">FIPS support</a></li>
 		<li><a href="#monit_httpd_authentication">Monit HTTPD Authentication</a></li>
 		<ul>
 
@@ -1112,7 +1114,7 @@ process is not running, file doesn't exist, etc.) is to perform
 service restart action.</p>
 <p>The default action can be overrided with following statement:</p>
 <dl>
-<dt><strong><a name="if_failed_existence_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED EXISTENCE [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
+<dt><strong><a name="if_does_not_exist_x_y_cycles_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF [DOES] NOT EXIST [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action
       [ELSE IF SUCCEEDED [[&lt;X&gt;] &lt;Y&gt; CYCLES] THEN action]</a></strong></dt>
 
 </dl>
@@ -1120,8 +1122,8 @@ service restart action.</p>
 &quot;EXEC&quot;, &quot;MONITOR&quot; or &quot;UNMONITOR&quot;.</p>
 <p>Example:</p>
 <pre>
- check file with path /dev/usb000
-   if failed existence for 5 cycles then exec &quot;/bin/flashdisk_removed.sh&quot;</pre>
+ check file with path /cifs/mydata
+   if does not exist for 5 cycles then exec &quot;/usr/bin/mount_cifs.sh&quot;</pre>
 <p>
 </p>
 <h2><a name="resource_testing">RESOURCE TESTING</a></h2>
@@ -1728,6 +1730,7 @@ moment Monit knows how to speak:
  <em>LDAP2</em>
  <em>LDAP3</em>
  <em>LMTP</em>
+ <em>MEMCACHE</em>
  <em>MYSQL</em>
  <em>NNTP</em>
  <em>NTP3</em>
@@ -1759,20 +1762,31 @@ deduce if the server behind the port is up or not.</p>
 <p>The protocol statement is:</p>
 <pre>
  PROTO(COL) {name}</pre>
-<p>HTTP protocol supports additional options:
- o REQUEST
- o HOSTHEADER
- o CHECKSUM</p>
+<p>The HTTP protocol supports in addition:</p>
+<ul>
+<li><strong><a name="request" class="item">REQUEST</a></strong>
+
+</li>
+<li><strong><a name="hostheader" class="item">HOSTHEADER</a></strong>
+
+</li>
+<li><strong><a name="checksum" class="item">CHECKSUM</a></strong>
+
+</li>
+</ul>
 <pre>
  PROTO(COL) HTTP [REQUEST {&quot;/path&quot;} [with HOSTHEADER &quot;string&quot;] [with CHECKSUM checksum]</pre>
-<p>When the Host header option is not specified, for HTTP protocol, by default
-the content of host option which specifies the target host to connect to is used.
-The Host header can be used when you need to test</p>
-<p>Examples:</p>
+<p>The Host header option can be used to explict specify the HTTP
+host header in the request. If not used, Monit will use the
+hostname or IP-address of the host as specified in the statement.
+Specifiying a host header is useful if you want to connect to the
+host using an IP-address, and the web-server handle name based
+virtual hosts. Examples:</p>
 <pre>
-  if failed host 192.168.1.100 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
-  if failed host 192.168.1.101 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert
-  if failed host 192.168.1.102 port 8080 protocol http and request '/testing' hostheader 'example.com' with timeout 20 seconds for 2 cycles then alert</pre>
+  if failed host 192.168.1.100 port 8080 protocol http 
+     and request '/testing' hostheader 'example.com' 
+     with timeout 20 seconds for 2 cycles 
+  then alert</pre>
 <p>In addition to the standard protocols, the <em>APACHE-STATUS</em>
 protocol is a test of a specific server type, rather than a
 generic protocol. Server performance is examined using the status
@@ -2148,7 +2162,7 @@ the connection type.</pre>
 <p>
 </p>
 <h4><a name="testing_the_radius_protocol">Testing the RADIUS protocol</a></h4>
-<p>The SIP test is similar to the other protocol tests, but in
+<p>The RADIUS test is similar to the other protocol tests, but in
 addition allows extra optional parameters.</p>
 <dl>
 <dt><strong><a name="if_failed_host_port_type_protocol_radius_secret_string_then_action_else_if_succeeded_x_y_cycles_then_action" class="item">IF FAILED [host] [port] [type] PROTOCOL radius [SECRET string] THEN action
@@ -2164,6 +2178,30 @@ you may specify an alternative secret, default is &quot;testing123&quot;.</p>
        stop program = &quot;/etc/init.d/freeradius stop&quot;
        if failed host 127.0.0.1 port 1812 type udp protocol radius secret testing123 then alert
        if 5 restarts within 5 cycles then timeout</pre>
+<p>
+</p>
+<hr />
+<h1><a name="service_poll_time">SERVICE POLL TIME</a></h1>
+<p>Each service is polled in sequence as they are written in
+<em>.monitrc</em> file, unless they are part of a dependecy chain.
+However, a service may specify an individual poll time. Meaning
+that instead of checking the service on each poll cycle, the
+cycle check can be specified individually per service using the
+<em>every</em> statement. The syntax of which is:</p>
+<dl>
+<dt><strong><a name="every_number_cycles" class="item">EVERY [number] CYCLES</a></strong></dt>
+
+</dl>
+<p>Example:</p>
+<pre>
+ check process nginx with pidfile /var/run/nginx.pid every 2 cycles
+ start program = &quot;/etc/init.d/nginx start&quot;
+ stop program  = &quot;/etc/init.d/nginx stop&quot;
+ [...]</pre>
+<p>In the above example, if the global poll time set by <em>set
+daemon</em> is 20 seconds, then the nginx process will be checked
+every 40 second. This is because the every statement specify that
+this process should only be checked every other cycle</p>
 <p>
 </p>
 <hr />
@@ -2257,6 +2295,19 @@ That is, the daemon is requested to start and stop the services.
 This ensures that a daemon will not restart a service that you
 requested to stop and that (any) timeout lock will be removed
 from a service when you start it.</p>
+<p>
+</p>
+<h2><a name="fips_support">FIPS support</a></h2>
+<p>Monit built-in web-server support the OpenSSL FIPS module. 
+To enable this mode, your OpenSSL library must first be built
+with FIPS support. Then in the Monit control file, simply
+add this <em>set</em> statement at the top;</p>
+<pre>
+ set fips</pre>
+<p>Note that the FIPS module may not be supported in the lates 
+version of OpenSSL. So make sure that your version of OpenSSL
+support the FIPS object module before attempting to enable this
+in Monit.</p>
 <p>
 </p>
 <h2><a name="monit_httpd_authentication">Monit HTTPD Authentication</a></h2>
@@ -2511,7 +2562,7 @@ complain and exit otherwise.</p>
 <p>Comments begin with a '#' and extend through the end of the line.
 Otherwise the file consists of a series of service entries or
 global option statements in a free-format, token-oriented syntax.</p>
-<p>There are three kinds of tokens: grammar keywords, numbers (i.e.
+<p>There are three kinds of tokens: grammar  , numbers (i.e.
 decimal digit sequences) and strings. Strings can be either
 quoted or unquoted. A quoted string is bounded by double quotes
 and may contain whitespace (and quoted digits are treated as a
@@ -2866,10 +2917,11 @@ insensitive.</p>
 <em>unmonitor</em>, <em>rdate</em>, <em>rsync</em>, <em>data</em>, <em>invalid</em>, <em>exec</em>,
 <em>nonexist</em>, <em>policy</em>, <em>reminder</em>, <em>instance</em>, <em>eventqueue</em>,
 <em>basedir</em>, <em>slot(s)</em>, <em>system</em>, <em>idfile</em>, <em>gps</em>, <em>radius</em>,
-<em>secret</em>, <em>target</em>, <em>maxforward</em>, <em>hostheader</em> and <em>failed</em></p>
+<em>secret</em>, <em>target</em>, <em>maxforward</em>, <em>hostheader</em>, <em>register</em>,
+<em>credentials</em>, <em>fips</em> and <em>failed</em></p>
 <p>And here is a complete list of <strong>noise keywords</strong> ignored by
 monit:</p>
-<p><em>is</em>, <em>as</em>, <em>are</em>, <em>on(ly)</em>, <em>with(in)</em>, <em>and</em>, <em>has</em>,
+<p><em>is</em>, <em>as</em>, <em>are</em>, <em>on(ly)</em>, <em>with(in|out)</em>, <em>and</em>, <em>has</em>,
 <em>using</em>, <em>use</em>, <em>the</em>, <em>sum</em>, <em>program(s)</em>, <em>than</em>, <em>for</em>,
 <em>usage</em>, <em>was</em>, <em>but</em>, <em>of</em>.</p>
 <p><strong>Note:</strong> If the <em>start</em> or <em>stop</em> programs are shell scripts,
@@ -3055,11 +3107,10 @@ Application Servers. So if we want to keep the poll-cycle low
 (i.e. &lt; 60 seconds) but allow some services to take its time to
 start, the <strong>every</strong> statement is handy:</p>
 <pre>
- check process dynamo with pidfile /etc/dynamo.pid
+ check process dynamo with pidfile /etc/dynamo.pid every 2 cycles
        start program = &quot;/etc/init.d/dynamo start&quot;
        stop program  = &quot;/etc/init.d/dynamo stop&quot;
-       if failed port 8840 then alert
-       every 2 cycles</pre>
+       if failed port 8840 then alert</pre>
 <p>Here is an example where we group together two database entries
 so you can manage them together, e.g.; 'Monit -g database start
 all'. The mode statement is also illustrated in the first entry
@@ -3389,7 +3440,6 @@ authors.</p>
 Martin Pala &lt;<a href="mailto:martinp@tildeslash.com">martinp@tildeslash.com</a>&gt;, 
 Christian Hopp &lt;<a href="mailto:chopp@iei.tu-clausthal.de">chopp@iei.tu-clausthal.de</a>&gt;, 
 Rory Toma &lt;<a href="mailto:rory@digeo.com">rory@digeo.com</a>&gt;</p>
-<p>See also <a href="http://mmonit.com/monit/who/">http://mmonit.com/monit/who/</a></p>
 <p>
 </p>
 <hr />
