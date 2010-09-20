@@ -12,119 +12,106 @@ Version 5.2
 NEW FEATURES AND FUNCTIONS:
 
 * Added support for monitoring processes without pidfile using pattern matching.
-  You can use POSIX regular expressions or full strings maching process name.
-  The process string corresponds to output of 'ps' utility. Some platforms
-  like Mac OS X require super-user privileges to get full process name.
-  The first match is used so this form of check is useful for unique
-  pattern matching - the pidfile should be used where possible as it defines
-  expected pid exactly (pattern matching won't be useful for Apache for example).
-  Example usage (monitoring VMware virtual machine):
-      check process vmware-debian matching "/usr/lib/vmware/bin/vmware-vmx .*debian4-x86.vmx"
-          ...
+  You can use POSIX regular expressions or full strings matching process name
+  with arguments as provided by the 'ps' utility. If the pattern matches
+  multiple processes, the first match is used. Example:
+      check process debian matching "/usr/lib/vmware/bin/vmware-vmx .*deb.vmx"
 
-* Added support for system swap usage monitoring. Syntax is similar to
-  memory usage monitoring - example:
+* Added support for swap monitoring. Example:
       check system myserver
           if swap usage > 25% then alert
 
-* Allow to override default action when service doesn't exist (for example process
-  is not running, file doesn't exist). Default action is service restart, it can be
-  customized with following statement now:
+* Allow to override the default action when service doesn't exist. The default
+  action is restart, it can be customized with following statement:
       if [does] not exist [[<x> times within] <y> cycles] then <action1>
-     [else if succeeded   [[<x> times within] <y> cycles] then <action2>]
-  For example instead of default restart action:
-      check file with path /cifs/mydata
-        if does not exist for 5 cycles then exec "/usr/bin/mount_cifs.sh"
 
-* MacOSX: allow monitoring of system-wide load average, cpu and memory usage
-  even when Monit is running as non-root user. Note: the monitoring of per-process
-  CPU usage on MacOSX still requires monit to run as root, otherwise it will display
-  process' cpu usage as 0.
+* Monit automatically registers credentials with M/Monit now, so it's not
+  necessary to set it manually in M/Monit anymore. To disable credentials
+  registration:
+     set mmonit https://monit:monit@10.0.0.1:8443/collector
+         and register without credentials
 
-* Remove the configuration limit of 20 ICMP requests per cycle.
+* Added memcache protocol test. Thanks to Sébastien Debrard for the patch.
 
-* Monit now registers credentials with M/Monit automatically, so it's not
-  necessary to set it manually in M/Monit anymore in order to manage services
-  on Monit host. The automatic credentials registration can be disabled:
-     set mmonit http://monit:monit@192.168.1.10:8080/collector and register without credentials
+* Added openssl FIPS to Monit httpd. Thanks to Lior Okman for the patch. 
 
-* Added MEMCACHE protocol test. Thanks to Sébastien Debrard for the patch.
+* The 'check system' can now use start/stop program statements too.
 
-* Added FIPS OpenSSL module to Monit httpd. Thanks to Lior Okman for the patch. 
-
-* Allow use of start/stop program statements in 'check system'
-
-* Display backtrace on error if debug mode is enabled. The backtrace is available if the OS'
-  libc supports it (for example Linux, MacOSX, Solaris do).
+* Display backtrace on error if debug mode is enabled (requires backtrace
+  support in libc)
 
 BUGFIXES:
 
-* Show real process uptime - formerly the presented uptime was based on create/modify
-  timestamp of process' pidfile which provides invalid uptime if the pidfile is
-  replaced and process keeps running with original PID (such as on apache reload).
-  Thanks to Nima Chavooshi for report.
+* Show real process uptime - formerly the presented uptime was based on create
+  and modify timestamp of process' pidfile which provides invalid uptime if the
+  pidfile is replaced and process keeps running with original PID. Thanks to
+  Nima Chavooshi for report.
 
-* When user triggered action for some service (such as stop) and before that action
-  completed user triggered another action for the same service (such as start), the
-  second action has been ignored. Monit will not accept new action and return temporary
-  error until the previous action completes.
+* When user triggered action for some service (such as stop) and before that
+  action completed user triggered another action for the same service (such as
+  start), the second action has been ignored. Monit will not accept new action
+  and return temporary error until the previous action completed.
 
-* If process resource usage gathering failed, retry next cycle as the error can be
-  temporary.
+* If process resource usage gathering failed, retry next cycle as the error can
+  be temporary.
 
-* Fixed sporadic ICMP echo (ping) false positive/negative.
+* Fixed sporadic failures when SSL was used.
 
-* Fixed ICMP echo test on AIX and NETBSD.
+* ICMP echo test (ping):
+     - fixed sporadic false positive/negative
+     - removed limit of 20 pings per cycle
 
-* Fixed sporadic connection failures when SSL sockets were used.
+* DNS test:
+     - accept NS root request refusal as correct response because server reacts
+       on request
+     - accept authority answer as alternative to record. Thanks to Nick Osborn
+       for patch
 
-* DNS protocol test now accepts request refusal as correct response - the test is based
-  on query for NS root record which may be prohibited on server side, whereas the negative
-  response means that the server reacts to requests.
+* RADIUS test fix. Thanks to Alan DeKok for patch.
 
-* DNS protocol test accepts authority answer as alternative to resource records. Thanks
-  to Nick Osborn for patch.
+* M/Monit heartbeat is fully independent of testing cycle now to prevent false
+  positive when service test blocks.
 
-* M/Monit heartbeat is made non-blocking even on service level, so when some service test
-  takes long time (waiting on timeout), it won't generate false alert in M/Monit.
+* Fixed SMTP STARTTLS protocol, required for servers that adhere strictly to RFC
+  3207 4.2. Thanks to Lorenzo A. Sedano Cadinanos for patch.
 
-* Fixed support for service names which contain "/" in the name so they can be managed
-  via monit web interface, also removed limitation of service names so they can start
-  with slash ("/") now. Thanks to Artyom Khafizof.
+* Service name:
+     - allow the service name to start with "/"
+     - fixed handling of the service names which contain "/" in the name in Monit
+       web interface. Thanks to Artyom Khafizov for patch.
   
-* Fixed SMTP STARTTLS protocol. Required for servers that adhere strictly to 
-  RFC 3207: 4.2. Thanks to Lorenzo A. Sedano Cadinanos for patch and
-  investigating the problem.
-
-* Fixed RADIUS procol test. Thanks to Alan DeKok for patch.
-
-* Fixed MONIT_DESCRIPTION environment variable. Thanks to Marco Roeland for
-  patch.
-
-* Fixed system load average monitoring on AIX
-
-* Fixed compilation on AIX 6.1
-
 * When 'check system' is not defined, monit adds it automatically using hostname
   for service name. If existing service was defined with the same service name
-  (matching hostname), monit didn't added the entry and reported error (correctly),
-  but the error message was confusing as it incorrectly pointed to the end of
-  configuration file. The error message is fixed and monit also prefixes the hostname
-  with string "system_" so conflict with existing service is less likely. Thanks to
-  Thorsten Kampe for report and help.
+  (matching hostname), monit didn't added the entry and reported confusing error
+  message pointing to the end of configuration file. Thanks to Thorsten Kampe
+  for report and help.
 
 * Remove extra NL characters from message when resource succeeded event is sent.
   The extra NL character may break the mail headers. Thanks to Hanno Boeck for
-  report and patch.
+  patch.
 
 * Fixed display of cpu user/system/wait usage which temporarily displayed -1.0%
-  between two monitoring cycles while cpu monitoring was initializing. Thanks to
-  Marcus Muelbuesch for report.
+  between two monitoring cycles while cpu monitoring was initializing. Thanks
+  to Marcus Muelbuesch for report.
 
-* Fixed display of port response time as -1 in 'monit status' if it was called in
-  the middle of service test.
+* Fixed display of port response time as -1 if 'monit status' was called in the
+  middle of service test.
 
-* Fixed display of initializing state for services after monit start or reload.
+* Fixed display of service initializing state after monit start or reload.
+
+* Fixed MONIT_DESCRIPTION environment variable. Thanks to Marco Roeland for patch
+
+* AIX:
+     - fixed compilation
+     - fixed system load average monitoring
+     - fixed ICMP echo test
+
+* Mac OS X:
+     - allow monitoring of system-wide load average, cpu and memory usage even if
+       Monit is running as non-root user
+
+* NetBSD:
+     - fixed ICMP echo test
 
 
 
