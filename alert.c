@@ -232,6 +232,12 @@ static void copy_mail(Mail_T n, Mail_T o) {
       Run.MailFormat.from?
       xstrdup(Run.MailFormat.from):
       xstrdup(ALERT_FROM);
+  n->replyto = 
+      o->replyto?
+      xstrdup(o->replyto):
+      Run.MailFormat.replyto?
+      xstrdup(Run.MailFormat.replyto):
+      NULL;
   n->subject=
       o->subject?
       xstrdup(o->subject):

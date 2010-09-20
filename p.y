@@ -280,7 +280,7 @@
 %token TIMEOUT RESTART CHECKSUM EVERY 
 %token DEFAULT HTTP APACHESTATUS FTP SMTP POP IMAP CLAMAV NNTP NTP3 MYSQL DNS
 %token SSH DWP LDAP2 LDAP3 RDATE RSYNC TNS PGSQL POSTFIXPOLICY SIP LMTP GPS RADIUS MEMCACHE
-%token <string> STRING PATH MAILADDR MAILFROM MAILSUBJECT
+%token <string> STRING PATH MAILADDR MAILFROM MAILREPLYTO MAILSUBJECT
 %token <string> MAILBODY SERVICENAME STRINGNAME
 %token <number> NUMBER PERCENT LOGLIMIT CLOSELIMIT DNSLIMIT KEEPALIVELIMIT 
 %token <number> REPLYLIMIT REQUESTLIMIT STARTLIMIT WAITLIMIT GRACEFULLIMIT 
@@ -600,6 +600,7 @@ setmailservers  : SET MAILSERVER mailserverlist nettimeout hostname {
 
 setmailformat   : SET MAILFORMAT '{' formatoptionlist '}' {
                    Run.MailFormat.from    = mailset.from    ?  mailset.from    : xstrdup(ALERT_FROM);
+                   Run.MailFormat.replyto = mailset.replyto ?  mailset.replyto : NULL;
                    Run.MailFormat.subject = mailset.subject ?  mailset.subject : xstrdup(ALERT_SUBJECT);
                    Run.MailFormat.message = mailset.message ?  mailset.message : xstrdup(ALERT_MESSAGE);
                    reset_mailset();
@@ -1285,6 +1286,7 @@ formatoptionlist: formatoption
                 ;
 
 formatoption    : MAILFROM { mailset.from = $1; }
+                | MAILREPLYTO { mailset.replyto = $1; }
                 | MAILSUBJECT { mailset.subject = $1; }
                 | MAILBODY { mailset.message = $1; }
                 ;
@@ -1899,6 +1901,7 @@ static void preparse() {
   Run.maillist            = NULL;
   Run.mailservers         = NULL;
   Run.MailFormat.from     = NULL;
+  Run.MailFormat.replyto  = NULL;
   Run.MailFormat.subject  = NULL;
   Run.MailFormat.message  = NULL;
   Run.localhostname       = xstrdup(localhost);

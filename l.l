@@ -447,7 +447,13 @@ group[ \t]+       {
                       yylval.string = Util_trim(xstrdup(p));
                       save_arg(); return MAILFROM;
                   }
-                     
+
+"reply-to:"[ \t]*{str}[@]{str} {
+                      char *p= yytext+strlen("reply-to:");
+                      yylval.string = Util_trim(xstrdup(p));
+                      save_arg(); return MAILREPLYTO;
+                  }
+
 "subject:"[^}\n]* {
                       char *p= yytext+strlen("subject:");
                       yylval.string = Util_trim(xstrdup(p));

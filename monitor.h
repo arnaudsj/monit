@@ -356,6 +356,7 @@ typedef struct mymmonit {
 typedef struct mymail {
   char *to;                         /**< Mail address for alert notification */
   char *from;                                     /**< The mail from address */
+  char *replyto;                              /**< Optional reply-to address */
   char *subject;                                       /**< The mail subject */
   char *message;                                       /**< The mail message */
   unsigned int events;  /*< Events for which this mail object should be sent */
@@ -858,6 +859,7 @@ struct myrun {
                                       /** User selected standard mail format */
   struct myformat {
     char *from;                          /**< The standard mail from address */
+    char *replyto;                             /**< Optional reply-to header */
     char *subject;                            /**< The standard mail subject */
     char *message;                            /**< The standard mail message */
   } MailFormat;

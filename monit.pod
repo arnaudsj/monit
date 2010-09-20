@@ -730,6 +730,7 @@ statement is as follows:
 
  mail-format {
       from: monit@localhost
+  reply-to: support@domain.com
    subject: $SERVICE $EVENT at $DATE
    message: Monit $ACTION $SERVICE at $DATE on $HOST: $DESCRIPTION.
             Yours sincerely,
@@ -739,8 +740,9 @@ statement is as follows:
 Where the keyword I<from:> is the email address Monit should
 pretend it is sending from. It does not have to be a real mail
 address, but it must be a proper formated mail address, on the
-form: name@domain. The keyword I<subject:> is for the email
-subject line. The subject must be on only I<one> line. The
+form: name@domain. The I<reply-to:> keyword can be used to set
+the reply-to mail header. The keyword I<subject:> is for the
+email subject line. The subject must be on only I<one> line. The
 I<message:> keyword denotes the mail body. If used, this keyword
 should always be the last in a mail-format statement. The mail
 body can be as long as you want, but must B<not> contain the '}'

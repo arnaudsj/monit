@@ -37,6 +37,8 @@ NEW FEATURES AND FUNCTIONS:
 
 * The 'check system' can now use start/stop program statements too.
 
+* Added the option to set the "Reply-To" mail header in mail-format.
+
 * Display backtrace on error if debug mode is enabled (requires backtrace
   support in libc)
 

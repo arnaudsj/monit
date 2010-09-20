@@ -141,6 +141,7 @@ void gc_mail_list(Mail_T *m) {
 
   FREE((*m)->to);
   FREE((*m)->from);
+  FREE((*m)->replyto);
   FREE((*m)->subject);
   FREE((*m)->message);
   FREE(*m);

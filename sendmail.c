@@ -181,6 +181,8 @@ int sendmail(Mail_T mail) {
     do_send(&S, "DATA\r\n");
     do_status(&S);
     do_send(&S, "From: %s\r\n", m->from);
+    if (m->replyto)
+      do_send(&S, "Reply-To: %s\r\n", m->replyto);
     do_send(&S, "To: %s\r\n", m->to);
     do_send(&S, "Subject: %s\r\n", m->subject);
     do_send(&S, "Date: %s\r\n", now);
