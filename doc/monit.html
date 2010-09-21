@@ -4,7 +4,7 @@
 <head>
 <title>Monit - utility for monitoring services on a Unix system</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:info@mmonit.com" />
+<link rev="made" href="mailto:martinpala@trilobite.local" />
 </head>
 
 <body style="background-color: white">
@@ -13,8 +13,6 @@
 <!-- INDEX BEGIN -->
 <div name="index">
 <p><a name="__index__"></a></p>
-
-<h2>Version 5.2</h2>
 
 <ul>
 
@@ -749,6 +747,7 @@ statement is as follows:</p>
 <pre>
  mail-format {
       from: monit@localhost
+  reply-to: support@domain.com
    subject: $SERVICE $EVENT at $DATE
    message: Monit $ACTION $SERVICE at $DATE on $HOST: $DESCRIPTION.
             Yours sincerely,
@@ -757,8 +756,9 @@ statement is as follows:</p>
 <p>Where the keyword <em>from:</em> is the email address Monit should
 pretend it is sending from. It does not have to be a real mail
 address, but it must be a proper formated mail address, on the
-form: name@domain. The keyword <em>subject:</em> is for the email
-subject line. The subject must be on only <em>one</em> line. The
+form: name@domain. The <em>reply-to:</em> keyword can be used to set
+the reply-to mail header. The keyword <em>subject:</em> is for the
+email subject line. The subject must be on only <em>one</em> line. The
 <em>message:</em> keyword denotes the mail body. If used, this keyword
 should always be the last in a mail-format statement. The mail
 body can be as long as you want, but must <strong>not</strong> contain the '}'
@@ -3456,17 +3456,6 @@ MERCHANTABILITY or FITNESS for a particular purpose.</p>
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p>GNU text utilities; md5sum(1); sha1sum(1); <code>openssl(1)</code>; <code>glob(7)</code>;
 <code>regex(7)</code>; <em><a href="http://mmonit.com/">http://mmonit.com/</a></em></p>
-
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-17448732-1']);
-  _gaq.push(['_trackPageview']);
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script>
 
 </body>
 

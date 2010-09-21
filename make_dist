@@ -78,7 +78,7 @@ ${MAKE} distclean # Keep only the relevant files
 # Build the dist file using current version in filename
 cd ..
 mv $WORKDIR $RELEASE # Rename the monit dir to include the version number
-tar -zcvfX ${TARGET} $RELEASE/exclude $RELEASE # Create the tar file
+tar zcvfX ${TARGET} $RELEASE/exclude $RELEASE # Create the tar file
 mv $RELEASE $WORKDIR # Rename the work dir. back to monit
 mv $TARGET $WORKDIR # Move the tar.gz package into work dir.
 cd $WORKDIR
