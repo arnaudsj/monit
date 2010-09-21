@@ -1,4 +1,7 @@
 CVS
+.DS_Store
+monit.xcode
+build
 .svn
 valgrind*
 make_dist
