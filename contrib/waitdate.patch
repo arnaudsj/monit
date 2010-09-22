@@ -1,0 +1,162 @@
+diff -Naur monit-5.1.1-orig/l.l monit-5.1.1-new/l.l
+--- monit-5.1.1-orig/l.l	2010-01-08 03:15:43.000000000 -0800
++++ monit-5.1.1-new/l.l	2010-09-21 18:50:14.687202000 -0700
+@@ -118,7 +118,7 @@
+ megabyte    ("megabyte"|"mb")
+ gigabyte    ("gigabyte"|"gb")
+ 
+-%x ARGUMENT_COND DEPEND_COND SERVICE_COND URL_COND STRING_COND INCLUDE
++%x ARGUMENT_COND DEPEND_COND SERVICE_COND URL_COND STRING_COND INCLUDE NUMBER_COND
+ 
+ %%
+ 
+@@ -373,6 +373,11 @@
+                     return GROUP;
+                   }
+ 
++waitdate[ \t]+    {
++                    BEGIN(NUMBER_COND);
++                    return WAITDATE;
++                  }
++
+ [a-zA-Z0-9]+"://" {
+ 		    yylval.url= 
+ 		      create_URL(xstrndup(yytext, strlen(yytext)-3));
+@@ -595,6 +600,15 @@
+ 
+ }
+ 
++<NUMBER_COND>{
++
++  {str}           {
++                    yylval.number= atoi(yytext);
++                    BEGIN(INITIAL);
++                    save_arg(); return NUMBERNAME;
++                  }
++}
++
+ <STRING_COND>{
+ 
+   {str}           {
+@@ -621,7 +635,7 @@
+ 
+ }
+ 
+-<INITIAL,ARGUMENT_COND,SERVICE_COND,DEPEND_COND,URL_COND,STRING_COND>. {
++<INITIAL,ARGUMENT_COND,SERVICE_COND,DEPEND_COND,URL_COND,STRING_COND,NUMBER_COND>. {
+                       return yytext[0];
+                   }  
+ 
+diff -Naur monit-5.1.1-orig/monitor.h monit-5.1.1-new/monitor.h
+--- monit-5.1.1-orig/monitor.h	2010-02-14 09:55:00.000000000 -0800
++++ monit-5.1.1-new/monitor.h	2010-09-21 16:22:32.535806000 -0700
+@@ -719,6 +719,7 @@
+   Mail_T      maillist;                  /**< Alert notification mailinglist */
+ 
+   /** Test rules and event handlers */
++  time_t waitdate;                               /**< Date to wait for check */
+   ActionRate_T actionratelist;                    /**< ActionRate check list */
+   Checksum_T  checksum;                                  /**< Checksum check */
+   Filesystem_T filesystemlist;                    /**< Filesystem check list */
+diff -Naur monit-5.1.1-orig/p.y monit-5.1.1-new/p.y
+--- monit-5.1.1-orig/p.y	2010-02-22 13:24:26.000000000 -0800
++++ monit-5.1.1-new/p.y	2010-09-21 18:52:30.827971000 -0700
+@@ -221,6 +221,7 @@
+   static void  addhtpasswdentry(char *, char *, int);
+   static uid_t get_uid(char *, uid_t);
+   static gid_t get_gid(char *, gid_t);
++  static void  addwaitdate(time_t);
+   static void  addchecksum(Checksum_T);
+   static void  addperm(Perm_T);
+   static void  addmatch(Match_T, int, int);
+@@ -285,14 +286,14 @@
+ %token <string> MAILBODY SERVICENAME STRINGNAME
+ %token <number> NUMBER PERCENT LOGLIMIT CLOSELIMIT DNSLIMIT KEEPALIVELIMIT 
+ %token <number> REPLYLIMIT REQUESTLIMIT STARTLIMIT WAITLIMIT GRACEFULLIMIT 
+-%token <number> CLEANUPLIMIT 
++%token <number> CLEANUPLIMIT NUMBERNAME
+ %token <real> REAL
+ %token CHECKPROC CHECKFILESYS CHECKFILE CHECKDIR CHECKHOST CHECKSYSTEM CHECKFIFO CHECKSTATUS
+ %token CHILDREN SYSTEM
+ %token RESOURCE MEMORY TOTALMEMORY LOADAVG1 LOADAVG5 LOADAVG15 
+ %token MODE ACTIVE PASSIVE MANUAL CPU TOTALCPU CPUUSER CPUSYSTEM CPUWAIT
+ %token GROUP REQUEST DEPENDS BASEDIR SLOT EVENTQUEUE SECRET HOSTHEADER
+-%token UID GID MMONIT INSTANCE USERNAME PASSWORD
++%token UID GID MMONIT INSTANCE USERNAME PASSWORD WAITDATE
+ %token TIMESTAMP CHANGED SECOND MINUTE HOUR DAY
+ %token SSLAUTO SSLV2 SSLV3 TLSV1 CERTMD5
+ %token BYTE KILOBYTE MEGABYTE GIGABYTE
+@@ -353,6 +354,7 @@
+                 | every
+                 | mode
+                 | group
++                | waitdate
+                 | depend
+                 | resourceprocess
+                 ;
+@@ -1274,6 +1276,9 @@
+                 ;
+ 
+ 
++waitdate        : WAITDATE NUMBERNAME { addwaitdate($2);}
++                ;
++
+ depend          : DEPENDS dependlist
+                 ;
+ 
+@@ -2217,6 +2222,14 @@
+   reset_sizeset();
+ }
+ 
++/*
++ * Set waitdate object in current service
++ */
++static void addwaitdate(time_t date) {
++
++  current->waitdate = date;
++  LogError("waitdate is: %d\n", date);
++}
+ 
+ /*
+  * Set Checksum object in the current service
+diff -Naur monit-5.1.1-orig/validate.c monit-5.1.1-new/validate.c
+--- monit-5.1.1-orig/validate.c	2010-02-23 02:32:40.000000000 -0800
++++ monit-5.1.1-new/validate.c	2010-09-21 19:04:03.974225000 -0700
+@@ -123,6 +123,7 @@
+ static void check_match_if(Service_T, char *);
+ static int  check_skip(Service_T);
+ static void check_timeout(Service_T);
++static int  check_date(Service_T);
+ static void check_checksum(Service_T);
+ static void check_timestamp(Service_T);
+ static void check_process_state(Service_T);
+@@ -178,7 +179,8 @@
+   /* Check the services */
+   for (s = servicelist; s && !Run.stopped; s = s->next) {
+     LOCK(s->mutex)
+-      if (! do_scheduled_action(s) && s->monitor && ! check_skip(s)) {
++      if (! do_scheduled_action(s) && s->monitor && ! check_skip(s)
++	  && ! check_date(s)) {
+         check_timeout(s); // Can disable monitoring => need to check s->monitor again
+ 	if (s->monitor) {
+           if (! s->check(s))
+@@ -1255,6 +1257,19 @@
+   
+ }
+ 
++static int check_date(Service_T s) {
++  time_t now = time(NULL);
++
++  ASSERT(s);
++
++  if (! s->waitdate)
++    return FALSE;
++
++  if (now < s->waitdate)
++    return TRUE;
++
++  return FALSE;
++}
+ 
+ static void check_timeout(Service_T s) {
+   ActionRate_T ar;

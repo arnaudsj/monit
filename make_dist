@@ -83,5 +83,8 @@ mv $RELEASE $WORKDIR # Rename the work dir. back to monit
 mv $TARGET $WORKDIR # Move the tar.gz package into work dir.
 cd $WORKDIR
 
+openssl dgst -md5 $TARGET > $TARGET.md5
+openssl dgst -sha256 $TARGET > $TARGET.sha256
+
 # cleanup
 clean_up
