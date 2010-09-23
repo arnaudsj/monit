@@ -88,7 +88,7 @@ openssl dgst -sha256 $TARGET > $TARGET.sha256
 # cleanup
 clean_up
 
-if test uname != "Linux"
+if test "`uname`" != "Linux"
 then
         echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         echo "please verify the manual page with 'man --warnings monit.1 > /dev/null'"
