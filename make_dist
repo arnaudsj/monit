@@ -52,8 +52,7 @@ clean_up
 #mv doxygen.cfg.bak doxygen.cfg
 echo "Generating documentation"
 d=`date  '+%B %d. %Y'`
-pod2man -center "User Commands" --release "${d}" \
-                  --date="www.mmonit.com" --lax monit.pod > monit.1
+pod2man --center "User Commands" --release "${d}" --date="www.mmonit.com" --lax monit.pod > monit.1
 pod2html monit.pod > doc/monit.html
 rm -f pod2*
 grep -v "<\?php include" web/doc/examples.php | sed -e 's/<img src="index.gif">//' > doc/examples.html
