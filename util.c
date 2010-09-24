@@ -2205,7 +2205,7 @@ static char *is_str_defined(char *s) {
  */
 static int is_url_unsafe(unsigned char *c) {
   int i;
-  static unsigned char unsafe[]= "<>\"#{}|\\^~[]`/";
+  static unsigned char unsafe[]= "<>\"#{}|\\^~[]`";
   
   ASSERT(c);
   
