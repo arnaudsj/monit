@@ -1602,8 +1602,9 @@ char *Util_urlDecode(char *url) {
 // NOTE: To be used to URL encode service names when ready
 char *Util_encodeServiceName(char *name) {
         int i;
+        char *s;
         ASSERT(name);
-        char *s = Util_urlEncode(name);
+        s = Util_urlEncode(name);
         for (i = 0; s[i]; i++)
                 if (s[i] == '/') return Util_replaceString(&s, "/", "%2F");
         return s;
