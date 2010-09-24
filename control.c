@@ -100,7 +100,6 @@ int control_service_daemon(const char *S, const char *action) {
   int status, content_length = 0;
   Socket_T s;
   char *auth;
-  char *svc;
   char buf[STRLEN];
   
   ASSERT(S);
@@ -119,7 +118,6 @@ int control_service_daemon(const char *S, const char *action) {
 
   /* Send request */
   auth = Util_getBasicAuthHeaderMonit();
-  svc = Util_encodeServiceName((char *)S);
   if (socket_print(s,
         "POST /%s HTTP/1.0\r\n"
         "Content-Type: application/x-www-form-urlencoded\r\n"
@@ -127,7 +125,7 @@ int control_service_daemon(const char *S, const char *action) {
         "%s"
         "\r\n"
         "action=%s",
-        svc,
+        S,
         strlen("action=") + strlen(action),
         auth ? auth : "",
         action) < 0) {
@@ -175,7 +173,6 @@ err2:
     rv = TRUE;
 err1:
   FREE(auth);
-  FREE(svc);
   socket_free(&s);
 
   return rv;

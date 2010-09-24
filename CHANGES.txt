@@ -1,10 +1,22 @@
-                     CHANGES version 5.2
+                     CHANGES version 5.2.1
                                 
            This file summarizes changes made since 5.0
                                 
        Bug fixes may refer to an auto-generated id in our
           bug-tracking system, which can be found here
           https://savannah.nongnu.org/bugs/?group=monit
+
+
+Version 5.2.1
+
+BUGFIXES:
+
+* HTTP and URL protocol tests: Fixed a problem where HTTP protocol
+  tests using a specific request always failed. This bug may also
+  affect URL tests. The problem was caused by faulty URL encoding. In
+  the process of fixing this bug the new feature that allowed slash in
+  service names has been reverted and instead will be added in a later
+  release.
 
 
 Version 5.2

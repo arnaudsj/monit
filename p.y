@@ -3339,6 +3339,8 @@ static void check_name(char *name) {
 
   if (Util_existService(name) || (current && IS(name, current->name)))
     yyerror2("service name conflict, %s already defined", name);
+  if (name && *name == '/')		
+          yyerror2("service name '%s' must not start with '/' -- ", name);	
 }
 
 

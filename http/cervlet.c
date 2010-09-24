@@ -714,15 +714,12 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
   ActionRate_T ar;
   ServiceGroup_T sg;
   ServiceGroupMember_T sgm;
-  char *svc;
   char *status;
   char buf[STRLEN];
 
   ASSERT(s);
 
-  svc = Util_encodeServiceName(s->name);
-  HEAD(svc, s->name, Run.polltime)
-  FREE(svc);
+  HEAD(s->name, s->name, Run.polltime)
 
   out_print(res,
     "<p><br><h3>%s status</h3><br>"
@@ -880,7 +877,6 @@ static void printPixel(HttpResponse res) {
 
 static void do_home_system(HttpRequest req, HttpResponse res) {
   Service_T s = Run.system;
-  char *svc = Util_encodeServiceName(s->name);
   char *status = get_service_status_html(s);
 
   out_print(res,
@@ -903,9 +899,7 @@ static void do_home_system(HttpRequest req, HttpResponse res) {
     "<tr bgcolor=\"#EFEFEF\">"
     "<td align=\"left\"><a href='%s'>%s</a></td>"
     "<td align=\"left\">%s</td>",
-    svc, s->name,
-    status);
-  FREE(svc);
+    s->name, s->name, status);
   FREE(status);
 
   if(Run.doprocess) {
@@ -938,7 +932,6 @@ static void do_home_system(HttpRequest req, HttpResponse res) {
 static void do_home_process(HttpRequest req, HttpResponse res) {
 
   Service_T      s;
-  char          *svc;
   char          *status;
   int            on= TRUE;
   int            header= TRUE;
@@ -971,15 +964,12 @@ static void do_home_process(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
       "<td align=\"left\">%s</td>",
       on?"bgcolor=\"#EFEFEF\"":"",
-      svc, s->name,
-      status);
-    FREE(svc);
+      s->name, s->name, status);
     FREE(status);
 
     if(!Util_hasServiceStatus(s)) {
@@ -1027,7 +1017,6 @@ static void do_home_process(HttpRequest req, HttpResponse res) {
 
 static void do_home_filesystem(HttpRequest req, HttpResponse res) {
   Service_T     s;
-  char         *svc;
   char         *status;
   int           on= TRUE;
   int           header= TRUE;
@@ -1053,15 +1042,12 @@ static void do_home_filesystem(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
       "<td align=\"left\">%s</td>",
       on?"bgcolor=\"#EFEFEF\"":"",
-      svc, s->name,
-      status);
-    FREE(svc);
+      s->name, s->name,status);
     FREE(status);
 
     if(!Util_hasServiceStatus(s)) {
@@ -1108,7 +1094,6 @@ static void do_home_filesystem(HttpRequest req, HttpResponse res) {
 static void do_home_file(HttpRequest req, HttpResponse res) {
   
   Service_T  s;
-  char      *svc;
   char      *status;
   int        on= TRUE;
   int        header= TRUE;
@@ -1136,15 +1121,12 @@ static void do_home_file(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
       "<td align=\"left\">%s</td>",
       on?"bgcolor=\"#EFEFEF\"":"",
-      svc, s->name,
-      status);
-    FREE(svc);
+      s->name, s->name,status);
     FREE(status);
     
     if(!Util_hasServiceStatus(s)) {
@@ -1184,7 +1166,6 @@ static void do_home_file(HttpRequest req, HttpResponse res) {
 static void do_home_fifo(HttpRequest req, HttpResponse res) {
   
   Service_T  s;
-  char      *svc;
   char      *status;
   int        on= TRUE;
   int        header= TRUE;
@@ -1211,15 +1192,12 @@ static void do_home_fifo(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
       "<td align=\"left\">%s</td>",
       on?"bgcolor=\"#EFEFEF\"":"",
-      svc, s->name,
-      status);
-    FREE(svc);
+      s->name, s->name,status);
     FREE(status);
     
     if(!Util_hasServiceStatus(s)) {
@@ -1256,7 +1234,6 @@ static void do_home_fifo(HttpRequest req, HttpResponse res) {
 static void do_home_directory(HttpRequest req, HttpResponse res) {
   
   Service_T        s;
-  char            *svc;
   char            *status;
   int              on= TRUE;
   int              header= TRUE;
@@ -1283,15 +1260,12 @@ static void do_home_directory(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
       "<td align=\"left\">%s</td>",
       on?"bgcolor=\"#EFEFEF\"":"",
-      svc, s->name,
-      status);
-    FREE(svc);
+      s->name, s->name,status);
     FREE(status);
     
     if(!Util_hasServiceStatus(s)) {
@@ -1330,7 +1304,6 @@ static void do_home_host(HttpRequest req, HttpResponse res) {
   Service_T  s;
   Icmp_T     icmp;
   Port_T     port;
-  char      *svc;
   char      *status;
   int        on= TRUE;
   int        header= TRUE;
@@ -1355,15 +1328,12 @@ static void do_home_host(HttpRequest req, HttpResponse res) {
     }
     
     status= get_service_status_html(s);
-    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
       "<td align=\"left\">%s</td>",
       on?"bgcolor=\"#EFEFEF\"":"",
-      svc, s->name,
-      status);
-    FREE(svc);
+      s->name, s->name,status);
     FREE(status);
 
     if(!Util_hasServiceStatus(s)) {
@@ -1489,7 +1459,6 @@ static void print_alerts(HttpResponse res, Mail_T s) {
 
 
 static void print_buttons(HttpRequest req, HttpResponse res, Service_T s) {
-  char *svc;
 
   if(is_readonly(req)) {
     /*
@@ -1498,8 +1467,6 @@ static void print_buttons(HttpRequest req, HttpResponse res, Service_T s) {
     return;
   }
   
-  svc = Util_encodeServiceName(s->name);
-
   out_print(res, "<table cellspacing=16><tr nowrap><td><font size=+1>");
   /* Start program */
   if(s->start)
@@ -1507,32 +1474,30 @@ static void print_buttons(HttpRequest req, HttpResponse res, Service_T s) {
                 "<td><form method=POST action=%s>"
                 "<input type=hidden value='start' name=action>"
                 "<input type=submit value='Start service' style='font-size: "
-                "12pt'></form></td>", svc);
+                "12pt'></form></td>", s->name);
   /* Stop program */
   if(s->stop)
       out_print(res, 
                 "<td><form method=POST action=%s>"
                 "<input type=hidden value='stop' name=action>"
                 "<input type=submit value='Stop service' style='font-size: "
-                "12pt'></form></td>", svc);
+                "12pt'></form></td>", s->name);
   /* Restart program */
   if(s->start && s->stop)
       out_print(res, 
                 "<td><form method=POST action=%s>"
                 "<input type=hidden value='restart' name=action>"
                 "<input type=submit value='Restart service' style='font-size: "
-                "12pt'></form></td>", svc);
+                "12pt'></form></td>", s->name);
   /* (un)monitor */
   out_print(res, 
             "<td><form method=POST action=%s>"
             "<input type=hidden value='%s' name=action>"
             "<input type=submit value='%s' style='font-size: 12pt'>"
             "</form></td></tr></table>",
-            svc,
+            s->name,
             s->monitor?"unmonitor":"monitor",
             s->monitor?"Disable monitoring":"Enable monitoring");
-
-  FREE(svc);
 }
 
 

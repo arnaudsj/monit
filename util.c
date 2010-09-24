@@ -134,7 +134,6 @@
 static char   x2c(char *hex);
 static char  *is_str_defined(char *);
 static void   printevents(unsigned int);
-static int    is_url_unsafe(unsigned char *);
 #ifdef HAVE_LIBPAM
 #ifdef SOLARIS
 static int    PAMquery(int, struct pam_message **, struct pam_response **, void *);
@@ -149,6 +148,63 @@ static Auth_T PAMcheckUserGroup(const char *);
 struct ad_user {
   const char *login;
   const char *passwd;
+};
+
+
+/* Unsafe URL characters: <>\"#%{}|\\^[] ` */
+static const unsigned char urlunsafe[256] = {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
+};
+
+
+static const unsigned char b2x[][256] = {
+        "00", "01", "02", "03", "04", "05", "06", "07", 
+        "08", "09", "0A", "0B", "0C", "0D", "0E", "0F", 
+        "10", "11", "12", "13", "14", "15", "16", "17", 
+        "18", "19", "1A", "1B", "1C", "1D", "1E", "1F", 
+        "20", "21", "22", "23", "24", "25", "26", "27", 
+        "28", "29", "2A", "2B", "2C", "2D", "2E", "2F", 
+        "30", "31", "32", "33", "34", "35", "36", "37", 
+        "38", "39", "3A", "3B", "3C", "3D", "3E", "3F", 
+        "40", "41", "42", "43", "44", "45", "46", "47", 
+        "48", "49", "4A", "4B", "4C", "4D", "4E", "4F", 
+        "50", "51", "52", "53", "54", "55", "56", "57", 
+        "58", "59", "5A", "5B", "5C", "5D", "5E", "5F", 
+        "60", "61", "62", "63", "64", "65", "66", "67", 
+        "68", "69", "6A", "6B", "6C", "6D", "6E", "6F", 
+        "70", "71", "72", "73", "74", "75", "76", "77", 
+        "78", "79", "7A", "7B", "7C", "7D", "7E", "7F",
+        "80", "81", "82", "83", "84", "85", "86", "87", 
+        "88", "89", "8A", "8B", "8C", "8D", "8E", "8F",
+        "90", "91", "92", "93", "94", "95", "96", "97", 
+        "98", "99", "9A", "9B", "9C", "9D", "9E", "9F", 
+        "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", 
+        "A8", "A9", "AA", "AB", "AC", "AD", "AE", "AF", 
+        "B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", 
+        "B8", "B9", "BA", "BB", "BC", "BD", "BE", "BF", 
+        "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", 
+        "C8", "C9", "CA", "CB", "CC", "CD", "CE", "CF",
+        "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7", 
+        "D8", "D9", "DA", "DB", "DC", "DD", "DE", "DF", 
+        "E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7", 
+        "E8", "E9", "EA", "EB", "EC", "ED", "EE", "EF", 
+        "F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", 
+        "F8", "F9", "FA", "FB", "FC", "FD", "FE", "FF"
 };
 
 
@@ -1481,34 +1537,41 @@ int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize) {
 }
 
 
+int Util_isurlsafe(const char *url) {
+        int i;
+        ASSERT(url && *url);
+        for (i = 0; url[i]; i++) 
+                if (urlunsafe[(unsigned char)url[i]])
+                        return FALSE;
+        return TRUE;
+}
+
+
 /**
- * Escape an uri string converting unsafe characters to a hex (%xx)
+ * Escape an url string converting unsafe characters to a hex (%xx)
  * representation.  The caller must free the returned string.
- * @param uri an uri string
+ * @param url an url string
  * @return the escaped string
  */
-char *Util_urlEncode(char *uri) {
-
-  register int x, y;
-  unsigned char *str;
-  static unsigned char hexchars[]= "0123456789ABCDEF";
-
-  ASSERT(uri);
-
-  str= (unsigned char *)xcalloc(sizeof(unsigned char), 3 * strlen(uri) + 1);
-
-  for(x = 0, y = 0; uri[x]; x++, y++) {
-    if(is_url_unsafe((unsigned char*) &uri[x])) {
-      str[y++] = '%';
-      str[y++] = hexchars[(unsigned char) uri[x] >> 4];
-      str[y] = hexchars[(unsigned char) uri[x] & 0xf];
-    } else str[y]= (unsigned char)uri[x];
-  }
-
-  str[y] = '\0';
-
-  return ((char *) str);
-
+char *Util_urlEncode(char *url) {
+        char *escaped = NULL;
+        if (url) {
+                char *p;
+                int i, n;
+                for (n = i = 0; url[i]; i++) 
+                        if (urlunsafe[(unsigned char)(url[i])]) 
+                                n += 2;
+                p = escaped = xmalloc(i + n + 1);
+                for (; *url; url++, p++) {
+                        if (urlunsafe[(unsigned char)(*p = *url)]) {
+                                *p++= '%';
+                                *p++= b2x[(unsigned char)(*url)][0];
+                                *p = b2x[(unsigned char)(*url)][1];
+                        }
+                }
+                *p = 0;
+        }
+        return escaped;
 }
 
 
@@ -1519,25 +1582,24 @@ char *Util_urlEncode(char *uri) {
  * @return A pointer to the unescaped <code>url</code>string
  */
 char *Util_urlDecode(char *url) {
-
-  register int x,y;
-
-  if(!(url&&*url)) return url;
-  Util_replace(url, '+', ' ');
-  for(x=0,y=0;url[y];++x,++y) {
-    if((url[x] = url[y]) == '%') {
-      url[x]= x2c(&url[y+1]);
-      y+=2;
-    }
-    while(url[x] == '/' && url[y+1] == '/') {
-      y++;
-    }
-  }
-  url[x]= 0;
-  return url;
+	if (url && *url) {
+                register int x, y;
+                for (x = 0, y = 0; url[y]; x++, y++) {
+                        if ((url[x] = url[y]) == '+')
+                                url[x] = ' ';
+                        else if (url[x] == '%') {
+                                if (! (url[x + 1] && url[x + 2]))
+                                        break;
+                                url[x] = x2c(url + y + 1);
+                                y += 2;
+                        }
+                }
+                url[x] = 0;
+        }
+	return url;
 }
 
-
+// NOTE: To be used to URL encode service names when ready
 char *Util_encodeServiceName(char *name) {
         int i;
         ASSERT(name);
@@ -2205,29 +2267,6 @@ void Util_stringbuffer(Buffer_T *b, const char *m, ...) {
  */
 static char *is_str_defined(char *s) {
   return ((s&&*s)?s:"(not defined)");
-}
-
-
-/**
- * Returns TRUE if the given char is url unsafe
- * @param c A unsigned char
- * @return TRUE if the char is in the set of unsafe URL Characters
- */
-static int is_url_unsafe(unsigned char *c) {
-  int i;
-  static unsigned char unsafe[]= "<>\"#{}|\\^~[]`";
-  
-  ASSERT(c);
-  
-  if(33>*c || *c>176)
-    return TRUE;
-  if(*c=='%') {
-    if( isxdigit(*(c + 1)) && isxdigit(*(c + 2)) ) return FALSE;
-    return TRUE;
-  }
-  for(i=0; unsafe[i]; i++)
-    if(*c==unsafe[i]) return TRUE;
-  return FALSE;
 }
 
 

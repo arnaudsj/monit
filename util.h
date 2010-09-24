@@ -294,12 +294,19 @@ int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize);
 
 
 /**
- * Escape an uri string converting unsafe characters to a hex (%xx)
+ * Returns true if url contains url safe characters otherwise false
+ * @param url an url string to test
+ * @return true if url is url safe otherwise false
+ */
+int Util_isurlsafe(const char *url);
+
+/**
+ * Escape an url string converting unsafe characters to a hex (%xx)
  * representation.  The caller must free the returned string.
- * @param uri an uri string
+ * @param url an url string
  * @return the escaped string
  */
-char *Util_urlEncode(char *uri);
+char *Util_urlEncode(char *url);
 
 
 /**
