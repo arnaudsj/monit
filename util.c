@@ -1538,6 +1538,16 @@ char *Util_urlDecode(char *url) {
 }
 
 
+char *Util_encodeServiceName(char *name) {
+        int i;
+        ASSERT(name);
+        char *s = Util_urlEncode(name);
+        for (i = 0; s[i]; i++)
+                if (s[i] == '/') return Util_replaceString(&s, "/", "%2F");
+        return s;
+}
+
+
 /**
  * @return a Basic Authentication Authorization string (RFC 2617),
  * with credentials from the Run object, NULL if credentials are not defined.

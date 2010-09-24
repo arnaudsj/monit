@@ -720,7 +720,7 @@ static void do_service(HttpRequest req, HttpResponse res, Service_T s) {
 
   ASSERT(s);
 
-  svc = Util_urlEncode(s->name);
+  svc = Util_encodeServiceName(s->name);
   HEAD(svc, s->name, Run.polltime)
   FREE(svc);
 
@@ -880,7 +880,7 @@ static void printPixel(HttpResponse res) {
 
 static void do_home_system(HttpRequest req, HttpResponse res) {
   Service_T s = Run.system;
-  char *svc = Util_urlEncode(s->name);
+  char *svc = Util_encodeServiceName(s->name);
   char *status = get_service_status_html(s);
 
   out_print(res,
@@ -971,7 +971,7 @@ static void do_home_process(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_urlEncode(s->name);
+    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
@@ -1053,7 +1053,7 @@ static void do_home_filesystem(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_urlEncode(s->name);
+    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
@@ -1136,7 +1136,7 @@ static void do_home_file(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_urlEncode(s->name);
+    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
@@ -1211,7 +1211,7 @@ static void do_home_fifo(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_urlEncode(s->name);
+    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
@@ -1283,7 +1283,7 @@ static void do_home_directory(HttpRequest req, HttpResponse res) {
     }
 
     status= get_service_status_html(s);
-    svc = Util_urlEncode(s->name);
+    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
@@ -1355,7 +1355,7 @@ static void do_home_host(HttpRequest req, HttpResponse res) {
     }
     
     status= get_service_status_html(s);
-    svc = Util_urlEncode(s->name);
+    svc = Util_encodeServiceName(s->name);
     out_print(res,
       "<tr %s>"
       "<td width=\"20%%\"><a href='%s'>%s</a></td>"
@@ -1498,7 +1498,7 @@ static void print_buttons(HttpRequest req, HttpResponse res, Service_T s) {
     return;
   }
   
-  svc = Util_urlEncode(s->name);
+  svc = Util_encodeServiceName(s->name);
 
   out_print(res, "<table cellspacing=16><tr nowrap><td><font size=+1>");
   /* Start program */

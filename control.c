@@ -119,7 +119,7 @@ int control_service_daemon(const char *S, const char *action) {
 
   /* Send request */
   auth = Util_getBasicAuthHeaderMonit();
-  svc = Util_urlEncode((char *)S);
+  svc = Util_encodeServiceName((char *)S);
   if (socket_print(s,
         "POST /%s HTTP/1.0\r\n"
         "Content-Type: application/x-www-form-urlencoded\r\n"

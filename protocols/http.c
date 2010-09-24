@@ -120,7 +120,7 @@ int check_http(Socket_T s) {
   ASSERT(P);
   
   request= P->request?P->request:"/";
-
+        
   Util_getHTTPHostHeader(s, host, STRLEN);
   hostheader= P->request_hostheader?P->request_hostheader:host;
  
