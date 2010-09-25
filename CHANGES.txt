@@ -1,10 +1,14 @@
-                     CHANGES version 5.2.1
+                     CHANGES version 5.3
                                 
            This file summarizes changes made since 5.0
                                 
        Bug fixes may refer to an auto-generated id in our
           bug-tracking system, which can be found here
           https://savannah.nongnu.org/bugs/?group=monit
+
+
+Version 5.3
+
 
 
 Version 5.2.1
