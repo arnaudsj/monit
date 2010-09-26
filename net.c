@@ -738,6 +738,13 @@ double icmp_echo(const char *hostname, int timeout, int count) {
       continue;
     }
   
+    /* Experimental: it seems monit sporadically reads its own ICMP echo request if the request is sent to the
+     * same host's network interface (such as for virtual hosts running on the same machine), whereas the raw
+     * socket seems to read it before target host gets the request. Need to investiagte it more, trying to delay
+     * the read to see if there will be difference (we see the transient 1/3 attempt failure sporadically on testing
+     * farm */
+    usleep(100);
+
     if (can_read(s, timeout)) {
       socklen_t size = sizeof(struct sockaddr_in);
 
