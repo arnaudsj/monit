@@ -703,7 +703,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   }
 #endif
 
-  id_out = htons(getpid() & 0xFFFF);
+  id_out = getpid() & 0xFFFF;
   icmpout = (struct icmp *)buf;
   for (i = 0; i < count; i++) {
     int j;
@@ -711,7 +711,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
 
     icmpout->icmp_code  = 0;
     icmpout->icmp_type  = ICMP_ECHO;
-    icmpout->icmp_id    = id_out;
+    icmpout->icmp_id    = htons(id_out);
     icmpout->icmp_seq   = i;
     icmpout->icmp_cksum = 0;
 
