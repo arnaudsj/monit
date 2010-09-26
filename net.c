@@ -702,7 +702,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   }
 #endif
 
-  id_out = (getpid() + time(NULL)) & 0xFFFF;
+  id_out = getpid() & 0xFFFF;
   icmpout = (struct icmp *)buf;
   for (i = 0; i < count; i++) {
     int j;
@@ -738,13 +738,6 @@ double icmp_echo(const char *hostname, int timeout, int count) {
       continue;
     }
   
-    /* Experimental: it seems monit sporadically reads its own ICMP echo request if the request is sent to the
-     * same host's network interface (such as for virtual hosts running on the same machine), whereas the raw
-     * socket seems to read it before target host gets the request. Need to investiagte it more, trying to delay
-     * the read to see if there will be difference (we see the transient 1/3 attempt failure sporadically on testing
-     * farm */
-    usleep(100);
-
     if (can_read(s, timeout)) {
       socklen_t size = sizeof(struct sockaddr_in);
 
@@ -770,7 +763,9 @@ double icmp_echo(const char *hostname, int timeout, int count) {
           DEBUG("ICMP echo response %d/%d succeeded -- received id=%d sequence=%d response_time=%fs\n", i + 1, count, icmpin->icmp_id, icmpin->icmp_seq, response);
           break; // Wait for one response only
         } else
-          LogError("ICMP echo response %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence 0-%d)\n", i + 1, count, icmpin->icmp_id, id_out, icmpin->icmp_seq, count - 1);
+          LogError("ICMP echo response %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence=%d)\n", i + 1, count, icmpin->icmp_id, id_out, icmpin->icmp_seq, count - 1);
+      } else if (icmpin->icmp_type == ICMP_ECHO) {
+        LogError("ICMP echo response %d/%d failed -- received echo request instead of expected response, source id=%d (mine id=%d) sequence=%d (mine sequence=%d)\n", i + 1, count, icmpin->icmp_id, id_out, icmpin->icmp_seq, count - 1);
       } else
         LogError("ICMP echo response %d/%d failed -- invalid ICMP response type: %x (%s)\n", i + 1, count, icmpin->icmp_type, icmpin->icmp_type < 19 ? icmpnames[icmpin->icmp_type] : "unknown");
     } else
