@@ -9,6 +9,9 @@
 
 Version 5.3
 
+BUGFIXES:
+
+* Fix crash on MacOSX
 
 
 Version 5.2.1

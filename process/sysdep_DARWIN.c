@@ -97,9 +97,6 @@ static long cpu_user_old = 0;
 static long cpu_syst_old = 0;
 
 
-static char *skipString(char *p);
-
-
 /* ------------------------------------------------------------------ Public */
 
 
@@ -190,7 +187,7 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
     LogError("system statistic error -- sysctl failed: %s\n", STRERROR);
     return FALSE;
   }
-  args = (char *)xcalloc(1, args_size);
+  args = (char *)xcalloc(1, args_size + 1);
   size = args_size; // save for per-process sysctl loop
 
   for (i = 0; i < treesize; i++) {
@@ -214,18 +211,22 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
        *        }
        * The strings are terminated with '\0' and may have variable '\0' padding
        */
-      int       argc = *args;
-      char     *p = args + sizeof(int); // arguments beginning
+      int  argc = *args;
+      char *p = args + sizeof(int); // arguments beginning
       Buffer_T  cmdline;
 
       memset(&cmdline, 0, sizeof(Buffer_T));
 
-      p = skipString(p); // skip exec name
-      while (argc-- && p < args + args_size) {
-        Util_stringbuffer(&cmdline, argc ? "%s " : "%s", p);
-        p = skipString(p);
+      p += strlen(p); // skip exename
+      while (argc && p < args + args_size) {
+        if (*p == 0) { // skip terminating 0 and variable length 0 padding
+          p++;
+          continue;
+        }
+        Util_stringbuffer(&cmdline, argc-- ? "%s " : "%s", p);
+        p += strlen(p);
       }
-      pt[i].cmdline = cmdline.buf;
+      pt[i].cmdline = Util_trim(cmdline.buf);
     }
     if (! pt[i].cmdline || ! *pt[i].cmdline)
       pt[i].cmdline = xstrdup(pinfo[i].kp_proc.p_comm);
@@ -359,13 +360,5 @@ int used_system_cpu_sysdep(SystemInfo_T *si) {
     return TRUE;
   }
   return FALSE;
-}
-
-
-static char *skipString(char *p) {
-  p += strlen(p);
-  while (! *p) // skip terminating '\0' and possible padding
-    p++;
-  return p;
 }
 
