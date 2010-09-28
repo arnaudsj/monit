@@ -13,6 +13,11 @@ BUGFIXES:
 
 * ICMP echo test (ping):
      - bug #31128: do not log error if different response type is received
+     - bug #31129: do not require root to use ping test. Privilege to create
+       raw socket is still required, but on some platforms such as Solaris it
+       can be granted to non-root users too. If the user has no permission to
+       perform ping, monit will skip the icmp test and log message (in debug
+       mode only).
 
 * Fix crash on MacOSX
 

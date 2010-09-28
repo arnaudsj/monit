@@ -2540,23 +2540,21 @@ static void addfilesystem(Filesystem_T ds) {
  * Add a new icmp object to the current service's icmp list
  */
 static void addicmp(Icmp_T is) {
-  if (!getuid()) {
-    Icmp_T icmp;
+  Icmp_T icmp;
 
-    ASSERT(is);
+  ASSERT(is);
 
-    NEW(icmp);
-    icmp->type         = is->type;      
-    icmp->count        = is->count;
-    icmp->timeout      = is->timeout;
-    icmp->action       = is->action;
-    icmp->is_available = FALSE;
-    icmp->response     = -1;
+  NEW(icmp);
+  icmp->type         = is->type;      
+  icmp->count        = is->count;
+  icmp->timeout      = is->timeout;
+  icmp->action       = is->action;
+  icmp->is_available = FALSE;
+  icmp->response     = -1;
   
-    icmp->next         = current->icmplist;
-    current->icmplist  = icmp;
-  } else
-    yyerror("icmp statements must be run as root");
+  icmp->next         = current->icmplist;
+  current->icmplist  = icmp;
+
   reset_icmpset();
 }
 

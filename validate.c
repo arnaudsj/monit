@@ -488,7 +488,10 @@ int check_remote_host(Service_T s) {
 
         icmp->response = icmp_echo(s->path, icmp->timeout, icmp->count);
 
-        if (icmp->response < 0) {
+        if (icmp->response == -2) {
+          icmp->is_available = TRUE;
+          DEBUG("'%s' icmp ping skipped -- the monit user has no permission to create raw socket, please run monit as root or add privilege for net_icmpaccess\n", s->name);
+        } else if (icmp->response == -1) {
           icmp->is_available = FALSE;
           DEBUG("'%s' icmp ping failed\n", s->name);
           Event_post(s, Event_Icmp, STATE_FAILED, icmp->action, "failed ICMP test [%s]", icmpnames[icmp->type]);

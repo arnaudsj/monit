@@ -648,7 +648,9 @@ int udp_write(int socket, void *b, int len, int timeout) {
  * @param hostname The host to open a socket at
  * @param timeout If response will not come within timeout seconds abort
  * @param count How many pings to send
- * @return response time on succes, -1 on error
+ * @return response time on succes, -1 on error, -2 when monit has no
+ * permissions for raw socket (normally requires root or net_icmpaccess
+ * privilege on Solaris)
  */
 double icmp_echo(const char *hostname, int timeout, int count) {
   struct sockaddr_in sout;
@@ -681,7 +683,12 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   }
 
   if ((s = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0) {
-    LogError("ICMP echo for %s -- socket failed: %s\n", hostname, STRERROR);
+    if (errno == EACCES || errno == EPERM) {
+      DEBUG("ICMP echo for %s -- cannot create socket: %s\n", hostname, STRERROR);
+      response = -2.;
+    } else {
+      LogError("ICMP echo for %s -- canot create socket: %s\n", hostname, STRERROR);
+    }
     goto error2;
   }
 
