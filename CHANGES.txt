@@ -12,7 +12,7 @@ Version 5.3
 BUGFIXES:
 
 * ICMP echo test (ping):
-     - do not log error if different response type is received
+     - bug #31128: do not log error if different response type is received
 
 * Fix crash on MacOSX
 
