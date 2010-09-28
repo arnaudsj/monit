@@ -11,7 +11,11 @@ Version 5.3
 
 BUGFIXES:
 
+* ICMP echo test (ping):
+     - do not log error if different response type is received
+
 * Fix crash on MacOSX
+
 
 
 Version 5.2.1
@@ -24,6 +28,7 @@ BUGFIXES:
   the process of fixing this bug the new feature that allowed slash in
   service names has been reverted and instead will be added in a later
   release.
+
 
 
 Version 5.2

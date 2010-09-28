@@ -660,11 +660,9 @@ double icmp_echo(const char *hostname, int timeout, int count) {
   int len_in = sizeof(struct ip) + sizeof(struct icmp);
   struct icmp *icmpin = NULL;
   struct icmp *icmpout = NULL;
-  uint16_t id_in;
-  uint16_t id_out;
+  uint16_t id_in, id_out, seq_in;
   int r, i, s, n = 0;
-  struct timeval t_out;
-  struct timeval t_in;
+  struct timeval t_in, t_out;
   char buf[STRLEN];
   double response = -1.;
 #if ! defined NETBSD && ! defined AIX
@@ -712,7 +710,7 @@ double icmp_echo(const char *hostname, int timeout, int count) {
     icmpout->icmp_code  = 0;
     icmpout->icmp_type  = ICMP_ECHO;
     icmpout->icmp_id    = htons(id_out);
-    icmpout->icmp_seq   = i;
+    icmpout->icmp_seq   = htons(i);
     icmpout->icmp_cksum = 0;
 
     /* Add originate timestamp to data section */
@@ -756,20 +754,21 @@ double icmp_echo(const char *hostname, int timeout, int count) {
       iphdrin = (struct ip *)buf;
       icmpin  = (struct icmp *)(buf + iphdrin->ip_hl * 4);
       id_in   = ntohs(icmpin->icmp_id);
+      seq_in  = ntohs(icmpin->icmp_seq);
       if (icmpin->icmp_type == ICMP_ECHOREPLY) {
-        if (id_in == id_out && icmpin->icmp_seq < (uint16_t)count) {
+        if (id_in == id_out && seq_in < (uint16_t)count) {
           /* Get the response time */
           gettimeofday(&t_in, NULL);
           memcpy(&t_out, icmpin->icmp_data, sizeof(struct timeval));
           response = (double)(t_in.tv_sec - t_out.tv_sec) + (double)(t_in.tv_usec - t_out.tv_usec) / 1000000;
-          DEBUG("ICMP echo response for %s %d/%d succeeded -- received id=%d sequence=%d response_time=%fs\n", hostname, i + 1, count, id_in, icmpin->icmp_seq, response);
+          DEBUG("ICMP echo response for %s %d/%d succeeded -- received id=%d sequence=%d response_time=%fs\n", hostname, i + 1, count, id_in, seq_in, response);
           break; // Wait for one response only
         } else
-          LogError("ICMP echo response for %s %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence=%d)\n", hostname, i + 1, count, id_in, id_out, icmpin->icmp_seq, count - 1);
+          LogError("ICMP echo response for %s %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence=%d)\n", hostname, i + 1, count, id_in, id_out, seq_in, i);
       } else if (icmpin->icmp_type == ICMP_ECHO) {
-        LogError("ICMP echo response for %s %d/%d failed -- received echo request instead of expected response, source id=%d (mine id=%d) sequence=%d (mine sequence=%d)\n", hostname, i + 1, count, id_in, id_out, icmpin->icmp_seq, count - 1);
+        LogError("ICMP echo response for %s %d/%d failed -- received echo request instead of expected response, source id=%d (mine id=%d) sequence=%d (mine sequence=%d)\n", hostname, i + 1, count, id_in, id_out, seq_in, i);
       } else
-        LogError("ICMP echo response for %s %d/%d failed -- invalid ICMP response type: %x (%s)\n", hostname, i + 1, count, icmpin->icmp_type, icmpin->icmp_type < 19 ? icmpnames[icmpin->icmp_type] : "unknown");
+        DEBUG("ICMP echo response for %s %d/%d -- expected ECHOREPLY, received response type: %x (%s)\n", hostname, i + 1, count, icmpin->icmp_type, icmpin->icmp_type < 19 ? icmpnames[icmpin->icmp_type] : "unknown");
     } else
       LogError("ICMP echo response for %s %d/%d timed out -- no response within %d seconds\n", hostname, i + 1, count, timeout);
   }
