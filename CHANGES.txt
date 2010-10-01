@@ -1,4 +1,4 @@
-                     CHANGES version 5.3
+                     CHANGES version 5.2.2
                                 
            This file summarizes changes made since 5.0
                                 
@@ -7,9 +7,11 @@
           https://savannah.nongnu.org/bugs/?group=monit
 
 
-Version 5.3
+Version 5.2.2
 
 BUGFIXES:
+
+* Fix crash on MacOSX
 
 * ICMP echo test (ping):
      - bug #31128: do not log error if different response type is received
@@ -18,8 +20,6 @@ BUGFIXES:
        can be granted to non-root users too. If the user has no permission to
        perform ping, monit will skip the icmp test and log message (in debug
        mode only).
-
-* Fix crash on MacOSX
 
 
 
