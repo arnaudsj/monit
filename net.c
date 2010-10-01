@@ -772,10 +772,8 @@ double icmp_echo(const char *hostname, int timeout, int count) {
           break; // Wait for one response only
         } else
           LogError("ICMP echo response for %s %d/%d error -- received id=%d (expected id=%d), received sequence=%d (expected sequence=%d)\n", hostname, i + 1, count, id_in, id_out, seq_in, i);
-      } else if (icmpin->icmp_type == ICMP_ECHO) {
-        LogError("ICMP echo response for %s %d/%d failed -- received echo request instead of expected response, source id=%d (mine id=%d) sequence=%d (mine sequence=%d)\n", hostname, i + 1, count, id_in, id_out, seq_in, i);
       } else
-        DEBUG("ICMP echo response for %s %d/%d -- expected ECHOREPLY, received response type: %x (%s)\n", hostname, i + 1, count, icmpin->icmp_type, icmpin->icmp_type < 19 ? icmpnames[icmpin->icmp_type] : "unknown");
+        DEBUG("ICMP echo response for %s %d/%d -- expected ECHOREPLY, received response type: %x (%s), source id=%d (mine id=%d) sequence=%d (mine sequence=%d)\n", hostname, i + 1, count, icmpin->icmp_type, icmpin->icmp_type < 19 ? icmpnames[icmpin->icmp_type] : "unknown", id_in, id_out, seq_in, i);
     } else
       LogError("ICMP echo response for %s %d/%d timed out -- no response within %d seconds\n", hostname, i + 1, count, timeout);
   }
