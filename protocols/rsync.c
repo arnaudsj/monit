@@ -47,58 +47,63 @@
 /**
  *  Check the server for greeting "@RSYNCD: XX, then send this greeting back
  *  to server, send command '#list' to get a listing of modules.
- * 
+ *
  *  @author Igor Homyakov <homyakov@altlinux.ru>
  *
  *  @file
  */
 int check_rsync(Socket_T s) {
-
-  char  buf[STRLEN];
-  char  msg[STRLEN];
-  int   rc, version;
+  char  buf[64];
+  char  header[10];
+  char  result[64];
+  int   rc, version_major, version_minor;
   char  *rsyncd = "@RSYNCD:";
-  
+  char  *rsyncd_exit = "@RSYNCD: EXIT";
+
   ASSERT(s);
-    
-  if(!socket_readln(s, buf, sizeof(buf))) {
+
+  /* Read and check the greeting */
+  if (!socket_readln(s, buf, sizeof(buf))) {
     LogError("RSYNC: did not see server greeting  -- %s\n", STRERROR);
     return FALSE;
   }
-
   Util_chomp(buf);
-  
-  rc = sscanf(buf, "%255s %d", msg, &version);
-  if ((rc == EOF) || (rc == 0)) {
-     LogError("RSYNC: server greeting parse error %s\n", buf);
+  rc = sscanf(buf, "%10s %d.%d", header, &version_major, &version_minor);
+  if ((rc == EOF) || (rc != 3)) {
+    LogError("RSYNC: server greeting parse error %s\n", buf);
     return FALSE;
   }
-   
-  if(strncasecmp(msg, rsyncd, strlen(rsyncd)) != 0) {
-    LogError("RSYNC: server sent \"%s\" rather than greeting\n", buf);
-    return FALSE;
-  }
-
-  if(snprintf(buf, sizeof(buf), "%s %d\n", rsyncd, version) < 0) {
-    LogError("RSYNC: string copy error -- %s\n", STRERROR);
-    return FALSE;
-  } 
-	
-  if(socket_write(s, buf, strlen(buf)) <= 0) {
-    LogError("RSYNC: error sending identification string -- %s\n", STRERROR);
-     return FALSE;
-  }
-
-  if(socket_print(s, "#list\n") < 0) {
-    LogError("RSYNC: error sending writing #list command  -- %s\n", STRERROR);
+  if (strncasecmp(header, rsyncd, strlen(rsyncd)) != 0) {
+    LogError("RSYNC: server sent unexpected greeting -- %s\n", buf);
     return FALSE;
   }
 
-  if(!socket_readln(s, buf, sizeof(buf))) {
-    LogError("RSYNC: did not see server answer  -- %s\n", STRERROR);
+  /* Send back the greeting */
+  if (socket_print(s, "%s\n", buf) <= 0) {
+    LogError("RSYNC: identification string send failed -- %s\n", STRERROR);
     return FALSE;
   }
-  
+
+  /* Send #list command */
+  if (socket_print(s, "#list\n") < 0) {
+    LogError("RSYNC: #list command failed -- %s\n", STRERROR);
+    return FALSE;
+  }
+
+  /* Read response: discard list output and check that we've received successful exit */
+  do {
+    if (! socket_readln(s, buf, sizeof(buf))) {
+      LogError("RSYNC: error receiving data -- %s\n", STRERROR);
+      return FALSE;
+    }
+    Util_chomp(buf);
+  } while (strncasecmp(buf, rsyncd, strlen(rsyncd)));
+  if (strncasecmp(buf, rsyncd_exit, strlen(rsyncd_exit)) != 0) {
+    LogError("RSYNC: server sent unexpected response -- %s\n", buf);
+    return FALSE;
+  }
+
   return TRUE;
-  
+
 }
+

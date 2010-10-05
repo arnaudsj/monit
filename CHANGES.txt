@@ -21,6 +21,9 @@ BUGFIXES:
        perform ping, monit will skip the icmp test and log message (in debug
        mode only).
 
+* rsync protocol test:
+     - bug #31249: send full version to rsync server
+
 
 
 Version 5.2.1
