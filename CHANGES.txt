@@ -24,6 +24,7 @@ BUGFIXES:
 * rsync protocol test:
      - bug #31249: send full version to rsync server. Thanks to John Hall for
        report
+     - wait for full server response and verify exit was received
 
 
 
