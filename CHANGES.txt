@@ -22,7 +22,8 @@ BUGFIXES:
        mode only).
 
 * rsync protocol test:
-     - bug #31249: send full version to rsync server
+     - bug #31249: send full version to rsync server. Thanks to John Hall for
+       report
 
 
 
