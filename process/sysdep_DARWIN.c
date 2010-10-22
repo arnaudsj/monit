@@ -226,7 +226,8 @@ int initprocesstree_sysdep(ProcessTree_T **reference) {
         Util_stringbuffer(&cmdline, argc-- ? "%s " : "%s", p);
         p += strlen(p);
       }
-      pt[i].cmdline = Util_trim(cmdline.buf);
+      if (cmdline.buf)
+        pt[i].cmdline = Util_trim(cmdline.buf);
     }
     if (! pt[i].cmdline || ! *pt[i].cmdline)
       pt[i].cmdline = xstrdup(pinfo[i].kp_proc.p_comm);
