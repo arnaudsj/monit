@@ -1,4 +1,4 @@
-                     CHANGES version 5.2.2
+                     CHANGES version 5.2.3
                                 
            This file summarizes changes made since 5.0
                                 
@@ -6,6 +6,12 @@
           bug-tracking system, which can be found here
           https://savannah.nongnu.org/bugs/?group=monit
 
+
+Version 5.2.3
+
+BUGFIXES:
+
+* Mysql protocol test supports mysql 5.5.x and newer now.
 
 Version 5.2.2
 

@@ -136,9 +136,8 @@ int check_mysql(Socket_T s) {
   }
 
   /* Compare Response Code: */
-
-  /* If OK, we are loged in and will perform MySQL ping */
   if(buf[4] == 0x00) {
+    /* If OK, we are loged in and will perform MySQL ping */
     if(socket_write(s, (unsigned char *)requestPing, sizeof(requestPing)) < 0) {
       LogError("MYSQL: error sending ping -- %s\n", STRERROR);
       return FALSE;
@@ -161,13 +160,12 @@ int check_mysql(Socket_T s) {
     }
 
     return TRUE;
-  }
-  /* If Authentication Failed, return success immediately */
-  else if((buf[4] == 0xFF) && (buf[5] == 0x15 && buf[6] == 0x04)) {
+  } else if((buf[4] == 0xFF) && ((buf[5] == 0x15 && buf[6] == 0x04) || (buf[5] == 0xE3 && buf[6] == 0x04))) {
+    /* If access denied (1045) or server requires newer authentication protocol (1251), return success immediately */
     return TRUE;
   }
 
-  LogError("MYSQL: login failed\n");
+  LogError("MYSQL: login failed (error code 0x%x%x)\n", buf[5], buf[6]);
 
   return FALSE;
 }
