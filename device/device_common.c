@@ -104,7 +104,7 @@ char *device_path(Info_T inf, char *object) {
     inf->mntpath[sizeof(inf->mntpath) - 1] = 0;
     return strncpy(inf->mntpath, object, sizeof(inf->mntpath) - 1);
 
-  } else if(S_ISBLK(buf.st_mode)) {
+  } else if(S_ISBLK(buf.st_mode) || S_ISCHR(buf.st_mode)) {
 
     return device_mountpoint_sysdep(inf, object);
 

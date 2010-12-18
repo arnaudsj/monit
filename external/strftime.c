@@ -999,6 +999,7 @@ strftime (s, maxsize, format, tp)
 		   valid time_t value.  Check whether an error really
 		   occurred.  */
 		struct tm tm;
+                memset(&tm, 0, sizeof(struct tm));
 		localtime_r (&lt, &tm);
 
 		if ((ltm.tm_sec ^ tm.tm_sec)

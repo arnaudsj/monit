@@ -321,70 +321,37 @@ int getloadavg_sysdep (double *loadv, int nelem) {
 int used_system_memory_sysdep(SystemInfo_T *si) {
   char          *ptr;
   char           buf[1024];
-  unsigned long  mem_free;
-  unsigned long  buffers;
-  unsigned long  cached;
-  unsigned long  swap_total;
-  unsigned long  swap_free;
+  unsigned long  mem_free = 0UL;
+  unsigned long  buffers = 0UL;
+  unsigned long  cached = 0UL;
+  unsigned long  swap_total = 0UL;
+  unsigned long  swap_free = 0UL;
   
-  /* Memory */
-
   if (! read_proc_file(buf, 1024, "meminfo", -1, NULL)) {
     LogError("system statistic error -- cannot get real memory free amount\n");
     goto error;
   }
 
-  if (! (ptr = strstr(buf, MEMFREE))) {
+  /* Memory */
+  if (! (ptr = strstr(buf, MEMFREE)) || sscanf(ptr + strlen(MEMFREE), "%ld", &mem_free) != 1) {
     LogError("system statistic error -- cannot get real memory free amount\n");
     goto error;
   }
-  if (sscanf(ptr + strlen(MEMFREE), "%ld", &mem_free) != 1) {
-    LogError("system statistic error -- cannot get real memory free amount\n");
-    goto error;
-  }
-
-  if (! (ptr = strstr(buf, MEMBUF))) {
-    LogError("system statistic error -- cannot get real memory buffers "
-      "amount\n");
-    goto error;
-  }
-  if (sscanf(ptr + strlen(MEMBUF), "%ld", &buffers) != 1) {
-    LogError("system statistic error -- cannot get real memory buffers amount\n");
-    goto error;
-  }
-
-  if (! (ptr = strstr(buf, MEMCACHE))) {
-    LogError("system statistic error -- cannot get real memory cache amount\n");
-    goto error;
-  }
-  if (sscanf(ptr + strlen(MEMCACHE), "%ld", &cached) != 1) {
-    LogError("system statistic error -- cannot get real memory cache free "
-      "amount\n");
-    goto error;
-  }
-
+  if (! (ptr = strstr(buf, MEMBUF)) || sscanf(ptr + strlen(MEMBUF), "%ld", &buffers) != 1)
+    DEBUG("system statistic error -- cannot get real memory buffers amount\n");
+  if (! (ptr = strstr(buf, MEMCACHE)) || sscanf(ptr + strlen(MEMCACHE), "%ld", &cached) != 1)
+    DEBUG("system statistic error -- cannot get real memory cache amount\n");
   si->total_mem_kbyte = systeminfo.mem_kbyte_max - mem_free - buffers - cached;
 
   /* Swap */
-
-  if (! (ptr = strstr(buf, SWAPTOTAL))) {
+  if (! (ptr = strstr(buf, SWAPTOTAL)) || sscanf(ptr + strlen(SWAPTOTAL), "%ld", &swap_total) != 1) {
     LogError("system statistic error -- cannot get swap total amount\n");
     goto error;
   }
-  if (sscanf(ptr + strlen(SWAPTOTAL), "%ld", &swap_total) != 1) {
-    LogError("system statistic error -- cannot get swap total amount\n");
-    goto error;
-  }
-
-  if (! (ptr = strstr(buf, SWAPFREE))) {
+  if (! (ptr = strstr(buf, SWAPFREE)) || sscanf(ptr + strlen(SWAPFREE), "%ld", &swap_free) != 1) {
     LogError("system statistic error -- cannot get swap free amount\n");
     goto error;
   }
-  if (sscanf(ptr + strlen(SWAPFREE), "%ld", &swap_free) != 1) {
-    LogError("system statistic error -- cannot get swap free amount\n");
-    goto error;
-  }
-
   si->swap_kbyte_max   = swap_total;
   si->total_swap_kbyte = swap_total - swap_free;
 

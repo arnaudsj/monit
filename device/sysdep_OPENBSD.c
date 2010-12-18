@@ -71,21 +71,28 @@
  * @return         NULL in the case of failure otherwise mountpoint
  */
 char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
-
-  struct statfs usage;
+  int countfs;
 
   ASSERT(inf);
   ASSERT(blockdev);
 
-  if(statfs(blockdev, &usage) != 0) {
-    LogError("%s: Error getting mountpoint for filesystem '%s' -- %s\n",
-        prog, blockdev, STRERROR);
-    return NULL;
+  if ((countfs = getfsstat(NULL, 0, MNT_NOWAIT)) != -1) {
+    struct statfs *statfs = xcalloc(countfs, sizeof(struct statfs));
+    if ((countfs = getfsstat(statfs, countfs * sizeof(struct statfs), MNT_NOWAIT)) != -1) {
+      int i;
+      for (i = 0; i < countfs; i++) {
+        struct statfs *sfs = statfs + i;
+        if (IS(sfs->f_mntfromname, blockdev)) {
+          snprintf(inf->mntpath, sizeof(inf->mntpath), "%s", sfs->f_mntonname);
+          FREE(statfs);
+          return inf->mntpath;
+        }
+      }
+    }
+    FREE(statfs);
   }
-
-  inf->mntpath[sizeof(inf->mntpath) - 1] = 0;
-  return strncpy(inf->mntpath, usage.f_mntonname, sizeof(inf->mntpath) - 1);
-
+  LogError("%s: Error getting mountpoint for filesystem '%s' -- %s\n", prog, blockdev, STRERROR);
+  return NULL;
 }
 
 

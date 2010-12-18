@@ -57,6 +57,10 @@
 #include <sys/mount.h>
 #endif
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
 #ifdef HAVE_SYS_STATVFS_H
 #include <sys/statvfs.h>
 #endif
@@ -74,28 +78,28 @@
  * @return         NULL in the case of failure otherwise mountpoint
  */
 char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
-
-#if(__NetBSD_Version__ >= 300000000)
-  struct statvfs usage;
-#else
-  struct statfs usage;
-#endif
+  int countfs;
 
   ASSERT(inf);
   ASSERT(blockdev);
 
-#if(__NetBSD_Version__ >= 300000000)
-  if(statvfs(blockdev, &usage) != 0) {
-#else
-  if(statfs(blockdev, &usage) != 0) {
-#endif
-    LogError("%s: Error getting mountpoint for filesystem '%s' -- %s\n",
-        prog, blockdev, STRERROR);
-    return NULL;
+  if ((countfs = getvfsstat(NULL, 0, ST_NOWAIT)) != -1) {
+    struct statvfs *statvfs = xcalloc(countfs, sizeof(struct statvfs));
+    if ((countfs = getvfsstat(statvfs, countfs * sizeof(struct statvfs), ST_NOWAIT)) != -1) {
+      int i;
+      for (i = 0; i < countfs; i++) {
+        struct statvfs *sfs = statvfs + i;
+        if (IS(sfs->f_mntfromname, blockdev)) {
+          snprintf(inf->mntpath, sizeof(inf->mntpath), "%s", sfs->f_mntonname);
+          FREE(statvfs);
+          return inf->mntpath;
+        }
+      }
+    }
+    FREE(statvfs);
   }
-
-  inf->mntpath[sizeof(inf->mntpath) - 1] = 0;
-  return strncpy(inf->mntpath, usage.f_mntonname, sizeof(inf->mntpath) - 1);
+  LogError("%s: Error getting mountpoint for filesystem '%s' -- %s\n", prog, blockdev, STRERROR);
+  return NULL;
 
 }
 
@@ -108,38 +112,23 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
  * @return        TRUE if informations were succesfully read otherwise FALSE
  */
 int filesystem_usage_sysdep(Info_T inf) {
-
-#if(__NetBSD_Version__ >= 300000000)
   struct statvfs usage;
-#else
-  struct statfs usage;
-#endif
 
   ASSERT(inf);
 
-#if(__NetBSD_Version__ >= 300000000)
   if(statvfs(inf->mntpath, &usage) != 0) {
-#else
-  if(statfs(inf->mntpath, &usage) != 0) {
-#endif
-    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n",
-        prog, inf->mntpath, STRERROR);
+    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->mntpath, STRERROR);
     return FALSE;
   }
 
-  inf->f_bsize=           usage.f_bsize;
+  inf->f_bsize=           usage.f_frsize;
   inf->f_blocks=          usage.f_blocks;
   inf->f_blocksfree=      usage.f_bavail;
   inf->f_blocksfreetotal= usage.f_bfree;
   inf->f_files=           usage.f_files;
   inf->f_filesfree=       usage.f_ffree;
-#if(__NetBSD_Version__ >= 300000000)
   inf->flags=             usage.f_flag;
-#else
-  inf->flags=             usage.f_flags;
-#endif
 
   return TRUE;
-
 }
 

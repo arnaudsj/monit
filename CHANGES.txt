@@ -1,4 +1,4 @@
-                     CHANGES version 5.2.3
+                     CHANGES version 5.2.4
                                 
            This file summarizes changes made since 5.0
                                 
@@ -7,11 +7,28 @@
           https://savannah.nongnu.org/bugs/?group=monit
 
 
+Version 5.2.4
+
+BUGFIXES:
+
+* FreeBSD, NetBSD, OpenBSD, MacOSX filesystem check fix:
+  If block/character device was used in the check path instead
+  of mountpoint, monit reported usage of wrong filesystem.
+
+* NetBSD filesystem check: Fix space usage report
+
+* Linux OpenVZ 2.6.32+: Fix memory usage monitoring in VPS
+  virtual hosts. Thanks to Kelly for report.
+
+
+
 Version 5.2.3
 
 BUGFIXES:
 
 * Mysql protocol test supports mysql 5.5.x and newer now.
+
+
 
 Version 5.2.2
 
