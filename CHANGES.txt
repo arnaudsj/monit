@@ -11,7 +11,7 @@ Version 5.2.4
 
 BUGFIXES:
 
-* FreeBSD, NetBSD, OpenBSD, MacOSX filesystem check fix:
+* FreeBSD, NetBSD, OpenBSD, MacOSX, Solaris filesystem check fix:
   If block/character device was used in the check path instead
   of mountpoint, monit reported usage of wrong filesystem.
 

@@ -76,36 +76,28 @@
  * @return         NULL in the case of failure otherwise mountpoint
  */
 char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
-
   struct mnttab mnt;
   FILE         *mntfd;
 
   ASSERT(inf);
   ASSERT(blockdev);
 
-
-  if((mntfd= fopen("/etc/mnttab", "r")) == NULL) {
+  if ((mntfd= fopen("/etc/mnttab", "r")) == NULL) {
     LogError("%s: Cannot open /etc/mnttab file\n", prog);
     return NULL;
   }
 
-  /* First match is significant */
-  while(getmntent(mntfd, &mnt) == 0) {
-
-    if(IS(blockdev, mnt.mnt_special)) {
-
-      fclose(mntfd);
-      inf->mntpath[sizeof(inf->mntpath) - 1] = 0;
-      return strncpy(inf->mntpath, mnt.mnt_mountp, sizeof(inf->mntpath) - 1);
-
+  while (getmntent(mntfd, &mnt) == 0) {
+    char real_mnt_special[PATH_MAX+1];
+    if (realpath(mnt.mnt_special, real_mnt_special) && IS(real_mnt_special, blockdev)) {
+        fclose(mntfd);
+        snprintf(inf->mntpath, sizeof(inf->mntpath), "%s", mnt.mnt_mountp);
+        return inf->mntpath;
     }
-
   }
 
   fclose(mntfd);
-
   return NULL;
-
 }
 
 
@@ -114,17 +106,15 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
  * given information structure.
  *
  * @param inf Information structure where resulting data will be stored
- * @return        TRUE if informations were succesfully read otherwise FALSE
+ * @return TRUE if informations were succesfully read otherwise FALSE
  */
 int filesystem_usage_sysdep(Info_T inf) {
-
   struct statvfs usage;
 
   ASSERT(inf);
 
-  if(statvfs(inf->mntpath, &usage) != 0) {
-    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n",
-        prog, inf->mntpath, STRERROR);
+  if (statvfs(inf->mntpath, &usage) != 0) {
+    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->mntpath, STRERROR);
     return FALSE;
   }
 
@@ -137,6 +127,5 @@ int filesystem_usage_sysdep(Info_T inf) {
   inf->flags=             usage.f_flag;
 
   return TRUE;
-
 }
 
