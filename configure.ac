@@ -319,9 +319,6 @@ AC_CHECK_FUNCS(syslog)
 AC_CHECK_FUNCS(vsyslog)
 AC_CHECK_FUNCS(backtrace)
 
-# Check if we do need external GNU replacements
-AC_FUNC_GETLOADAVG
-
 jm_FUNC_GNU_STRFTIME
 
 EXTERNALS=""
