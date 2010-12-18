@@ -141,7 +141,6 @@ AC_CHECK_HEADERS([ \
 	sys/time.h \
 	sys/tree.h \
 	sys/types.h \
-	sys/ucred.h \
 	sys/un.h \
 	sys/utsname.h \
         sys/vmmeter.h \
@@ -199,6 +198,7 @@ AC_CHECK_HEADERS([ \
         sys/mount.h \
         sys/proc.h \
         sys/swap.h \
+	sys/ucred.h \
         sys/user.h \
         ],
         [],
