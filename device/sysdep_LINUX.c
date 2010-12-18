@@ -76,13 +76,11 @@
  * @return         NULL in the case of failure otherwise mountpoint
  */
 char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
-
   struct mntent *mnt;
   FILE          *mntfd;
 
   ASSERT(inf);
   ASSERT(blockdev);
-
 
   if((mntfd= setmntent("/etc/mtab", "r")) == NULL) {
     LogError("%s: Cannot open /etc/mtab file\n", prog);
@@ -91,22 +89,16 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
 
   /* First match is significant */
   while((mnt= getmntent(mntfd)) != NULL) {
-
     if(IS(blockdev, mnt->mnt_fsname)) {
-
       endmntent(mntfd);
       inf->mntpath[sizeof(inf->mntpath) - 1] = 0;
       return strncpy(inf->mntpath, mnt->mnt_dir, sizeof(inf->mntpath) - 1);
-
     }
-
   }
-
   endmntent(mntfd);
 
   LogError("Device %s not found in /etc/mtab\n", blockdev);
   return NULL;
-
 }
 
 
