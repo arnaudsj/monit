@@ -46,19 +46,19 @@
 #include <errno.h>
 #endif
 
-#if defined HAVE_STRING_H
+#ifdef HAVE_STRING_H
 #include <string.h>
 #endif
 
-#if defined HAVE_SYS_PARAM_H
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
 #endif
 
-#if defined HAVE_SYS_UCRED_H
+#ifdef HAVE_SYS_UCRED_H
 #include <sys/ucred.h>
 #endif
 
-#if defined HAVE_SYS_MOUNT_H
+#ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>
 #endif
 
@@ -108,26 +108,22 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
  * @return    TRUE if informations were succesfully read otherwise FALSE
  */
 int filesystem_usage_sysdep(Info_T inf) {
-
   struct statfs usage;
 
   ASSERT(inf);
 
-  if(statfs(inf->mntpath, &usage) != 0) {
-    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n",
-        prog, inf->mntpath, STRERROR);
+  if (statfs(inf->mntpath, &usage) != 0) {
+    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->mntpath, STRERROR);
     return FALSE;
   }
-
-  inf->f_bsize=           usage.f_bsize;
-  inf->f_blocks=          usage.f_blocks;
-  inf->f_blocksfree=      usage.f_bavail;
-  inf->f_blocksfreetotal= usage.f_bfree;
-  inf->f_files=           usage.f_files;
-  inf->f_filesfree=       usage.f_ffree;
-  inf->flags=             usage.f_flags;
+  inf->f_bsize =           usage.f_bsize;
+  inf->f_blocks =          usage.f_blocks;
+  inf->f_blocksfree =      usage.f_bavail;
+  inf->f_blocksfreetotal = usage.f_bfree;
+  inf->f_files =           usage.f_files;
+  inf->f_filesfree =       usage.f_ffree;
+  inf->flags =             usage.f_flags;
 
   return TRUE;
-
 }
 
