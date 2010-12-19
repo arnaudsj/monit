@@ -234,16 +234,13 @@ nsCertType = server
 In order to generate the actual pemfile just run these commands:
  
 # Generates the private key and the certificate
-/usr/local/bin/openssl req -new -x509 -days 365 -nodes \
-        -config ./monit.cnf -out /var/certs/monit.pem \
-        -keyout /var/certs/monit.pem
+openssl req -new -x509 -days 365 -nodes -config ./monit.cnf -out /var/certs/monit.pem -keyout /var/certs/monit.pem
 
 # Generates the  Diffie-Hellman Parameters
-/usr/local/bin/openssl gendh 512 >> /var/certs/monit.pem
+openssl gendh 512 >> /var/certs/monit.pem
 
 # Prints out the certificate information
-/usr/local/bin/openssl x509 -subject -dates -fingerprint -noout \
-                -in /var/certs/monit.pem
+openssl x509 -subject -dates -fingerprint -noout -in /var/certs/monit.pem
 
 
 
