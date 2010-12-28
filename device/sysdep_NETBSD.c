@@ -90,7 +90,6 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
       for (i = 0; i < countfs; i++) {
         struct statvfs *sfs = statvfs + i;
         if (IS(sfs->f_mntfromname, blockdev)) {
-          FREE(inf->priv.filesystem.mntpath);
           inf->priv.filesystem.mntpath = xstrdup(sfs->f_mntonname);
           FREE(statvfs);
           return inf->priv.filesystem.mntpath;

@@ -89,7 +89,6 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
   while ((mnt = getmntent(mntfd)) != NULL) {
     if (IS(blockdev, mnt->mnt_fsname)) {
       endmntent(mntfd);
-      FREE(inf->priv.filesystem.mntpath);
       inf->priv.filesystem.mntpath = xstrdup(mnt->mnt_dir);
       return inf->priv.filesystem.mntpath;
     }

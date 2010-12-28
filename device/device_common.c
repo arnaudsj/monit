@@ -99,7 +99,6 @@ char *device_path(Info_T inf, char *object) {
   }
 
   if(S_ISREG(buf.st_mode) || S_ISDIR(buf.st_mode)) {
-    FREE(inf->priv.filesystem.mntpath);
     inf->priv.filesystem.mntpath = xstrdup(object);
     return inf->priv.filesystem.mntpath;
   } else if(S_ISBLK(buf.st_mode) || S_ISCHR(buf.st_mode)) {
@@ -122,15 +121,16 @@ char *device_path(Info_T inf, char *object) {
  * @return        TRUE if informations were succesfully read otherwise FALSE
  */
 int filesystem_usage(Info_T inf, char *object) {
+  int rv;
+
   ASSERT(inf);
   ASSERT(object);
 
   if(!device_path(inf, object))
     return FALSE;
-
-  /* save the previous filesystem flags */
-  inf->priv.filesystem._flags= inf->priv.filesystem.flags;
-
-  return filesystem_usage_sysdep(inf);
+  inf->priv.filesystem._flags = inf->priv.filesystem.flags;
+  rv = filesystem_usage_sysdep(inf);
+  FREE(inf->priv.filesystem.mntpath);
+  return rv;
 }
 

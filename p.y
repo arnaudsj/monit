@@ -2002,8 +2002,7 @@ static void createservice(int type, char *name, char *value, int (*check)(Servic
   else
     NEW(current);
 
-  /* Reset the current object */
-  memset(current, 0, sizeof(*current));
+  current->type = type;
 
   NEW(current->inf);
   Util_resetInfo(current);
@@ -2012,7 +2011,6 @@ static void createservice(int type, char *name, char *value, int (*check)(Servic
   current->monitor = MONITOR_INIT;
   current->mode    = MODE_ACTIVE;
   current->name    = name;
-  current->type    = type;
   current->check   = check;
   current->path    = value;
 
@@ -2032,7 +2030,6 @@ static void createservice(int type, char *name, char *value, int (*check)(Servic
   addeventaction(&(current)->action_ACTION,       ACTION_ALERT, ACTION_IGNORE);
   
   gettimeofday(&current->collected, NULL);
-
 }
 
 
