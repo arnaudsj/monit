@@ -460,6 +460,7 @@ static void _gcpql(Resource_T *q) {
 
 static void _gc_inf(Info_T *i) {
   ASSERT(i);
+  FREE((*i)->priv.filesystem.mntpath);
   FREE(*i);
 }
 

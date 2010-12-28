@@ -82,20 +82,19 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
   ASSERT(inf);
   ASSERT(blockdev);
 
-  if ((mntfd= fopen("/etc/mnttab", "r")) == NULL) {
+  if ((mntfd = fopen("/etc/mnttab", "r")) == NULL) {
     LogError("%s: Cannot open /etc/mnttab file\n", prog);
     return NULL;
   }
-
   while (getmntent(mntfd, &mnt) == 0) {
     char real_mnt_special[PATH_MAX+1];
     if (realpath(mnt.mnt_special, real_mnt_special) && IS(real_mnt_special, blockdev)) {
         fclose(mntfd);
-        snprintf(inf->mntpath, sizeof(inf->mntpath), "%s", mnt.mnt_mountp);
-        return inf->mntpath;
+        FREE(inf->priv.filesystem.mntpath);
+        inf->priv.filesystem.mntpath = xstrdup(mnt.mnt_mountp);
+        return inf->priv.filesystem.mntpath;
     }
   }
-
   fclose(mntfd);
   return NULL;
 }
@@ -109,23 +108,23 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
  * @return TRUE if informations were succesfully read otherwise FALSE
  */
 int filesystem_usage_sysdep(Info_T inf) {
+  int size;
   struct statvfs usage;
 
   ASSERT(inf);
 
-  if (statvfs(inf->mntpath, &usage) != 0) {
-    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->mntpath, STRERROR);
+  if (statvfs(inf->priv.filesystem.mntpath, &usage) != 0) {
+    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->priv.filesystem.mntpath, STRERROR);
     return FALSE;
   }
-
-  inf->f_bsize=           usage.f_bsize;
-  inf->f_blocks=          usage.f_blocks/(usage.f_frsize?(usage.f_bsize/usage.f_frsize):1);
-  inf->f_blocksfree=      usage.f_bavail/(usage.f_frsize?(usage.f_bsize/usage.f_frsize):1);
-  inf->f_blocksfreetotal= usage.f_bfree/(usage.f_frsize?(usage.f_bsize/usage.f_frsize):1);
-  inf->f_files=           usage.f_files;
-  inf->f_filesfree=       usage.f_ffree;
-  inf->flags=             usage.f_flag;
-
+  size =                                   usage.f_frsize ? (usage.f_bsize / usage.f_frsize) : 1;
+  inf->priv.filesystem.f_bsize =           usage.f_bsize;
+  inf->priv.filesystem.f_blocks =          usage.f_blocks / size;
+  inf->priv.filesystem.f_blocksfree =      usage.f_bavail / size;
+  inf->priv.filesystem.f_blocksfreetotal = usage.f_bfree  / size;
+  inf->priv.filesystem.f_files =           usage.f_files;
+  inf->priv.filesystem.f_filesfree =       usage.f_ffree;
+  inf->priv.filesystem.flags =             usage.f_flag;
   return TRUE;
 }
 

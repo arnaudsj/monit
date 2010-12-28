@@ -99,8 +99,9 @@ char *device_path(Info_T inf, char *object) {
   }
 
   if(S_ISREG(buf.st_mode) || S_ISDIR(buf.st_mode)) {
-    snprintf(inf->mntpath, sizeof(inf->mntpath), "%s", object);
-    return inf->mntpath;
+    FREE(inf->priv.filesystem.mntpath);
+    inf->priv.filesystem.mntpath = xstrdup(object);
+    return inf->priv.filesystem.mntpath;
   } else if(S_ISBLK(buf.st_mode) || S_ISCHR(buf.st_mode)) {
     return device_mountpoint_sysdep(inf, object);
   }
@@ -128,7 +129,7 @@ int filesystem_usage(Info_T inf, char *object) {
     return FALSE;
 
   /* save the previous filesystem flags */
-  inf->_flags= inf->flags;
+  inf->priv.filesystem._flags= inf->priv.filesystem.flags;
 
   return filesystem_usage_sysdep(inf);
 }

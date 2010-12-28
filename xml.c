@@ -280,11 +280,11 @@ static void status_service(Service_T S, Buffer_T *B, short L, int V) {
       if(S->type == TYPE_FILE) {
         Util_stringbuffer(B,
   		"<size>%llu</size>",
-  		(unsigned long long) S->inf->st_size);
+  		(unsigned long long) S->inf->priv.file.st_size);
         if(S->checksum) {
           Util_stringbuffer(B,
   		  "<checksum type=\"%s\">%s</checksum>",
-  		  checksumnames[S->checksum->type], S->inf->cs_sum);
+  		  checksumnames[S->checksum->type], S->inf->priv.file.cs_sum);
         }
       }
       if(S->type == TYPE_FILESYSTEM) {
@@ -295,20 +295,20 @@ static void status_service(Service_T S, Buffer_T *B, short L, int V) {
   		"<usage>%.1f MB</usage>"
                 "<total>%.1f MB</total>"
   		"</block>",
-  		S->inf->flags,
-  		S->inf->space_percent/10.,
-  		S->inf->f_bsize > 0 ? (float)S->inf->space_total / (float)1048576 * (float)S->inf->f_bsize : 0,
-                S->inf->f_bsize > 0 ? (float)S->inf->f_blocks / (float)1048576 * (float)S->inf->f_bsize : 0);
-        if(S->inf->f_files > 0) {
+  		S->inf->priv.filesystem.flags,
+  		S->inf->priv.filesystem.space_percent/10.,
+  		S->inf->priv.filesystem.f_bsize > 0 ? (float)S->inf->priv.filesystem.space_total / (float)1048576 * (float)S->inf->priv.filesystem.f_bsize : 0,
+                S->inf->priv.filesystem.f_bsize > 0 ? (float)S->inf->priv.filesystem.f_blocks / (float)1048576 * (float)S->inf->priv.filesystem.f_bsize : 0);
+        if(S->inf->priv.filesystem.f_files > 0) {
           Util_stringbuffer(B,
   		  "<inode>"
                   "<percent>%.1f</percent>"
                   "<usage>%ld</usage>"
                   "<total>%ld</total>"
 		  "</inode>",
-		  S->inf->inode_percent/10.,
-		  S->inf->inode_total,
-                  S->inf->f_files);
+		  S->inf->priv.filesystem.inode_percent/10.,
+		  S->inf->priv.filesystem.inode_total,
+                  S->inf->priv.filesystem.f_files);
         }
       }
       if(S->type == TYPE_PROCESS) {
@@ -316,9 +316,9 @@ static void status_service(Service_T S, Buffer_T *B, short L, int V) {
   		"<pid>%d</pid>"
   		"<ppid>%d</ppid>"
   		"<uptime>%ld</uptime>",
-  		S->inf->pid,
-  		S->inf->ppid,
-  		(long)S->inf->uptime);
+  		S->inf->priv.process.pid,
+  		S->inf->priv.process.ppid,
+  		(long)S->inf->priv.process.uptime);
         if(Run.doprocess) {
           Util_stringbuffer(B,
   		  "<children>%d</children>"
@@ -332,13 +332,13 @@ static void status_service(Service_T S, Buffer_T *B, short L, int V) {
 		  "<percent>%.1f</percent>"
 		  "<percenttotal>%.1f</percenttotal>"
 		  "</cpu>",
-		  S->inf->children,
-		  S->inf->mem_percent/10.0,
-	  	  S->inf->total_mem_percent/10.0,
-  		  S->inf->mem_kbyte,
-  		  S->inf->total_mem_kbyte,
-  		  S->inf->cpu_percent/10.0,
-  		  S->inf->total_cpu_percent/10.0);
+		  S->inf->priv.process.children,
+		  S->inf->priv.process.mem_percent/10.0,
+	  	  S->inf->priv.process.total_mem_percent/10.0,
+  		  S->inf->priv.process.mem_kbyte,
+  		  S->inf->priv.process.total_mem_kbyte,
+  		  S->inf->priv.process.cpu_percent/10.0,
+  		  S->inf->priv.process.total_cpu_percent/10.0);
         }
       }
       if(S->type == TYPE_HOST && S->icmplist) {
@@ -476,7 +476,7 @@ static void status_event(Event_T E, Buffer_T *B) {
     Event_get_state(E),
     Event_get_action(E),
     Event_get_message(E));
-  if ((s = Event_get_source(E)) && *s->token)
+  if ((s = Event_get_source(E)) && s->token)
     Util_stringbuffer(B, "<token>%s</token>", s->token);
   Util_stringbuffer(B,
     "</event>");

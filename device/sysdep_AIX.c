@@ -75,36 +75,26 @@
  * @return         NULL
  */
 char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
-
   struct mntent *mnt;
   FILE          *mntfd;
 
   ASSERT(inf);
   ASSERT(blockdev);
 
-
-  if((mntfd= setmntent("/etc/mtab", "r")) == NULL) {
+  if ((mntfd = setmntent("/etc/mtab", "r")) == NULL) {
     LogError("%s: Cannot open /etc/mtab file\n", prog);
     return NULL;
   }
-
-  /* Finf->mntpathirst match is significant */
-  while((mnt= getmntent(mntfd)) != NULL) {
-
-    if(IS(blockdev, mnt->mnt_fsname)) {
-
+  while ((mnt = getmntent(mntfd)) != NULL) {
+    if (IS(blockdev, mnt->mnt_fsname)) {
       endmntent(mntfd);
-      inf->mntpath[sizeof(inf->mntpath) - 1] = 0;
-      return strncpy(inf->mntpath, mnt->mnt_dir, sizeof(inf->mntpath) - 1);
-
+      FREE(inf->priv.filesystem.mntpath);
+      inf->priv.filesystem.mntpath = xstrdup(mnt->mnt_dir);
+      return inf->priv.filesystem.mntpath;
     }
-
   }
-
   endmntent(mntfd);
-
   return NULL;
-
 }
 
 
@@ -116,25 +106,20 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
  * @return    FALSE
  */
 int filesystem_usage_sysdep(Info_T inf) {
-
   struct statfs usage;
 
   ASSERT(inf);
 
-  if(statfs(inf->mntpath, &usage) != 0) {
-    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n",
-        prog, inf->mntpath, STRERROR);
+  if (statfs(inf->priv.filesystem.mntpath, &usage) != 0) {
+    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->priv.filesystem.mntpath, STRERROR);
     return FALSE;
   }
-
-  inf->f_bsize=           usage.f_bsize;
-  inf->f_blocks=          usage.f_blocks;
-  inf->f_blocksfree=      usage.f_bavail;
-  inf->f_blocksfreetotal= usage.f_bfree;
-  inf->f_files=           usage.f_files;
-  inf->f_filesfree=       usage.f_ffree;
-
+  inf->priv.filesystem.f_bsize =           usage.f_bsize;
+  inf->priv.filesystem.f_blocks =          usage.f_blocks;
+  inf->priv.filesystem.f_blocksfree =      usage.f_bavail;
+  inf->priv.filesystem.f_blocksfreetotal = usage.f_bfree;
+  inf->priv.filesystem.f_files =           usage.f_files;
+  inf->priv.filesystem.f_filesfree =       usage.f_ffree;
   return TRUE;
-
 }
 

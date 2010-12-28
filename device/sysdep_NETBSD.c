@@ -90,9 +90,10 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
       for (i = 0; i < countfs; i++) {
         struct statvfs *sfs = statvfs + i;
         if (IS(sfs->f_mntfromname, blockdev)) {
-          snprintf(inf->mntpath, sizeof(inf->mntpath), "%s", sfs->f_mntonname);
+          FREE(inf->priv.filesystem.mntpath);
+          inf->priv.filesystem.mntpath = xstrdup(sfs->f_mntonname);
           FREE(statvfs);
-          return inf->mntpath;
+          return inf->priv.filesystem.mntpath;
         }
       }
     }
@@ -100,7 +101,6 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
   }
   LogError("%s: Error getting mountpoint for filesystem '%s' -- %s\n", prog, blockdev, STRERROR);
   return NULL;
-
 }
 
 
@@ -116,19 +116,17 @@ int filesystem_usage_sysdep(Info_T inf) {
 
   ASSERT(inf);
 
-  if(statvfs(inf->mntpath, &usage) != 0) {
-    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->mntpath, STRERROR);
+  if (statvfs(inf->priv.filesystem.mntpath, &usage) != 0) {
+    LogError("%s: Error getting usage statistics for filesystem '%s' -- %s\n", prog, inf->priv.filesystem.mntpath, STRERROR);
     return FALSE;
   }
-
-  inf->f_bsize=           usage.f_frsize;
-  inf->f_blocks=          usage.f_blocks;
-  inf->f_blocksfree=      usage.f_bavail;
-  inf->f_blocksfreetotal= usage.f_bfree;
-  inf->f_files=           usage.f_files;
-  inf->f_filesfree=       usage.f_ffree;
-  inf->flags=             usage.f_flag;
-
+  inf->priv.filesystem.f_bsize =           usage.f_frsize;
+  inf->priv.filesystem.f_blocks =          usage.f_blocks;
+  inf->priv.filesystem.f_blocksfree =      usage.f_bavail;
+  inf->priv.filesystem.f_blocksfreetotal = usage.f_bfree;
+  inf->priv.filesystem.f_files =           usage.f_files;
+  inf->priv.filesystem.f_filesfree =       usage.f_ffree;
+  inf->priv.filesystem.flags =             usage.f_flag;
   return TRUE;
 }
 

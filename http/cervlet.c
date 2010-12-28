@@ -607,10 +607,10 @@ static void handle_action(HttpRequest req, HttpResponse res) {
     }
     s->doaction = doaction;
     token = get_parameter(req, "token");
-    if (token)
-      snprintf(s->token, sizeof(s->token), "%s", token);
-    else
-      *s->token = 0;
+    if (token) {
+      FREE(s->token);
+      s->token = xstrdup(token);
+    }
     LogInfo("%s service '%s' on user request\n", action, s->name);
     Run.doaction = TRUE; /* set the global flag */
     do_wakeupcall();
@@ -623,10 +623,10 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
   Service_T s;
   int doaction = ACTION_IGNORE;
   const char *action = get_parameter(req, "action");
+  const char *token = get_parameter(req, "token");
 
   if(action) {
     HttpParameter p;
-    char *token = NULL;
 
     if(is_readonly(req)) {
       send_error(res, SC_FORBIDDEN, "You do not have sufficent privileges to access this page");
@@ -636,8 +636,6 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
       send_error(res, SC_BAD_REQUEST, "Invalid action");
       return;
     }
-
-    token = (char *)get_parameter(req, "token");
 
     for(p= req->params; p; p= p->next) {
 
@@ -652,26 +650,21 @@ static void handle_do_action(HttpRequest req, HttpResponse res) {
           send_error(res, SC_SERVICE_UNAVAILABLE, "Other action already in progress -- please try again later");
           return;
         }
-
         s->doaction = doaction;
-        if (token)
-          snprintf(s->token, sizeof(s->token), "%s", token);
-
         LogInfo("%s service '%s' on user request\n", action, s->name);
       }
     }
 
+    /* Set token for last service only so we'll get it back after all services were handled */
     if (token) {
       Service_T q = NULL;
-      /* Make sure only the last service gets the service token */
-      for (s = servicelist; s; s = s->next) {
-        if (*s->token) {
-          *s->token = 0;
+      for (s = servicelist; s; s = s->next)
+        if (s->doaction == doaction)
           q = s;
-        }
+      if (q) {
+        FREE(q->token);
+        q->token = xstrdup(token);
       }
-      if (q)
-        snprintf(q->token, sizeof(q->token), "%s", token);
     }
 
     Run.doaction = TRUE; 
@@ -985,7 +978,7 @@ static void do_home_process(HttpRequest req, HttpResponse res) {
 
     } else {
 
-      char *uptime= Util_getUptime(s->inf->uptime, "&nbsp;");
+      char *uptime= Util_getUptime(s->inf->priv.process.uptime, "&nbsp;");
       out_print(res,
         "<td align=\"right\">%s</td>", uptime);
       FREE(uptime);
@@ -994,11 +987,11 @@ static void do_home_process(HttpRequest req, HttpResponse res) {
         out_print(res,
           "<td align=\"right\"><font%s>%.1f%%</font></td>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->cpu_percent/10.0);
+          s->inf->priv.process.cpu_percent/10.0);
         out_print(res,
           "<td align=\"right\"><font%s>%.1f%% [%ld&nbsp;kB]</font></td></tr>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->mem_percent/10.0, s->inf->mem_kbyte);
+          s->inf->priv.process.mem_percent/10.0, s->inf->priv.process.mem_kbyte);
       }
 
     }
@@ -1060,15 +1053,15 @@ static void do_home_filesystem(HttpRequest req, HttpResponse res) {
       
       out_print(res,
         "<td align=\"right\">%.1f%% [%.1f&nbsp;MB]</td>",
-        s->inf->space_percent/10.,
-        s->inf->f_bsize > 0 ? ((float)s->inf->space_total / (float)1048576 * (float)s->inf->f_bsize) : 0);
+        s->inf->priv.filesystem.space_percent/10.,
+        s->inf->priv.filesystem.f_bsize > 0 ? ((float)s->inf->priv.filesystem.space_total / (float)1048576 * (float)s->inf->priv.filesystem.f_bsize) : 0);
 
-      if(s->inf->f_files > 0) {
+      if(s->inf->priv.filesystem.f_files > 0) {
 
         out_print(res,
           "<td align=\"right\">%.1f%% [%ld&nbsp;objects]</td>",
-          s->inf->inode_percent/10.,
-          s->inf->inode_total);
+          s->inf->priv.filesystem.inode_percent/10.,
+          s->inf->priv.filesystem.inode_total);
 
       } else {
 
@@ -1144,7 +1137,7 @@ static void do_home_file(HttpRequest req, HttpResponse res) {
         "<td align=\"right\">%04o</td>"
         "<td align=\"right\">%d</td>"
         "<td align=\"right\">%d</td>",
-        (unsigned long long)s->inf->st_size,
+        (unsigned long long)s->inf->priv.file.st_size,
         s->inf->st_mode & 07777,
         s->inf->st_uid,
         s->inf->st_gid);
@@ -2038,36 +2031,36 @@ static void print_service_params_filesystem(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Filesystem flags</td><td>%#lx</td></tr>",
-        s->inf->flags);
+        s->inf->priv.filesystem.flags);
       out_print(res,
         "<tr><td>Blocks total</td><td>%ld [%.1f MB]</td></tr>",
-        s->inf->f_blocks,
-        s->inf->f_bsize > 0 ? ((float) s->inf->f_blocks/1048576*s->inf->f_bsize) : 0);
+        s->inf->priv.filesystem.f_blocks,
+        s->inf->priv.filesystem.f_bsize > 0 ? ((float) s->inf->priv.filesystem.f_blocks/1048576*s->inf->priv.filesystem.f_bsize) : 0);
       out_print(res,
         "<tr><td>Blocks free for non superuser</td>"
         "<td>%ld [%.1f MB] [%.1f%%]</td></tr>",
-        s->inf->f_blocksfree,
-        s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfree / (float)1048576 * (float)s->inf->f_bsize) : 0,
-        s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfree / (float)s->inf->f_blocks) : 0);
+        s->inf->priv.filesystem.f_blocksfree,
+        s->inf->priv.filesystem.f_bsize > 0 ? ((float)s->inf->priv.filesystem.f_blocksfree / (float)1048576 * (float)s->inf->priv.filesystem.f_bsize) : 0,
+        s->inf->priv.filesystem.f_blocks > 0 ? ((float)100 * (float)s->inf->priv.filesystem.f_blocksfree / (float)s->inf->priv.filesystem.f_blocks) : 0);
       out_print(res,
         "<tr><td>Blocks free total</td>"
         "<td><font%s>%ld [%.1f MB] [%.1f%%]</font></td></tr>",
         (s->error & Event_Resource)?" color='#ff0000'":"",
-        s->inf->f_blocksfreetotal,
-        s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfreetotal / (float)1048576 * (float)s->inf->f_bsize) : 0,
-        s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfreetotal / (float)s->inf->f_blocks) : 0);
+        s->inf->priv.filesystem.f_blocksfreetotal,
+        s->inf->priv.filesystem.f_bsize > 0 ? ((float)s->inf->priv.filesystem.f_blocksfreetotal / (float)1048576 * (float)s->inf->priv.filesystem.f_bsize) : 0,
+        s->inf->priv.filesystem.f_blocks > 0 ? ((float)100 * (float)s->inf->priv.filesystem.f_blocksfreetotal / (float)s->inf->priv.filesystem.f_blocks) : 0);
       out_print(res,
-        "<tr><td>Block size</td><td>%ld B</td></tr>", s->inf->f_bsize);
+        "<tr><td>Block size</td><td>%ld B</td></tr>", s->inf->priv.filesystem.f_bsize);
 
-      if(s->inf->f_files > 0) {
+      if(s->inf->priv.filesystem.f_files > 0) {
 
         out_print(res,
-          "<tr><td>Inodes total</td><td>%ld</td></tr>", s->inf->f_files);
+          "<tr><td>Inodes total</td><td>%ld</td></tr>", s->inf->priv.filesystem.f_files);
         out_print(res,
           "<tr><td>Inodes free</td><td><font%s>%ld [%.1f%%]</font></td></tr>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->f_filesfree,
-          (float)100 * (float)s->inf->f_filesfree / (float)s->inf->f_files);
+          s->inf->priv.filesystem.f_filesfree,
+          (float)100 * (float)s->inf->priv.filesystem.f_filesfree / (float)s->inf->priv.filesystem.f_files);
 
       }
     }
@@ -2089,7 +2082,7 @@ static void print_service_params_size(HttpResponse res, Service_T s) {
       out_print(res,
         "<tr><td>Size</td><td><font%s>%llu B</td></tr>",
         (s->error & Event_Size)?" color='#ff0000'":"",
-        (unsigned long long) s->inf->st_size);
+        (unsigned long long) s->inf->priv.file.st_size);
 
     }
   }
@@ -2127,7 +2120,7 @@ static void print_service_params_checksum(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Checksum</td><td><font%s>%s(%s)</font></td></tr>",
-        (s->error & Event_Checksum)?" color='#ff0000'":"", s->inf->cs_sum,
+        (s->error & Event_Checksum)?" color='#ff0000'":"", s->inf->priv.file.cs_sum,
         checksumnames[s->checksum->type]);
 
     }
@@ -2152,12 +2145,12 @@ static void print_service_params_process(HttpResponse res, Service_T s) {
 
       out_print(res,
         "<tr><td>Process id </td><td>%d</td></tr>",
-        s->inf->pid > 0 ? s->inf->pid : 0);
+        s->inf->priv.process.pid > 0 ? s->inf->priv.process.pid : 0);
       out_print(res,
         "<tr><td>Parent process id </td><td>%d</td></tr>",
-        s->inf->ppid > 0 ? s->inf->ppid : 0);
+        s->inf->priv.process.ppid > 0 ? s->inf->priv.process.ppid : 0);
 
-      uptime= Util_getUptime(s->inf->uptime, "&nbsp;");
+      uptime= Util_getUptime(s->inf->priv.process.uptime, "&nbsp;");
       out_print(res,
         "<tr><td>Process uptime</td><td>%s</td></tr>",
         uptime);
@@ -2191,25 +2184,25 @@ static void print_service_params_resource(HttpResponse res, Service_T s) {
         out_print(res,
           "<tr><td>CPU usage</td><td><font%s>%.1f%%</font></td></tr>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->cpu_percent/10.0);
+          s->inf->priv.process.cpu_percent/10.0);
         out_print(res,
           "<tr><td>Memory usage</td><td><font%s>%.1f%% [%ldkB]</font></td></tr>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->mem_percent/10.0, s->inf->mem_kbyte);
+          s->inf->priv.process.mem_percent/10.0, s->inf->priv.process.mem_kbyte);
         out_print(res,
           "<tr><td>Children</td><td><font%s>%d</font></td></tr>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->children);
+          s->inf->priv.process.children);
         out_print(res,
           "<tr><td>Total CPU usage (incl. children)</td><td><font%s>%.1f%%"
           "</font></td></tr>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->total_cpu_percent/10.0);
+          s->inf->priv.process.total_cpu_percent/10.0);
         out_print(res,
           "<tr><td>Total memory usage (incl. children)</td>"
           "<td><font%s>%.1f%% [%ldkB]</font></td></tr>",
           (s->error & Event_Resource)?" color='#ff0000'":"",
-          s->inf->total_mem_percent/10.0, s->inf->total_mem_kbyte);
+          s->inf->priv.process.total_mem_percent/10.0, s->inf->priv.process.total_mem_kbyte);
       } else if(s->type == TYPE_SYSTEM) {
         out_print(res,
           "<tr><td>Load average</td><td><font%s>[%.2f] [%.2f] [%.2f]</font></td></tr>",
@@ -2342,11 +2335,11 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
       if(s->type == TYPE_FILE) {
         out_print(res,
                   "  %-33s %llu B\n",
-                  "size", (unsigned long long) s->inf->st_size);
+                  "size", (unsigned long long) s->inf->priv.file.st_size);
         if(s->checksum) {
           out_print(res,
                     "  %-33s %s(%s)\n",
-                    "checksum", s->inf->cs_sum, 
+                    "checksum", s->inf->priv.file.cs_sum, 
                     checksumnames[s->checksum->type]);
         }
       }
@@ -2358,39 +2351,39 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
                   "  %-33s %ld [%.1f MB] [%.1f%%]\n"
                   "  %-33s %ld [%.1f MB] [%.1f%%]\n",
                   "filesystem flags",
-                  s->inf->flags,
+                  s->inf->priv.filesystem.flags,
                   "block size",
-                  s->inf->f_bsize,
+                  s->inf->priv.filesystem.f_bsize,
                   "blocks total",
-                  s->inf->f_blocks,
-                  s->inf->f_bsize > 0 ? ((float)s->inf->f_blocks / (float)1048576* (float)s->inf->f_bsize) : 0,
+                  s->inf->priv.filesystem.f_blocks,
+                  s->inf->priv.filesystem.f_bsize > 0 ? ((float)s->inf->priv.filesystem.f_blocks / (float)1048576* (float)s->inf->priv.filesystem.f_bsize) : 0,
                   "blocks free for non superuser",
-                  s->inf->f_blocksfree,
-                  s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfree / (float)1048576* (float)s->inf->f_bsize) : 0,
-                  s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfree / (float)s->inf->f_blocks) : 0,
+                  s->inf->priv.filesystem.f_blocksfree,
+                  s->inf->priv.filesystem.f_bsize > 0 ? ((float)s->inf->priv.filesystem.f_blocksfree / (float)1048576* (float)s->inf->priv.filesystem.f_bsize) : 0,
+                  s->inf->priv.filesystem.f_blocks > 0 ? ((float)100 * (float)s->inf->priv.filesystem.f_blocksfree / (float)s->inf->priv.filesystem.f_blocks) : 0,
                   "blocks free total",
-                  s->inf->f_blocksfreetotal,
-                  s->inf->f_bsize > 0 ? ((float)s->inf->f_blocksfreetotal/(float)1048576* (float)s->inf->f_bsize) : 0,
-                  s->inf->f_blocks > 0 ? ((float)100 * (float)s->inf->f_blocksfreetotal / (float)s->inf->f_blocks) : 0);
-        if(s->inf->f_files > 0) {
+                  s->inf->priv.filesystem.f_blocksfreetotal,
+                  s->inf->priv.filesystem.f_bsize > 0 ? ((float)s->inf->priv.filesystem.f_blocksfreetotal/(float)1048576* (float)s->inf->priv.filesystem.f_bsize) : 0,
+                  s->inf->priv.filesystem.f_blocks > 0 ? ((float)100 * (float)s->inf->priv.filesystem.f_blocksfreetotal / (float)s->inf->priv.filesystem.f_blocks) : 0);
+        if(s->inf->priv.filesystem.f_files > 0) {
           out_print(res,
                     "  %-33s %ld\n"
                     "  %-33s %ld [%.1f%%]\n",
                     "inodes total",
-                    s->inf->f_files,
+                    s->inf->priv.filesystem.f_files,
                     "inodes free",
-                    s->inf->f_filesfree,
-                    ((float)100*(float)s->inf->f_filesfree/ (float)s->inf->f_files));
+                    s->inf->priv.filesystem.f_filesfree,
+                    ((float)100*(float)s->inf->priv.filesystem.f_filesfree/ (float)s->inf->priv.filesystem.f_files));
         }
       }
       if(s->type == TYPE_PROCESS) {
-        char *uptime= Util_getUptime(s->inf->uptime, " ");
+        char *uptime= Util_getUptime(s->inf->priv.process.uptime, " ");
         out_print(res,
                   "  %-33s %d\n"
                   "  %-33s %d\n"
                   "  %-33s %s\n",
-                    "pid", s->inf->pid > 0 ? s->inf->pid : 0,
-                  "parent pid", s->inf->ppid > 0 ? s->inf->ppid : 0,
+                    "pid", s->inf->priv.process.pid > 0 ? s->inf->priv.process.pid : 0,
+                  "parent pid", s->inf->priv.process.ppid > 0 ? s->inf->priv.process.ppid : 0,
                   "uptime", uptime);
         FREE(uptime);
         if(Run.doprocess)        {
@@ -2402,13 +2395,13 @@ static void status_service_txt(Service_T s, HttpResponse res, short level) {
                   "  %-33s %.1f%%\n"
                   "  %-33s %.1f%%\n"
                   "  %-33s %.1f%%\n",
-                  "children", s->inf->children,
-                  "memory kilobytes", s->inf->mem_kbyte,
-                  "memory kilobytes total", s->inf->total_mem_kbyte,
-                  "memory percent", s->inf->mem_percent/10.0,
-                  "memory percent total", s->inf->total_mem_percent/10.0,
-                  "cpu percent", s->inf->cpu_percent/10.0,
-                    "cpu percent total", s->inf->total_cpu_percent/10.0);
+                  "children", s->inf->priv.process.children,
+                  "memory kilobytes", s->inf->priv.process.mem_kbyte,
+                  "memory kilobytes total", s->inf->priv.process.total_mem_kbyte,
+                  "memory percent", s->inf->priv.process.mem_percent/10.0,
+                  "memory percent total", s->inf->priv.process.total_mem_percent/10.0,
+                  "cpu percent", s->inf->priv.process.cpu_percent/10.0,
+                    "cpu percent total", s->inf->priv.process.total_cpu_percent/10.0);
         }
       }
       if(s->type == TYPE_HOST && s->icmplist) {

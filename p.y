@@ -1583,7 +1583,7 @@ space           : IF SPACE operator value unit rate1 THEN action1 recovery {
                       yyerror2("cannot read usage of filesystem %s", current->path);
                     filesystemset.resource = RESOURCE_ID_SPACE;
                     filesystemset.operator = $<number>3;
-                    filesystemset.limit_absolute = (int)((float)$<real>4 / (float)current->inf->f_bsize * (float)$<number>5);
+                    filesystemset.limit_absolute = (int)((float)$<real>4 / (float)current->inf->priv.filesystem.f_bsize * (float)$<number>5);
                     addeventaction(&(filesystemset).action, $<number>8, $<number>9);
                     addfilesystem(&filesystemset);
                   }

@@ -2049,14 +2049,18 @@ process_partial_block:
  */
 void Util_resetInfo(Service_T s) {
   memset(s->inf, 0, sizeof *(s->inf));
-  s->inf->_pid=        -1;
-  s->inf->_ppid=       -1;
-  s->inf->_flags=      -1;
-  s->inf->pid=         -1;
-  s->inf->ppid=        -1;
-  s->inf->flags=       -1;
-  s->inf->st_ino_prev=  0;
-  s->inf->readpos=      0;
+  switch (s->type) {
+    case TYPE_PROCESS:
+      s->inf->priv.process._pid  = -1;
+      s->inf->priv.process._ppid = -1;
+      s->inf->priv.process.pid   = -1;
+      s->inf->priv.process.ppid  = -1;
+      break;
+    case TYPE_FILESYSTEM:
+      s->inf->priv.filesystem._flags = -1;
+      s->inf->priv.filesystem.flags  = -1;
+      break;
+  }
 }
 
 

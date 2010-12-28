@@ -282,13 +282,13 @@ static void set_monit_environment(Service_T s, Command_T C, Event_T event, Envir
     snprintf(buf, STRLEN, "MONIT_PROCESS_PID=%d", Util_isProcessRunning(s));
     push_monit_environment(buf, e);
 
-    snprintf(buf, STRLEN, "MONIT_PROCESS_MEMORY=%ld", s->inf->mem_kbyte);
+    snprintf(buf, STRLEN, "MONIT_PROCESS_MEMORY=%ld", s->inf->priv.process.mem_kbyte);
     push_monit_environment(buf, e);
 
-    snprintf(buf, STRLEN, "MONIT_PROCESS_CHILDREN=%d", s->inf->children);
+    snprintf(buf, STRLEN, "MONIT_PROCESS_CHILDREN=%d", s->inf->priv.process.children);
     push_monit_environment(buf, e);
 
-    snprintf(buf, STRLEN, "MONIT_PROCESS_CPU_PERCENT=%d", s->inf->cpu_percent);
+    snprintf(buf, STRLEN, "MONIT_PROCESS_CPU_PERCENT=%d", s->inf->priv.process.cpu_percent);
     push_monit_environment(buf, e);
   }
 

@@ -656,49 +656,53 @@ typedef struct myfilesystem {
 
 /** Defines service data */
 typedef struct myinfo {
-
   /* Shared */
   mode_t  st_mode;                                           /**< Permission */
   uid_t   st_uid;                                           /**< Owner's uid */
   gid_t   st_gid;                                           /**< Owner's gid */
-  ino_t   st_ino;                                                 /**< Inode */
   time_t  timestamp;                                          /**< Timestamp */
 
-  /* Filesystem specific */
-  long   f_bsize;                                   /**< Transfer block size */
-  long   f_blocks;                      /**< Total data blocks in filesystem */
-  long   f_blocksfree;           /**< Free blocks available to non-superuser */
-  long   f_blocksfreetotal;                   /**< Free blocks in filesystem */
-  long   f_files;                        /**< Total file nodes in filesystem */
-  long   f_filesfree;                     /**< Free file nodes in filesystem */
-  char   mntpath[STRLEN];      /**< Filesystem file, directory or mountpoint */
-  int    inode_percent;                      /**< Used inode percentage * 10 */
-  long   inode_total;                          /**< Used inode total objects */
-  int    space_percent;                      /**< Used space percentage * 10 */
-  long   space_total;                           /**< Used space total blocks */
-  int    _flags;                       /**< Filesystem flags from last cycle */
-  int    flags;                      /**< Filesystem flags from actual cycle */
+  union {
+    struct {
+      long   f_bsize;                               /**< Transfer block size */
+      long   f_blocks;                  /**< Total data blocks in filesystem */
+      long   f_blocksfree;       /**< Free blocks available to non-superuser */
+      long   f_blocksfreetotal;               /**< Free blocks in filesystem */
+      long   f_files;                    /**< Total file nodes in filesystem */
+      long   f_filesfree;                 /**< Free file nodes in filesystem */
+      char  *mntpath;          /**< Filesystem file, directory or mountpoint */
+      int    inode_percent;                  /**< Used inode percentage * 10 */
+      long   inode_total;                      /**< Used inode total objects */
+      int    space_percent;                  /**< Used space percentage * 10 */
+      long   space_total;                       /**< Used space total blocks */
+      int    _flags;                   /**< Filesystem flags from last cycle */
+      int    flags;                  /**< Filesystem flags from actual cycle */
+    } filesystem;
 
-  /* File specific */
-  off_t st_size;                                                   /**< Size */
-  off_t readpos;                            /**< Position for regex matching */
-  ino_t st_ino_prev;                  /**< Previous inode for regex matching */
-  MD_T  cs_sum;                                                /**< Checksum */
+    struct {
+      off_t st_size;                                               /**< Size */
+      off_t readpos;                        /**< Position for regex matching */
+      ino_t st_ino;                                               /**< Inode */
+      ino_t st_ino_prev;              /**< Previous inode for regex matching */
+      MD_T  cs_sum;                                            /**< Checksum */
+    } file;
 
-  /* Process specific */
-  int    _pid;                              /**< Process PID from last cycle */
-  int    _ppid;                      /**< Process parent PID from last cycle */
-  int    pid;                             /**< Process PID from actual cycle */
-  int    ppid;                     /**< Process parent PID from actual cycle */
-  int    status_flag;
-  int    children;
-  long   mem_kbyte;    
-  long   total_mem_kbyte;
-  int    mem_percent;                                   /**< percentage * 10 */
-  int    total_mem_percent;                             /**< percentage * 10 */
-  int    cpu_percent;                                   /**< percentage * 10 */
-  int    total_cpu_percent;                             /**< percentage * 10 */
-  time_t uptime;                                         /**< Process uptime */
+    struct {
+      int    _pid;                          /**< Process PID from last cycle */
+      int    _ppid;                  /**< Process parent PID from last cycle */
+      int    pid;                         /**< Process PID from actual cycle */
+      int    ppid;                 /**< Process parent PID from actual cycle */
+      int    status_flag;
+      int    children;
+      long   mem_kbyte;    
+      long   total_mem_kbyte;
+      int    mem_percent;                               /**< percentage * 10 */
+      int    total_mem_percent;                         /**< percentage * 10 */
+      int    cpu_percent;                               /**< percentage * 10 */
+      int    total_cpu_percent;                         /**< percentage * 10 */
+      time_t uptime;                                     /**< Process uptime */
+    } process;
+  } priv;
 } *Info_T;
 
 
@@ -760,7 +764,7 @@ typedef struct myservice {
   Info_T             inf;                          /**< Service check result */
   struct timeval     collected;                /**< When were data collected */
   int                doaction;          /**< Action scheduled by http thread */
-  char               token[STRLEN];                        /**< Action token */
+  char              *token;                                /**< Action token */
 
   /** Events */
   struct myevent {

@@ -113,40 +113,40 @@ int update_process_data(Service_T s, ProcessTree_T *pt, int treesize, pid_t pid)
   ASSERT(systeminfo.mem_kbyte_max > 0);
 
   /* save the previous pid and set actual one */
-  s->inf->_pid = s->inf->pid;
-  s->inf->pid  = pid;
+  s->inf->priv.process._pid = s->inf->priv.process.pid;
+  s->inf->priv.process.pid  = pid;
 
   if ((leaf = findprocess(pid, pt, treesize)) != -1) {
  
     /* save the previous ppid and set actual one */
-    s->inf->_ppid             = s->inf->ppid;
-    s->inf->ppid              = pt[leaf].ppid;
-    s->inf->uptime            = time(NULL) - pt[leaf].starttime;
-    s->inf->children          = pt[leaf].children_sum;
-    s->inf->mem_kbyte         = pt[leaf].mem_kbyte;
-    s->inf->status_flag       = pt[leaf].status_flag;
-    s->inf->total_mem_kbyte   = pt[leaf].mem_kbyte_sum;
-    s->inf->cpu_percent       = pt[leaf].cpu_percent;
-    s->inf->total_cpu_percent = pt[leaf].cpu_percent_sum;
+    s->inf->priv.process._ppid             = s->inf->priv.process.ppid;
+    s->inf->priv.process.ppid              = pt[leaf].ppid;
+    s->inf->priv.process.uptime            = time(NULL) - pt[leaf].starttime;
+    s->inf->priv.process.children          = pt[leaf].children_sum;
+    s->inf->priv.process.mem_kbyte         = pt[leaf].mem_kbyte;
+    s->inf->priv.process.status_flag       = pt[leaf].status_flag;
+    s->inf->priv.process.total_mem_kbyte   = pt[leaf].mem_kbyte_sum;
+    s->inf->priv.process.cpu_percent       = pt[leaf].cpu_percent;
+    s->inf->priv.process.total_cpu_percent = pt[leaf].cpu_percent_sum;
 
     if (systeminfo.mem_kbyte_max == 0) {
-      s->inf->total_mem_percent = 0;
-      s->inf->mem_percent       = 0;
+      s->inf->priv.process.total_mem_percent = 0;
+      s->inf->priv.process.mem_percent       = 0;
     } else {
-      s->inf->total_mem_percent = (int)((double)pt[leaf].mem_kbyte_sum * 1000.0 / systeminfo.mem_kbyte_max);
-      s->inf->mem_percent       = (int)((double)pt[leaf].mem_kbyte * 1000.0 / systeminfo.mem_kbyte_max);
+      s->inf->priv.process.total_mem_percent = (int)((double)pt[leaf].mem_kbyte_sum * 1000.0 / systeminfo.mem_kbyte_max);
+      s->inf->priv.process.mem_percent       = (int)((double)pt[leaf].mem_kbyte * 1000.0 / systeminfo.mem_kbyte_max);
     }
 
   } else {
-    s->inf->ppid              = 0;
-    s->inf->uptime            = 0;
-    s->inf->children          = 0;
-    s->inf->total_mem_kbyte   = 0;
-    s->inf->total_mem_percent = 0;
-    s->inf->mem_kbyte         = 0;
-    s->inf->mem_percent       = 0;
-    s->inf->cpu_percent       = 0;
-    s->inf->total_cpu_percent = 0;
+    s->inf->priv.process.ppid              = 0;
+    s->inf->priv.process.uptime            = 0;
+    s->inf->priv.process.children          = 0;
+    s->inf->priv.process.total_mem_kbyte   = 0;
+    s->inf->priv.process.total_mem_percent = 0;
+    s->inf->priv.process.mem_kbyte         = 0;
+    s->inf->priv.process.mem_percent       = 0;
+    s->inf->priv.process.cpu_percent       = 0;
+    s->inf->priv.process.total_cpu_percent = 0;
   }
   
   return TRUE;
