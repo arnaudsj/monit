@@ -1997,10 +1997,12 @@ static void createservice(int type, char *name, char *value, int (*check)(Servic
 
   check_name(name);
 
-  if (current)
+  if (current) {
     addservice(current);
-  else
+    memset(current, 0, sizeof(*current));
+  } else {
     NEW(current);
+  }
 
   current->type = type;
 
