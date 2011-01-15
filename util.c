@@ -2237,6 +2237,17 @@ char *Util_portTypeDescription(Port_T p) {
 }
 
 
+char *Util_portDescription(Port_T p, char *buf, int bufsize) {
+  if (p->family == AF_INET)
+    snprintf(buf, STRLEN, "INET[%s:%d%s]%s%s", p->hostname, p->port, p->request ? p->request : "", p->family == AF_INET ? " via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "");
+  else if (p->family == AF_UNIX)
+    snprintf(buf, STRLEN, "UNIX[%s]", p->pathname);
+  else
+    *buf = 0;
+  return buf;
+}
+
+
 void Util_stringbuffer(Buffer_T *b, const char *m, ...) {
   if (m) {
     va_list  ap;

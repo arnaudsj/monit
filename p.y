@@ -2134,7 +2134,6 @@ static void addmail(char *mailto, Mail_T f, Mail_T *l, unsigned int events, unsi
  */
 static void addport(Port_T port) {
   Port_T p;
-  char address[STRLEN];
   
   ASSERT(port);
 
@@ -2166,14 +2165,6 @@ static void addport(Port_T port) {
   } else
     p->request_hashtype = 0;
 
-  if (port->family == AF_INET)
-    snprintf(address, STRLEN, "INET[%s:%d]", port->hostname, port->port);
-  else if (port->family == AF_UNIX)
-    snprintf(address, STRLEN, "UNIX[%s]", port->pathname);
-  else
-    address[0] = 0;
-  p->address = xstrdup(address);
-  
   if (port->SSL.use_ssl == TRUE) {
     if (!have_ssl()) {
       yyerror("ssl check cannot be activated. SSL is not supported");

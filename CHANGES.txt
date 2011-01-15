@@ -20,6 +20,13 @@ BUGFIXES:
 * Linux OpenVZ 2.6.32+: Fix memory usage monitoring in VPS
   virtual hosts. Thanks to Kelly for report.
 
+* If protocol test failed, print request path in the event if it is
+  set in monit configuration file. Thanks to Marco for report.
+
+IMPROVEMENTS:
+
+* Reduced memory usage.
+
 
 
 Version 5.2.3

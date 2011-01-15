@@ -496,6 +496,16 @@ char *Util_portTypeDescription(Port_T p);
 
 
 /**
+ * Print full port description <INET|UNIX>\[<host>:<port>[request]\][via TCP|TCPSSL|UDP]
+ * @param p A port structure
+ * @param buf Buffer
+ * @param bufsize Buffer size
+ * @return the buffer
+ */
+char *Util_portDescription(Port_T p, char *buf, int bufsize);
+
+
+/**
  * Print to string buffer
  * @param b A Buffer object
  * @param m Format string

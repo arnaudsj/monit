@@ -554,7 +554,8 @@ int check_system(Service_T s) {
 static void check_connection(Service_T s, Port_T p) {
   Socket_T socket;
   volatile int rv = TRUE;
-  char report[STRLEN]={0};
+  char buf[STRLEN];
+  char report[STRLEN] = {0};
   struct timeval t1;
   struct timeval t2;
 
@@ -566,29 +567,29 @@ static void check_connection(Service_T s, Port_T p) {
   /* Open a socket to the destination INET[hostname:port] or UNIX[pathname] */
   socket = socket_create(p);
   if (!socket) {
-    snprintf(report, STRLEN, "failed, cannot open a connection to %s%s%s", p->address, p->family == AF_INET ? " via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "");
+    snprintf(report, STRLEN, "failed, cannot open a connection to %s", Util_portDescription(p, buf, sizeof(buf)));
     rv = FALSE;
     goto error;
   } else
-    DEBUG("'%s' succeeded connecting to %s%s%s\n", s->name, p->address, p->family == AF_INET ? " via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "");
+    DEBUG("'%s' succeeded connecting to %s\n", s->name, Util_portDescription(p, buf, sizeof(buf)));
 
   /* Verify that the socket is ready for i|o. TCP sockets are checked anytime, UDP
    * sockets just when there is no specific protocol test used since the socket_is_ready()
    * adds 2s delay when used with UDP socket. When there is specific protocol used, we
    * don't need it for UDP, since the protocol test is sufficient */
   if ((socket_get_type(socket) != SOCK_DGRAM || p->protocol->check == check_default) && !socket_is_ready(socket)) {
-    snprintf(report, STRLEN, "connection failed, %s%s%s is not ready for i|o -- %s", p->address, p->family == AF_INET ?" via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "", STRERROR);
+    snprintf(report, STRLEN, "connection failed, %s is not ready for i|o -- %s", Util_portDescription(p, buf, sizeof(buf)), STRERROR);
     rv = FALSE;
     goto error;
   }
 
   /* Run the protocol verification routine through the socket */
   if (! p->protocol->check(socket)) {
-    snprintf(report, STRLEN, "failed protocol test [%s] at %s%s%s", p->protocol->name, p->address, p->family == AF_INET ? " via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "");
+    snprintf(report, STRLEN, "failed protocol test [%s] at %s", p->protocol->name, Util_portDescription(p, buf, sizeof(buf)));
     rv = FALSE;
     goto error;
   } else
-    DEBUG("'%s' succeeded testing protocol [%s] at %s%s%s\n", s->name, p->protocol->name, p->address, p->family == AF_INET ? " via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "");
+    DEBUG("'%s' succeeded testing protocol [%s] at %s\n", s->name, p->protocol->name, Util_portDescription(p, buf, sizeof(buf)));
 
   /* Get time of connection attempt finish */
   gettimeofday(&t2, NULL);
@@ -606,7 +607,7 @@ static void check_connection(Service_T s, Port_T p) {
     Event_post(s, Event_Connection, STATE_FAILED, p->action, report);
   } else {
     p->is_available = TRUE;
-    Event_post(s, Event_Connection, STATE_SUCCEEDED, p->action, "connection succeeded to %s%s%s", p->address, p->family == AF_INET ? " via " : "", p->family == AF_INET ? Util_portTypeDescription(p) : "");
+    Event_post(s, Event_Connection, STATE_SUCCEEDED, p->action, "connection succeeded to %s", Util_portDescription(p, buf, sizeof(buf)));
   }
       
 }

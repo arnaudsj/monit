@@ -466,7 +466,6 @@ typedef struct myport {
   char *request_hostheader;            /**< The optional Host: header to use */
   int  request_hashtype;  /**< The optional type of hash for a req. document */
   char *pathname;                   /**< Pathname, in case of an UNIX socket */
-  char *address;               /**< Human readable destination of the socket */
   int maxforward;            /**< Optional max forward for protocol checking */
   Generic_T generic;                                /**< Generic test handle */
   int timeout;   /**< The timeout in seconds to wait for connect or read i/o */
