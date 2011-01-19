@@ -3851,7 +3851,7 @@ Rory Toma <rory@digeo.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010 by Tildeslash Ltd. All Rights Reserved. This
+Copyright (C) 2011 by Tildeslash Ltd. All Rights Reserved. This
 product is distributed in the hope that it will be useful, but
 WITHOUT any warranty; without even the implied warranty of
 MERCHANTABILITY or FITNESS for a particular purpose.

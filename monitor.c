@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2010 Tildeslash Ltd. All rights reserved.
+ * Copyright (C) 2011 Tildeslash Ltd. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3.
@@ -709,7 +709,7 @@ static void help() {
  */
 static void version() {
   printf("This is Monit version " VERSION "\n");
-  printf("Copyright (C) 2000-2010 by Tildeslash Ltd.");
+  printf("Copyright (C) 2000-2011 Tildeslash Ltd.");
   printf(" All Rights Reserved.\n");
 }
 

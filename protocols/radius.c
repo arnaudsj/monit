@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Tildeslash Ltd. All rights reserved.
+ * Copyright (C) 2011 Tildeslash Ltd. All rights reserved.
  * Copyright (C) 2009 Alan DeKok <aland@freeradius.org> All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
