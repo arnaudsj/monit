@@ -440,6 +440,12 @@ static void do_action(char **args) {
     status(LEVEL_NAME_FULL);
   } else if (IS(action, "summary")) {
     status(LEVEL_NAME_SUMMARY);
+  } else if (IS(action, "procmatch")) {
+    if (! service) {
+      printf("Invalid syntax - usage: procmatch \"<pattern>\"\n");
+      exit(1);
+    }
+    process_testmatch(service);
   } else if (IS(action, "quit")) {
     kill_daemon(SIGTERM);
   } else if (IS(action, "validate")) {
@@ -685,21 +691,22 @@ static void help() {
   printf(" -V            Print version number and patchlevel\n");
   printf(" -h            Print this text\n");
   printf("Optional action arguments for non-daemon mode are as follows:\n");
-  printf(" start all      - Start all services\n");
-  printf(" start name     - Only start the named service\n");
-  printf(" stop all       - Stop all services\n");
-  printf(" stop name      - Only stop the named service\n");
-  printf(" restart all    - Stop and start all services\n");
-  printf(" restart name   - Only restart the named service\n");
-  printf(" monitor all    - Enable monitoring of all services\n");
-  printf(" monitor name   - Only enable monitoring of the named service\n");
-  printf(" unmonitor all  - Disable monitoring of all services\n");
-  printf(" unmonitor name - Only disable monitoring of the named service\n");
-  printf(" reload         - Reinitialize monit\n");
-  printf(" status         - Print full status information for each service\n");
-  printf(" summary        - Print short status information for each service\n");
-  printf(" quit           - Kill monit daemon process\n");
-  printf(" validate       - Check all services and start if not running\n");
+  printf(" start all           - Start all services\n");
+  printf(" start name          - Only start the named service\n");
+  printf(" stop all            - Stop all services\n");
+  printf(" stop name           - Only stop the named service\n");
+  printf(" restart all         - Stop and start all services\n");
+  printf(" restart name        - Only restart the named service\n");
+  printf(" monitor all         - Enable monitoring of all services\n");
+  printf(" monitor name        - Only enable monitoring of the named service\n");
+  printf(" unmonitor all       - Disable monitoring of all services\n");
+  printf(" unmonitor name      - Only disable monitoring of the named service\n");
+  printf(" reload              - Reinitialize monit\n");
+  printf(" status              - Print full status information for each service\n");
+  printf(" summary             - Print short status information for each service\n");
+  printf(" quit                - Kill monit daemon process\n");
+  printf(" validate            - Check all services and start if not running\n");
+  printf(" procmatch <pattern> - Test process matching pattern\n");
   printf("\n");
   printf("(Action arguments operate on services defined in the control file)\n");
 }

@@ -340,3 +340,53 @@ void delprocesstree(ProcessTree_T ** reference, int size) {
   return;
 }
 
+
+void process_testmatch(char *pattern) {
+#ifdef HAVE_REGEX_H
+  regex_t *regex_comp;
+  int reg_return;
+#endif
+  int ptreesize    = 0;
+  int oldptreesize = 0;
+  ProcessTree_T *ptree = NULL;
+  ProcessTree_T *oldptree = NULL;
+
+#ifdef HAVE_REGEX_H
+  NEW(regex_comp);
+  if ((reg_return = regcomp(regex_comp, pattern, REG_NOSUB|REG_EXTENDED))) {
+    char errbuf[STRLEN];
+    regerror(reg_return, regex_comp, errbuf, STRLEN);
+    regfree(regex_comp);
+    FREE(regex_comp);
+    printf("Regex %s parsing error: %s\n", pattern, errbuf);
+    exit(1);
+  }
+#endif
+  initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize);
+  if (Run.doprocess) {
+    int i, count = 0;
+    printf("List of processes matching pattern \"%s\":\n", pattern);
+    printf("------------------------------------------\n");
+    for (i = 0; i < ptreesize; i++) {
+      int match = FALSE;
+      if (ptree[i].cmdline && ! strstr(ptree[i].cmdline, "procmatch")) {
+#ifdef HAVE_REGEX_H
+        match = regexec(regex_comp, ptree[i].cmdline, 0, NULL, 0) ? FALSE : TRUE;
+#else
+        match = strstr(ptree[i].cmdline, pattern) ? TRUE : FALSE;
+#endif
+        if (match) {
+          printf("\t%s\n", ptree[i].cmdline);
+          count++;
+        }
+      }
+    }
+    printf("------------------------------------------\n");
+    printf("Total matches: %d\n", count);
+    if (count > 1)
+      printf("WARNING: multiple processes matched the pattern. The check is FIRST-MATCH based, please refine the pattern\n");
+  }
+  delprocesstree(&ptree, ptreesize);
+}
+
+

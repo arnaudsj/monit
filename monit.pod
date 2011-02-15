@@ -2954,11 +2954,13 @@ running process, Monit will call the entry's start method if
 defined.
 <regex> is alternative process specification using pattern matching
 to process name (command line) from process table instead of pidfile.
-The pattern to match can be obtained using 'ps' utility. The first
-match is used so this form of check is useful for unique pattern
-matching - the pidfile should be used where possible as it defines
-expected pid exactly (pattern matching won't be useful for Apache
-in most cases for example).
+The first match is used so this form of check is useful for unique
+pattern matching - the pidfile should be used where possible as it
+defines expected pid exactly (pattern matching won't be useful for
+Apache in most cases for example).
+The pattern can be obtained using I<monit procmatch ".*"> CLI command
+which lists all processes visible to Monit or using the I<ps> utility.
+The "procmatch" CLI command can be used to test your pattern as well.
 If Monit runs in passive mode or the start methods is not defined,
 Monit will just send alerts on errors.
 

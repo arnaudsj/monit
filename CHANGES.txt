@@ -9,6 +9,16 @@
 
 Version 5.2.4
 
+NEW FEATURES AND FUNCTIONS:
+
+* Added the "procmatch" command to monit CLI to allow to test the
+  pattern for process matching based check with processes visible
+  to monit.
+  Example usage:
+      $ monit procmatch "iChatAgent"
+
+* Reduced monit memory footprint.
+
 BUGFIXES:
 
 * FreeBSD, NetBSD, OpenBSD, MacOSX, Solaris filesystem check fix:
@@ -22,10 +32,6 @@ BUGFIXES:
 
 * If protocol test failed, print request path in the event if it is
   set in monit configuration file. Thanks to Marco for report.
-
-IMPROVEMENTS:
-
-* Reduced memory usage.
 
 
 
