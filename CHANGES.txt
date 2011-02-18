@@ -38,6 +38,11 @@ BUGFIXES:
 
 * Spelling fixes. Thanks to Sergey B Kirpichev.
 
+* Randomize the mail message id to prevent duplicates in the case, that
+  the same hostname is used on multiple hosts running monit and messages
+  are generated in the same second in parallel. Thanks to Sergey B
+  Kirpichev.
+
 
 
 Version 5.2.3
