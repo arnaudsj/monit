@@ -97,8 +97,8 @@
 #define QUEUEMASK          0077
 /* Set file mode: "drw-------" */
 #define PRIVATEMASK        0177
-/* Set log file mode: "-rw-rw-r--" */
-#define LOGMASK            0112
+/* Set log file mode: "-rw-r-----" */
+#define LOGMASK            0137
 /* Set pid file mode: "-rw-r--r--" */
 #define MYPIDMASK          0122
 #define MYPIDDIR           PIDDIR

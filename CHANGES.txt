@@ -19,6 +19,9 @@ NEW FEATURES AND FUNCTIONS:
 
 * Reduced monit memory footprint.
 
+* Set the default log file mask to 0640 (originally it was 0664).
+  Thanks to Sergey B Kirpichev.
+
 BUGFIXES:
 
 * FreeBSD, NetBSD, OpenBSD, MacOSX, Solaris filesystem check fix:
