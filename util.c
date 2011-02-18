@@ -1374,7 +1374,7 @@ int Util_isProcessRunning(Service_T s) {
         }
       }
     } else {
-        DEBUG("Process informations not available -- skipping service %s process existence check for this cycle\n", s->name);
+        DEBUG("Process information not available -- skipping service %s process existence check for this cycle\n", s->name);
         /* Return value is NOOP - it is based on existing errors bitmap so we don't generate false recovery/failures */
         return ! (s->error & Event_Nonexist);
     }

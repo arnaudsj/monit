@@ -33,6 +33,8 @@ BUGFIXES:
 * If protocol test failed, print request path in the event if it is
   set in monit configuration file. Thanks to Marco for report.
 
+* Spelling fixes. Thanks to Sergey B Kirpichev.
+
 
 
 Version 5.2.3

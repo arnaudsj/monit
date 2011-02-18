@@ -3015,7 +3015,7 @@ tildeslash.com or "64.87.72.95".
 
 =item 7. CHECK SYSTEM <unique name>
 
-The system name is usualy hostname, but any descriptive name can be
+The system name is usually hostname, but any descriptive name can be
 used. This test allows to check general system resources such as
 CPU usage (percent of time spent in user, system and wait), total
 memory usage or load average.
@@ -3331,7 +3331,7 @@ accepting connections at the port numbers. The method Monit use
 for a process restart is to first execute the stop-program, wait
 up to 30s for the process to stop and then execute the start-program
 and wait up to 30s for it to start. The length of start or stop
-timeout can be overriden using the 'timeout' option. If Monit was
+timeout can be overridden using the 'timeout' option. If Monit was
 unable to stop or start the service a failed alert message will
 be sent if you have requested alert messages to be sent.
 
