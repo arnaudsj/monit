@@ -11,37 +11,37 @@ Version 5.2.4
 
 NEW FEATURES AND FUNCTIONS:
 
-* Added the "procmatch" command to monit CLI to allow to test the
-  pattern for process matching based check with processes visible
-  to monit.
-  Example usage:
+* Added the "procmatch" CLI command which allows for easy testing
+  of pattern for process match check. The command takes regular
+  expression as an argument and displays all running processes
+  matching the pattern. Example usage:
       $ monit procmatch "iChatAgent"
-
-* Reduced monit memory footprint.
 
 * Set the default log file mask to 0640 (originally it was 0664).
   Thanks to Sergey B Kirpichev.
 
+* Reduced monit memory footprint by ca. 10%.
+
 BUGFIXES:
 
 * FreeBSD, NetBSD, OpenBSD, MacOSX, Solaris filesystem check fix:
-  If block/character device was used in the check path instead
+  If block/character device was used in the filesystem path instead
   of mountpoint, monit reported usage of wrong filesystem.
 
-* NetBSD filesystem check: Fix space usage report
+* NetBSD filesystem check: Fix space usage report.
 
-* Linux OpenVZ 2.6.32+: Fix memory usage monitoring in VPS
-  virtual hosts. Thanks to Kelly for report.
+* Fix memory usage monitoring in OpenVZ VPS 2.6.32 virtual hosts.
+  Thanks to Kelly for report.
 
-* If protocol test failed, print request path in the event if it is
-  set in monit configuration file. Thanks to Marco for report.
-
-* Spelling fixes. Thanks to Sergey B Kirpichev.
+* If the protocol test failed, show the request in the event. Thanks
+  to Marco for report.
 
 * Randomize the mail message id to prevent duplicates in the case, that
   the same hostname is used on multiple hosts running monit and messages
   are generated in the same second in parallel. Thanks to Sergey B
   Kirpichev.
+
+* Spelling fixes. Thanks to Sergey B Kirpichev.
 
 
 
