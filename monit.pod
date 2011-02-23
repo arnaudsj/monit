@@ -166,6 +166,12 @@ B<validate>
    action is also the default behavior when Monit runs 
    in daemon mode.
 
+B<procmatch regex>
+   Allows for easy testing of pattern for process match
+   check. The command takes regular expression as an
+   argument and displays all running processes matching
+   the pattern.
+
 
 =head1 WHAT TO MONITOR
 
