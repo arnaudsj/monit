@@ -10,6 +10,8 @@
 
 2.) modify the port:
 
+  portsnap fetch
+  portsnap update
   cd /usr/ports/sysutils
   cp -rp monit monit-new
   perl -p -i -e 's/^PORTVERSION=.*/PORTVERSION=    <new_version>' monit-new/Makefile
