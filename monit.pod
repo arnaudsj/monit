@@ -813,7 +813,6 @@ expanded into the text with these values:
  --------------------
  ALERT    | "alert"
  EXEC     | "exec"
- MONITOR  | "monitor"
  RESTART  | "restart"
  START    | "start"
  STOP     | "stop"
@@ -1141,11 +1140,6 @@ extension was used.
 
 =item * 
 
-B<MONITOR> will enable monitoring of the service I<and> send
-an alert.
-
-=item * 
-
 B<UNMONITOR> will disable monitoring of the service I<and> send
 an alert. The service will not be checked by Monit anymore nor
 restarted again later.  To reactivate monitoring of the service
@@ -1172,7 +1166,7 @@ The default action can be overrided with following statement:
 =back
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 Example:
 
@@ -1253,7 +1247,7 @@ specify a I<unit>. This could be "%" or if applicable "B" (Byte),
 "kB" (1024 Byte), "MB" (1024 KiloByte) or "GB" (1024 MegaByte).
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 
 To calculate the cycles, a counter is raised whenever the
@@ -1316,7 +1310,7 @@ I<sha1sum(1)> to create a checksum string for a file and
 use this string in the expect-statement.
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 The checksum statement in variable form may be used to check a
 file for changes and if changed, do a specified action. For
@@ -1376,7 +1370,7 @@ I<unit> is either "SECOND", "MINUTE", "HOUR" or "DAY" (it is also
 possible to use "SECONDS", "MINUTES", "HOURS", or "DAYS").
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 The variable timestamp statement is useful for checking a file
 for changes and then execute an action. This version was written
@@ -1471,7 +1465,7 @@ I<unit> is a choice of "B","KB","MB","GB" or long alternatives
 specified, "byte" unit is assumed by default.
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 The variable size test form is useful for checking a file for
 changes and send an alert or execute an action. Monit will
@@ -1552,7 +1546,7 @@ I<path> is an absolute path to a file containing extended
 regular expression on every line. See also regex(7).
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 You can use the I<NOT> statement to invert a match.
 
@@ -1617,7 +1611,7 @@ The syntax for the fsflags statement is:
 =back
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 Example:
 
@@ -1663,7 +1657,7 @@ alternatives "byte", "kilobyte", "megabyte", "gigabyte",
 "percent".
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 
 =head2 INODE TESTING
@@ -1698,7 +1692,7 @@ count of inodes. You can use the "%" character or the longer
 alternative "percent" as a unit.
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 
 =head2 PERMISSION TESTING
@@ -1724,7 +1718,7 @@ can omit the leading zeros, Monit will add the zeros to the left
 thus for example "640" is valid value and matches "0640").
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 The web interface will show a permission warning if the test
 failed.
@@ -1760,7 +1754,7 @@ The syntax for the uid statement is:
 I<user> defines a user id either in numeric or in string form.
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 
 The web interface will show a uid warning if the test should
@@ -1798,7 +1792,7 @@ The syntax for the gid statement is:
 I<user> defines a group id either in numeric or in string form.
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 
 The web interface will show a gid warning if the test should
@@ -1833,7 +1827,7 @@ The syntax for the pid statement is:
 =back
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 This test is useful to detect possible process restarts which has
 occurred in the timeframe between two Monit testing cycles. In
@@ -1873,7 +1867,7 @@ The syntax for the ppid statement is:
 =back
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 This test is useful for detecting changes of a process parent.
 
@@ -2138,7 +2132,7 @@ connection failed and execute the specified action. The default
 connect timeout is 5 seconds.
 
 I<action> is a choice of "ALERT", "RESTART", "START", "STOP",
-"EXEC", "MONITOR" or "UNMONITOR".
+"EXEC" or "UNMONITOR".
 
 
 =head4 Connection testing using the URL notation
