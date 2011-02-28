@@ -1272,7 +1272,6 @@ char *Util_monitId(char *idfile) {
       return NULL;
     }
     /* Generate the unique id */
-    srandom(time(NULL) + getpid());
     snprintf(buf, STRLEN, "%lu%d%lu", (unsigned long)time(NULL), getpid(), random());
     md5_buffer(buf, strlen(buf), digest);
     Util_digest2Bytes(digest, 16, Run.id);

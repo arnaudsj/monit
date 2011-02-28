@@ -1,10 +1,17 @@
-                     CHANGES version 5.2.4
+                     CHANGES version 5.2.5
                                 
            This file summarizes changes made since 5.0
                                 
        Bug fixes may refer to an auto-generated id in our
           bug-tracking system, which can be found here
           https://savannah.nongnu.org/bugs/?group=monit
+
+
+Version 5.2.5
+
+* bug #32583: Multiple SIP OPTIONS messages use the same header data.
+  Thanks to Hugh Waite for patch.
+
 
 
 Version 5.2.4

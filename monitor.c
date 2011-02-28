@@ -228,6 +228,11 @@ static void do_init() {
   signal(SIGPIPE, SIG_IGN);
 
   /*
+   * Initialize the random number generator
+   */
+  srand(time(NULL) + getpid());
+
+  /*
    * Initialize the Runtime mutex. This mutex
    * is used to synchronize handling of global
    * service data

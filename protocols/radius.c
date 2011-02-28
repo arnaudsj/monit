@@ -179,12 +179,9 @@ int check_radius(Socket_T s) {
   secret = (P->request ? P->request : "testing123");
   secret_len = strlen(secret);
 
-  /* initialization of random param */
-  srand(time(NULL) + getpid());
-
   /* Get 16 bytes of (very bad) random data */
   for (i = 0; i < 16; i++)
-    request[i + 4] = ((unsigned int)rand()) & 0xff;
+    request[i + 4] = ((unsigned int)random()) & 0xff;
 
   /* sign the packet */
   hmac_md5(request, sizeof(request), (unsigned char *)secret, secret_len, request + 22);

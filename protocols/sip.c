@@ -144,9 +144,6 @@ int check_sip(Socket_T s) {
 
   myip= socket_get_local_host(s);
 
-  /* initialization of random param */
-  srand(time(NULL)+getpid()+seed);
-
   if(socket_print(s,
     "OPTIONS %s:%s SIP/2.0\r\n"
     "Via: SIP/2.0/%s %s:%d;branch=z9hG4bKh%u%s\r\n"
@@ -164,15 +161,15 @@ int check_sip(Socket_T s) {
     transport,        // via transport udp|tcp
     myip,             // who its from
     port,             // our port
-    rand(),           // branch
+    random(),         // branch
     rport,            // rport option
     P->maxforward,    // maximum forwards
     proto,            // protocol
     request,          // to
     proto,            // protocol
     myip,             // from host
-    rand(),           // tag
-    rand(),           // call id
+    random(),         // tag
+    random(),         // call id
     proto,            // protocol
     myip,             // contact host
     port,             // contact port

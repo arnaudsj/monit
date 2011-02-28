@@ -174,7 +174,6 @@ int sendmail(Mail_T mail) {
   }
   
   for(i = 0, m= mail; m; m= m->next, i++) { 
-    srandom(time(NULL) + getpid() + i);
     do_send(&S, "MAIL FROM: <%s>\r\n", m->from);
     do_status(&S);
     do_send(&S, "RCPT TO: <%s>\r\n", m->to);
