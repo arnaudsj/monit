@@ -230,7 +230,7 @@ static void do_init() {
   /*
    * Initialize the random number generator
    */
-  srand(time(NULL) + getpid());
+  srandom(time(NULL) + getpid());
 
   /*
    * Initialize the Runtime mutex. This mutex
