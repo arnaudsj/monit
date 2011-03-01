@@ -154,19 +154,28 @@ static void set_sandbox(void) {
   struct stat st;
   extern char **environ;
   char   *path = "PATH=/bin:/usr/bin:/sbin:/usr/sbin";
+  char   buf[STRLEN];
+
+  /*
+   * Keep the TZ variable, the time.h family depends on it at least on AIX
+   */
+  snprintf(buf, sizeof(buf), "TZ=%s", getenv("TZ") ? getenv("TZ") : "");
 
   /*
    * Purge the environment. Then make sure PATH is set; some shells default
    * to a path with '.' first. You may have to putenv() other stuff, too,
    * but be careful with importing too much.
    */
-  environ[0]= 0;
+  environ[0] = 0;
   
-  if(putenv(path)) {
-    
+  if (putenv(xstrdup(buf))) {
+    LogError("%s: cannot set the TZ variable -- %s\n", prog, STRERROR);
+    exit(1);
+  }
+
+  if (putenv(path)) {
     LogError("%s: cannot set the PATH variable -- %s\n", prog, STRERROR);
     exit(1);
-    
   }
 
   /*

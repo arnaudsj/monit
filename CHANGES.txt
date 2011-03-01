@@ -12,6 +12,9 @@ Version 5.2.5
 * bug #32583: Multiple SIP OPTIONS messages use the same header data.
   Thanks to Hugh Waite for patch.
 
+* AIX: Fix the time display which was off by GMT difference. Thanks to
+  Helen Chen for report.
+
 
 
 Version 5.2.4
