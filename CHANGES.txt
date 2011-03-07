@@ -9,8 +9,11 @@
 
 Version 5.2.5
 
-* bug #32583: Multiple SIP OPTIONS messages use the same header data.
+* Fix bug #32583: Multiple SIP OPTIONS messages use the same header data.
   Thanks to Hugh Waite for patch.
+
+* Fix Debian bug #614984: smtp protocol test issues both EHLO and HELO.
+  Thanks to Sergey B Kirpichev for report.
 
 * AIX: Fix the time display which was off by GMT difference. Thanks to
   Helen Chen for report.

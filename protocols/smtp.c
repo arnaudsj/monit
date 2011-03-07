@@ -63,17 +63,11 @@ static int expect(Socket_T s, int expect, int log);
 int check_smtp(Socket_T s) {
   ASSERT(s);
   
-  if (! expect(s, 220, TRUE))
-    return FALSE;
-  
   /* Try HELO also before giving up as of rfc2821 4.1.1.1 */
-  if (! (say(s, "EHLO localhost\r\n") && expect(s, 250, FALSE)) || ! (say(s, "HELO localhost\r\n") && expect(s, 250, TRUE)))
-    return FALSE;
+  if (expect(s, 220, TRUE) && ((say(s, "EHLO localhost\r\n") && expect(s, 250, FALSE)) || (say(s, "HELO localhost\r\n") && expect(s, 250, TRUE))) && (say(s, "QUIT\r\n") && expect(s, 221, TRUE)))
+    return TRUE;
 
-  if (! (say(s, "QUIT\r\n") && expect(s, 221, TRUE)))
-    return FALSE;
-    
-  return TRUE;
+  return FALSE;
 }
 
 
