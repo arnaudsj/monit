@@ -432,7 +432,7 @@ then
 elif test `uname` = "AIX"
 then
    ARCH="AIX"
-   CFLAGS="$CFLAGS -D _REENTRANT"
+   CFLAGS="$CFLAGS -D_THREAD_SAFE -D_REENTRANT"
    LIBS="$LIBS -lodm"	
    # AIX v. 5.2
    LIBS="$LIBS -lcfg"	

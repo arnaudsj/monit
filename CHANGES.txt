@@ -18,6 +18,8 @@ Version 5.2.5
 * AIX: Fix the time display which was off by GMT difference. Thanks to
   Helen Chen for report.
 
+* AIX: Fix the M/Monit heartbeat. Thanks to Helen Chen for report.
+
 
 
 Version 5.2.4
