@@ -150,29 +150,25 @@ void init_env() {
  */
 static void set_sandbox(void) {
 
-  int    i;
+  int    i = 0;
   struct stat st;
   extern char **environ;
   char   *path = "PATH=/bin:/usr/bin:/sbin:/usr/sbin";
-  char   buf[STRLEN];
+  char   *tz;
 
   /*
-   * Keep the TZ variable, the time.h family depends on it at least on AIX
+   * Purge the environment, but keep the TZ variable as the time.h family depends on it at least on AIX
    */
-  snprintf(buf, sizeof(buf), "TZ=%s", getenv("TZ") ? getenv("TZ") : "");
-
-  /*
-   * Purge the environment. Then make sure PATH is set; some shells default
-   * to a path with '.' first. You may have to putenv() other stuff, too,
-   * but be careful with importing too much.
-   */
-  environ[0] = 0;
-  
-  if (putenv(xstrdup(buf))) {
-    LogError("%s: cannot set the TZ variable -- %s\n", prog, STRERROR);
-    exit(1);
+  for (tz = environ[0]; tz; tz = environ[++i]) {
+    if (! strncasecmp(tz, "TZ=", 3)) {
+      environ[0] = tz;
+      environ[1] = 0;
+      break;
+    }
   }
-
+  if (! tz)
+    environ[0] = 0;
+  
   if (putenv(path)) {
     LogError("%s: cannot set the PATH variable -- %s\n", prog, STRERROR);
     exit(1);
