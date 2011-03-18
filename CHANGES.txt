@@ -9,6 +9,11 @@
 
 Version 5.2.5
 
+* Fix process match check - when the monitored process failed and was
+  restarted by Monit, Monit didn't recognized it is running after the
+  restart and reported start failure (similar on stop). Thanks to
+  Kenichi Futatsumori for report and helping to root cause the problem.
+
 * Fix bug #32583: Multiple SIP OPTIONS messages use the same header data.
   Thanks to Hugh Waite for patch.
 

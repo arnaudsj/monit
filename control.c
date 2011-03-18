@@ -58,6 +58,7 @@
 #endif
 
 #include "monitor.h"
+#include "process.h"
 #include "net.h"
 #include "socket.h"
 #include "event.h"
@@ -459,22 +460,28 @@ static void do_depend(Service_T s, int action) {
  * @param service A Service to wait for
  */
 static void wait_start(Service_T s) {
-  time_t timeout = time(NULL) + s->start->timeout;
+  int            isrunning = FALSE;
+  int            ptreesize = 0;
+  int            oldptreesize = 0;
+  ProcessTree_T *ptree = NULL;
+  ProcessTree_T *oldptree = NULL;
+  time_t         timeout = time(NULL) + s->start->timeout;
   
   ASSERT(s);
 
   while ((time(NULL) < timeout) && !Run.stopped) {
-    if (Util_isProcessRunning(s))
+    initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize); // Reinitialize the process tree for match test
+    isrunning = Util_isProcessRunning(s);
+    delprocesstree(&oldptree, oldptreesize);
+    if (isrunning)
       break;
     sleep(1);
   }
   
-  if (!Util_isProcessRunning(s))
+  if (! isrunning)
     Event_post(s, Event_Exec, STATE_FAILED, s->action_EXEC, "failed to start");
   else
     Event_post(s, Event_Exec, STATE_SUCCEEDED, s->action_EXEC, "started");
-
-  return;
 }
 
 
@@ -488,17 +495,25 @@ static void wait_start(Service_T s) {
  * @return TRUE if the service was stopped otherwise FALSE
  */
 static int wait_stop(Service_T s) {
-  time_t timeout = time(NULL) + s->stop->timeout;
+  int            isrunning = TRUE;
+  int            ptreesize = 0; 
+  int            oldptreesize = 0;
+  ProcessTree_T *ptree = NULL;
+  ProcessTree_T *oldptree = NULL;
+  time_t         timeout = time(NULL) + s->stop->timeout;
   
   ASSERT(s);
 
   while ((time(NULL) < timeout) && !Run.stopped) {
-    if (!Util_isProcessRunning(s))
+    initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize); // Reinitialize the process tree for match test
+    isrunning = Util_isProcessRunning(s);
+    delprocesstree(&oldptree, oldptreesize);
+    if (! isrunning)
       break;
     sleep(1);
   }
 
-  if (Util_isProcessRunning(s)) {
+  if (isrunning) {
     Event_post(s, Event_Exec, STATE_FAILED, s->action_EXEC, "failed to stop");
     return FALSE;
   } else {
