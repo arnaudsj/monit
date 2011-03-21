@@ -214,6 +214,8 @@ int initprocesstree(ProcessTree_T **pt_r, int *size_r, ProcessTree_T **oldpt_r, 
   int root = -1;
 
   if (*pt_r != NULL) {  
+    if (oldpt_r && *oldpt_r != NULL)
+      delprocesstree(oldpt_r, oldsize_r);
     *oldpt_r   = *pt_r; 
     *oldsize_r = *size_r; 
   }
@@ -319,24 +321,19 @@ int findprocess(int pid, ProcessTree_T *pt, int size) {
 /**
  * Delete the process tree 
  */
-void delprocesstree(ProcessTree_T ** reference, int size) {
+void delprocesstree(ProcessTree_T **reference, int *size) {
   int i;
-  ProcessTree_T * pt;
-
-  pt = * reference;
+  ProcessTree_T *pt = *reference;
 
   if (pt == NULL || size <= 0)
       return;
-
-  for (i = 0; i < size; i++) {
+  for (i = 0; i < *size; i++) {
     FREE(pt[i].cmdline);
     FREE(pt[i].children);
   }
-
   FREE(pt);
-
   *reference = NULL;
-
+  *size = 0;
   return;
 }
 
@@ -346,10 +343,6 @@ void process_testmatch(char *pattern) {
   regex_t *regex_comp;
   int reg_return;
 #endif
-  int ptreesize    = 0;
-  int oldptreesize = 0;
-  ProcessTree_T *ptree = NULL;
-  ProcessTree_T *oldptree = NULL;
 
 #ifdef HAVE_REGEX_H
   NEW(regex_comp);
@@ -386,7 +379,6 @@ void process_testmatch(char *pattern) {
     if (count > 1)
       printf("WARNING: multiple processes matched the pattern. The check is FIRST-MATCH based, please refine the pattern\n");
   }
-  delprocesstree(&ptree, ptreesize);
 }
 
 

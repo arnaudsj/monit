@@ -128,6 +128,11 @@ pthread_t       heartbeatThread;               /**< M/Monit heartbeat thread */
 pthread_cond_t  heartbeatCond;                /**< Hearbeat wakeup condition */
 pthread_mutex_t heartbeatMutex;                          /**< Hearbeat mutex */
 
+int ptreesize = 0;
+int oldptreesize = 0;
+ProcessTree_T *ptree = NULL;
+ProcessTree_T *oldptree = NULL;
+
 char actionnames[][STRLEN]   = {"ignore", "alert", "restart", "stop", "exec", "unmonitor", "start", "monitor", ""};
 char modenames[][STRLEN]     = {"active", "passive", "manual"};
 char checksumnames[][STRLEN] = {"UNKNOWN", "MD5", "SHA1"};

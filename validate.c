@@ -135,14 +135,6 @@ static void check_process_resources(Service_T, Resource_T);
 static int  do_scheduled_action(Service_T);
 
 
-/* --------------------------------------------------------------- Globals */
-
-
-int            ptreesize    = 0;    
-int            oldptreesize = 0; 
-ProcessTree_T *ptree        = NULL;     
-ProcessTree_T *oldptree     = NULL;  
-
 /* ---------------------------------------------------------------- Public */
 
 
@@ -185,9 +177,6 @@ int validate() {
     gettimeofday(&s->collected, NULL);
   }
 
-  if (Run.doprocess)
-    delprocesstree(&oldptree, oldptreesize);
-
   reset_depend();
 
   return errors;
@@ -207,7 +196,7 @@ int check_process(Service_T s) {
   ASSERT(s);
 
   /* Test for running process */
-  if (!(pid = Util_isProcessRunning(s))) {
+  if (!(pid = Util_isProcessRunning(s, FALSE))) {
     Event_post(s, Event_Nonexist, STATE_FAILED, s->action_NONEXIST, "process is not running");
     return FALSE;
   } else

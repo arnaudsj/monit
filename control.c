@@ -58,7 +58,6 @@
 #endif
 
 #include "monitor.h"
-#include "process.h"
 #include "net.h"
 #include "socket.h"
 #include "event.h"
@@ -220,7 +219,7 @@ int control_service(const char *S, int A) {
 
     case ACTION_START:
       if (s->type == TYPE_PROCESS) {
-        if (Util_isProcessRunning(s)) {
+        if (Util_isProcessRunning(s, FALSE)) {
           DEBUG("%s: Process already running -- process %s\n", prog, S);
           Util_monitorSet(s);
           return TRUE;
@@ -330,7 +329,7 @@ static void do_start(Service_T s) {
     }
   }
   
-  if (s->start && (s->type!=TYPE_PROCESS || !Util_isProcessRunning(s))) {
+  if (s->start && (s->type!=TYPE_PROCESS || !Util_isProcessRunning(s, FALSE))) {
     LogInfo("'%s' start: %s\n", s->name, s->start->arg[0]);
     spawn(s, s->start, NULL);
     /* We only wait for a process type, other service types does not have a pid file to watch */
@@ -360,7 +359,7 @@ static int do_stop(Service_T s) {
     DEBUG("Monitoring disabled -- service %s\n", s->name);
   } 
 
-  if (s->stop && (s->type!=TYPE_PROCESS || Util_isProcessRunning(s))) {
+  if (s->stop && (s->type!=TYPE_PROCESS || Util_isProcessRunning(s, FALSE))) {
     LogInfo("'%s' stop: %s\n", s->name, s->stop->arg[0]);
     spawn(s, s->stop, NULL);
     if (s->type == TYPE_PROCESS) {
@@ -461,19 +460,12 @@ static void do_depend(Service_T s, int action) {
  */
 static void wait_start(Service_T s) {
   int            isrunning = FALSE;
-  int            ptreesize = 0;
-  int            oldptreesize = 0;
-  ProcessTree_T *ptree = NULL;
-  ProcessTree_T *oldptree = NULL;
   time_t         timeout = time(NULL) + s->start->timeout;
   
   ASSERT(s);
 
   while ((time(NULL) < timeout) && !Run.stopped) {
-    initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize); // Reinitialize the process tree for match test
-    isrunning = Util_isProcessRunning(s);
-    delprocesstree(&oldptree, oldptreesize);
-    if (isrunning)
+    if ((isrunning = Util_isProcessRunning(s, TRUE)))
       break;
     sleep(1);
   }
@@ -496,19 +488,12 @@ static void wait_start(Service_T s) {
  */
 static int wait_stop(Service_T s) {
   int            isrunning = TRUE;
-  int            ptreesize = 0; 
-  int            oldptreesize = 0;
-  ProcessTree_T *ptree = NULL;
-  ProcessTree_T *oldptree = NULL;
   time_t         timeout = time(NULL) + s->stop->timeout;
   
   ASSERT(s);
 
   while ((time(NULL) < timeout) && !Run.stopped) {
-    initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize); // Reinitialize the process tree for match test
-    isrunning = Util_isProcessRunning(s);
-    delprocesstree(&oldptree, oldptreesize);
-    if (! isrunning)
+    if (! (isrunning = Util_isProcessRunning(s, TRUE)))
       break;
     sleep(1);
   }

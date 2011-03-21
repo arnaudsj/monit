@@ -223,32 +223,17 @@ static const unsigned char b2x[][256] = {
 /* ------------------------------------------------------------------ Public */
 
 
-/**
- * Return only the filename with leading directory components
- * removed. This function does not modify the path string.
- * @param path A file path string
- * @return A pointer to the basename in path
- */
 char *Util_basename(char* path) {
-  
   char *fname;
 
   ASSERT(path);
 
   fname= strrchr(path, '/');
-  
   return(fname ? ++fname : path);
-  
 }
 
 
-/**
-  * Removes everything from the first line break or newline (CR|LF)
-  * @param s A string to be chomped
-  * @return The chomped string
-  */
 char *Util_chomp(char *s) {
-
   ASSERT(s);
   
   for (; *s; s++) {
@@ -256,36 +241,20 @@ char *Util_chomp(char *s) {
       *s= 0; break;
     }
   }
-
   return s;
-  
 }
 
 
-/**
- * Remove leading and trailing space from the string
- * @param s A string
- * @return s with leading and trailing spaces removed 
- */
 char *Util_trim(char *s) {
-
   ASSERT(s);
   
   Util_ltrim(s);
   Util_rtrim(s);
-
   return s;
-  
 }
 
 
-/**
- * Remove leading white space [ \t\r\n] from the string.
- * @param s A string
- * @return s with leading spaces removed
- */
 char *Util_ltrim(char *s) {
-  
   char *t= s;
 
   ASSERT(s);
@@ -297,111 +266,65 @@ char *Util_ltrim(char *s) {
       *r++= *t;
     } while(*t++);
   }
-
   return s;
-
 }
 
 
-/**
- * Remove trailing white space [ \t\r\n] from the string
- * @param s A string
- * @return s with trailing spaces removed
- */
 char *Util_rtrim(char *s) {
-
   char *t= s;
 
   ASSERT(s);
 
   while(*s) s++;
   while(*--s==' ' || *s=='\t' || *s=='\r' || *s=='\n') *s= 0;
-  
   return t;
-
 }
 
-/**
- * Remove any enclosing quotes ["'] from the string
- * @param s A string
- */
-void Util_trimQuotes(char *s) {
 
+void Util_trimQuotes(char *s) {
   char *t= s;
   char tmp=0;
 
   ASSERT(s);
 
   if(*t==39 || *t==34 ) {
-
     tmp=*t;
     t++;
-
-  } else {
-
+  } else
     return;
-    
-  }
-
   while ( *t != tmp && *t != '\0' ) {
     *(t-1) = *t;
     t++;
   }
-
   *(t-1) = '\0';
-  
   return;
-
 }
 
 
 char *Util_trunc(char *s, int n) {
-        ASSERT(n>=0);
-        if (s) {
-                int sl = strlen(s);
-                if (sl > (n + 4)) {
-                        int e = n+3;
-                        for (; n < e; n++)
-                                s[n]= '.';
-                        s[n]= 0;
-                }
-        }
-        return s;
+  ASSERT(n>=0);
+  if (s) {
+    int sl = strlen(s);
+    if (sl > (n + 4)) {
+      int e = n+3;
+      for (; n < e; n++)
+        s[n]= '.';
+      s[n]= 0;
+    }
+  }
+  return s;
 }
 
 
-/**
- * Replace all occurrences of the <code>old</code> char in the string
- * <code>s</code> with the <code>new</code> char.
- * @param s A string
- * @param old The old char
- * @param new The new char
- * @return s where all occurrence of old are replaced with new
- */
 char *Util_replace(char *s, char old, char new) {
-
   char *t= s;
 
   while (s&&*s) { if(*s==old) *s=new; s++; }
-
   return (t);
-
 }
 
 
-/**
- * Replace all occurrences of the sub-string old in the string src
- * with the sub-string new. The method is case sensitive for the
- * sub-strings new and old. The string parameter src must be an
- * allocated string, not a character array.
- * @param src An allocated string reference (e.g. &string)
- * @param old The old sub-string
- * @param new The new sub-string
- * @return src where all occurrences of the old sub-string are
- * replaced with the new sub-string. 
- */
 char *Util_replaceString(char **src, const char *old, const char *new) {
-
   int i;
   int d;
   
@@ -442,72 +365,39 @@ char *Util_replaceString(char **src, const char *old, const char *new) {
     FREE(*src);
     *src= buf;
   }
-  
   return *src;
-  
 }
 
 
-/**
- * Count the number the sub-string word occurs in s.
- * @param s The String to search for word in
- * @param word 	The sub-string to count in s
- */
 int Util_countWords(char *s, const char *word) {
-
   int i= 0;
   char *p= s;
 
   ASSERT(s && word);
   
   while((p= strstr(p, word))) { i++;  p++; }
-
   return i;
-
 }
 
 
-/**
- * Return TRUE if the string <i>a</i> starts with the string
- * <i>b</i>. The test is <i>case-insensitive</i> but depends on that
- * all characters in the two strings can be translated in the current
- * locale.
- * @param a The string to search for b in
- * @param b The sub-string to test a against
- * @return TRUE if a starts with b, otherwise FALSE
- */
 int Util_startsWith(const char *a, const char *b) {
-
   if((!a || !b) || toupper((int)*a)!=toupper((int)*b)) return FALSE;
-
-  while(*a && *b) {
-    
-    if(toupper((int)*a++) != toupper((int)*b++)) return FALSE;
-    
-  }
-
+  while(*a && *b)
+    if(toupper((int)*a++) != toupper((int)*b++))
+      return FALSE;
   return TRUE;
-
 }
 
 
-/**
- * Exchanges \escape sequences in a string
- * @param buf A string
- */
 void Util_handleEscapes(char *buf) {
-  
   int editpos;
   int insertpos;
   
   ASSERT(buf);
   
   for(editpos=insertpos=0; *(buf+editpos)!='\0'; editpos++, insertpos++) {
-    
     if(*(buf+editpos) == '\\' ) {
-      
       switch(*(buf+editpos+1)) {
-        
         case 'n': 
           *(buf+insertpos)='\n';
           editpos++;
@@ -555,36 +445,23 @@ void Util_handleEscapes(char *buf) {
       }  
       
     } else {
-      
       *(buf+insertpos)=*(buf+editpos);
-      
     }  
     
   }
   *(buf+insertpos)='\0';
-  
 }
 
 
-/**
- * Variant of Util_handleEscapes() which only handle \0x00 escape sequences 
- * in a string
- * @param buf A string
- * @return The new length of buf
- */
 int Util_handle0Escapes(char *buf) {
-  
   int editpos;
   int insertpos;
   
   ASSERT(buf);
   
   for(editpos=insertpos=0; *(buf+editpos)!='\0'; editpos++, insertpos++) {
-    
     if(*(buf+editpos) == '\\' ) {
-      
       switch(*(buf+editpos+1)) {
-        
         case '0':
           if(*(buf+editpos+2)=='x') {
             *(buf+insertpos)=x2c(&buf[editpos+3]);
@@ -598,46 +475,29 @@ int Util_handle0Escapes(char *buf) {
       }  
       
     } else {
-      
       *(buf+insertpos)=*(buf+editpos);
-      
     }  
-    
   }
   *(buf+insertpos)='\0';
-  
   return insertpos;
-  
 }
 
 
-/**
- * Convert a digest buffer to a char string
- * @param digest buffer containing a MD digest
- * @param mdlen digest length
- * @param result buffer to write the result to. Must be at least
- * 41 bytes long.
- */
 char *Util_digest2Bytes(unsigned char *digest, int mdlen, MD_T result) {
-        int i;
-        unsigned char *tmp= (unsigned char*)result;
-        static unsigned char hex[] = "0123456789abcdef";     
-        ASSERT(mdlen * 2 < MD_SIZE); // Overflow guard
-        for(i= 0; i < mdlen; i++) {
-                *tmp++ = hex[digest[i] >> 4];
-                *tmp++ = hex[digest[i] & 0xf];
-        }
-        *tmp = '\0';
-        return result;
+  int i;
+  unsigned char *tmp= (unsigned char*)result;
+  static unsigned char hex[] = "0123456789abcdef";     
+  ASSERT(mdlen * 2 < MD_SIZE); // Overflow guard
+  for(i= 0; i < mdlen; i++) {
+    *tmp++ = hex[digest[i] >> 4];
+    *tmp++ = hex[digest[i] & 0xf];
+  }
+  *tmp = '\0';
+  return result;
 }
 
 
-/**
- * @param name A service name as stated in the config file
- * @return the named service or NULL if not found
- */
 Service_T Util_getService(const char *name) {
-
   Service_T s;
 
   ASSERT(name);
@@ -647,17 +507,10 @@ Service_T Util_getService(const char *name) {
       return s;
     }
   }
-
   return NULL;
-
 }
 
 
-/**
- * Get the length of the service list, that is; the number of services
- * managed by monit
- * @return The number of services monitored
- */
 int Util_getNumberOfServices() {
   int i= 0;
   Service_T s;
@@ -666,25 +519,13 @@ int Util_getNumberOfServices() {
 }
 
 
-/**
- * @param name A service name as stated in the config file
- * @return TRUE if the service name exist in the
- * servicelist, otherwise FALSE
- */
 int Util_existService(const char *name) {
-
   ASSERT(name);
-
   return Util_getService(name)?TRUE:FALSE;
-
 }
 
 
-/**
- * Print the Runtime object
- */
 void Util_printRunList() {
-  
   printf("Runtime constants:\n");
   printf(" %-18s = %s\n", "Control file", is_str_defined(Run.controlfile));
   printf(" %-18s = %s\n", "Log file", is_str_defined(Run.logfile));
@@ -797,14 +638,9 @@ void Util_printRunList() {
   }
 
   printf("\n");
-  
 }
 
 
-/**
- * Print a service object
- * @param p A Service_T object
- */
 void Util_printService(Service_T s) {
   int sgheader = FALSE;
   Port_T n;
@@ -1193,30 +1029,20 @@ void Util_printService(Service_T s) {
 }
 
 
-/**
- * Print all the services in the servicelist
- */
 void Util_printServiceList() {
-
   Service_T s;
   char ruler[STRLEN];
   
   printf("The service list contains the following entries:\n\n");
   
-  for(s= servicelist_conf; s; s= s->next_conf) {
-    
+  for(s= servicelist_conf; s; s= s->next_conf)
     Util_printService(s);
-    
-  }
 
   memset(ruler, '-', STRLEN);
   printf("%-.79s\n", ruler);
-  
 }
 
-/**
- * Print file hashes from stdin or from the given file
- */
+
 void Util_printHash(char *filename) {
   unsigned char buf[STRLEN], buf2[STRLEN];
   FILE *fhandle = NULL;
@@ -1250,12 +1076,7 @@ fileerror:
   exit(1);
 }
 
-/**
- * Open and read the id from the given idfile. If the idfile doesn't exist,
- * generate new id and store it in the id file.
- * @param idfile An idfile with full path
- * @return the id
- */
+
 char *Util_monitId(char *idfile) {
   FILE *file = NULL;
 
@@ -1299,12 +1120,7 @@ char *Util_monitId(char *idfile) {
   return Run.id;
 }
 
-/**
- * Open and read the pid from the given pidfile.
- * @param pidfile A pidfile with full path
- * @return the pid (TRUE) or FALSE if the pid could
- * not be read from the file
- */
+
 pid_t Util_getPid(char *pidfile) {
   FILE *file= NULL;
   int pid= -1;
@@ -1340,17 +1156,16 @@ pid_t Util_getPid(char *pidfile) {
 }
 
 
-/**
- * @return TRUE (i.e. the running pid id)  if
- * the process is running, otherwise FALSE
- */
-int Util_isProcessRunning(Service_T s) {
+int Util_isProcessRunning(Service_T s, int refresh) {
   int   i;
   pid_t pid = -1;
   
   ASSERT(s);
   
   errno = 0;
+
+  if (refresh || ! ptree || ! ptreesize)
+    initprocesstree(&ptree, &ptreesize, &oldptree, &oldptreesize);
 
   if (s->matchlist) {
     /* The process table read may sporadically fail during read, because we're using glob on some platforms which may fail if the proc filesystem
@@ -1388,19 +1203,10 @@ int Util_isProcessRunning(Service_T s) {
   }
   Util_resetInfo(s);
   
-  return FALSE;
+  return 0;
 }
 
 
-/**
- * Returns a RFC822 Date string. If the given date is NULL compute the
- * date now. If an error occured the result buffer is set to an empty
- * string. The result buffer should be large enough to hold 33 bytes.
- * @param date seconds since EPOCH
- * @param result The buffer to write the date string to
- * @param len the length of the result buffer
- * @return a pointer to the result buffer
- */
 char *Util_getRFC822Date(time_t *date, char *result, int len) {
   
   struct tm *tm_now;
@@ -1417,14 +1223,7 @@ char *Util_getRFC822Date(time_t *date, char *result, int len) {
 }
 
 
-/**
- * Compute an uptime for a process based on the ctime
- * from the pidfile.
- * @param pidfile A process pidfile
- * @return an uptime
- */
 time_t Util_getProcessUptime(char *pidfile) {
-
   time_t ctime;
 
   ASSERT(pidfile);
@@ -1434,21 +1233,11 @@ time_t Util_getProcessUptime(char *pidfile) {
     time_t since= now-ctime;
     return since;
   }
-
   return (time_t)-1;
-
 }
 
   
-/**
- * Compute an uptime string based on the delta time in seconds. The
- * caller must free the returned string.
- * @param delta seconds. 
- * @param sep string separator
- * @return an uptime string
- */
 char *Util_getUptime(time_t delta, char *sep) {
-
   static int min = 60;
   static int hour = 3600;
   static int day = 86400;
@@ -1473,13 +1262,9 @@ char *Util_getUptime(time_t delta, char *sep) {
   snprintf(p, STRLEN - (p - buf), "%ldm%s", rest_m, sep);
   
   return xstrdup(buf);
-
 }
 
 
-/**
- * @return Store checksum for the given file in supplied buffer, return FALSE if failed, otherwise TRUE.
- */
 int Util_getChecksum(char *file, int hashtype, char *buf, int bufsize) {
   int hashlength = 16;
 
@@ -1546,12 +1331,6 @@ int Util_isurlsafe(const char *url) {
 }
 
 
-/**
- * Escape an url string converting unsafe characters to a hex (%xx)
- * representation.  The caller must free the returned string.
- * @param url an url string
- * @return the escaped string
- */
 char *Util_urlEncode(char *url) {
         char *escaped = NULL;
         if (url) {
@@ -1574,12 +1353,6 @@ char *Util_urlEncode(char *url) {
 }
 
 
-/**
- * Unescape an url string and remove redundant slashes. The
- * <code>url</code> parameter is modified by this method.
- * @param url an escaped url string
- * @return A pointer to the unescaped <code>url</code>string
- */
 char *Util_urlDecode(char *url) {
 	if (url && *url) {
                 register int x, y;
@@ -1598,6 +1371,7 @@ char *Util_urlDecode(char *url) {
 	return url;
 }
 
+
 // NOTE: To be used to URL encode service names when ready
 char *Util_encodeServiceName(char *name) {
         int i;
@@ -1610,12 +1384,7 @@ char *Util_encodeServiceName(char *name) {
 }
 
 
-/**
- * @return a Basic Authentication Authorization string (RFC 2617),
- * with credentials from the Run object, NULL if credentials are not defined.
- */
 char *Util_getBasicAuthHeaderMonit() {
-
   Auth_T c = Run.credentials;
 
   /* We find the first cleartext credential for authorization */
@@ -1632,10 +1401,6 @@ char *Util_getBasicAuthHeaderMonit() {
 }
 
 
-/**
- * @return a Basic Authentication Authorization string (RFC 2617),
- * NULL if username is not defined.
- */
 char *Util_getBasicAuthHeader(char *username, char *password) {
   char *auth, *b64;
   char  buf[STRLEN];
@@ -1655,14 +1420,7 @@ char *Util_getBasicAuthHeader(char *username, char *password) {
 }
 
 
-/**
- * Creates a new String by merging a formated string and a variable
- * argument list. The caller must free the returned String.
- * @param s A format string
- * @return The new String or NULL if the string could not be created
- */
 char *Util_getString(const char *s, ...) {
-
   long l;
   char *v;
   va_list ap;
@@ -1676,27 +1434,16 @@ char *Util_getString(const char *s, ...) {
   va_end(ap);
 
   return v;
-
 }
 
 
-/**
- * Do printf style format line parsing
- * @param s format string
- * @param ap variable argument list
- * @param len The lenght of the bytes written,
- * may be different from the returned allocated buffer size
- * @return buffer with parsed string
- */
 char *Util_formatString(const char *s, va_list ap, long *len) {
-
   int n;
-  int size= STRLEN;
-  char *buf= xcalloc(sizeof(char), size);
-  
 #ifdef HAVE_VA_COPY
   va_list ap_copy;
 #endif
+  int size= STRLEN;
+  char *buf= xcalloc(sizeof(char), size);
   
   ASSERT(s);
   
@@ -1719,14 +1466,9 @@ char *Util_formatString(const char *s, va_list ap, long *len) {
   *len= n;
   
   return buf;
-
 }
 
 
-/**
- * Redirect the standard file descriptors to /dev/null and route any
- * error messages to the log file.
- */
 void Util_redirectStdFds() {
   int i;
   for(i= 0; i < 3; i++) {
@@ -1737,11 +1479,6 @@ void Util_redirectStdFds() {
 }
 
 
-/**
- * Close all filedescriptors except standard. Everything
- * seems to have getdtablesize, so we'll use it here, and back
- * out to use 1024 if getdtablesize not available.
- */
 void Util_closeFds() {
   int i;
 #ifdef HAVE_UNISTD_H
@@ -1755,10 +1492,6 @@ void Util_closeFds() {
 }
 
 
-/**
- * Check if monit does have credentials for this user.  If successful
- * a pointer to the password is returned.
- */
 Auth_T Util_getUserCredentials(char *uname) {
   Auth_T c;
 

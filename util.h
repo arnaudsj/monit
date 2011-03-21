@@ -250,10 +250,12 @@ pid_t Util_getPid(char *pidfile);
 
 
 /**
- * @return TRUE (i.e. the running pid id)  if
- * the process is running, otherwise FALSE
+ * Check whether the process is running
+ * @param s The service being checked
+ * @param refresh TRUE to refresh the global ptree (useful for procmatch if process was mangled by monit in the same cycle such as by restart action) or FALSE to use cached ptree
+ * @return The PID of the running running process or 0 if the process is not running.
  */
-int Util_isProcessRunning(Service_T s);
+int Util_isProcessRunning(Service_T s, int refresh);
 
 
 /**

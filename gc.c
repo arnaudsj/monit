@@ -93,8 +93,8 @@ void gc() {
   gc_protocols();
 
   if(Run.doprocess) {
-    delprocesstree(&oldptree, oldptreesize);
-    delprocesstree(&ptree, ptreesize);
+    delprocesstree(&oldptree, &oldptreesize);
+    delprocesstree(&ptree, &ptreesize);
   }
   
   if(servicelist)

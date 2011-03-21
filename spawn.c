@@ -279,7 +279,7 @@ static void set_monit_environment(Service_T s, Command_T C, Event_T event, Envir
   push_monit_environment(buf, e);
 
   if (s->type == TYPE_PROCESS) {
-    snprintf(buf, STRLEN, "MONIT_PROCESS_PID=%d", Util_isProcessRunning(s));
+    snprintf(buf, STRLEN, "MONIT_PROCESS_PID=%d", Util_isProcessRunning(s, FALSE));
     push_monit_environment(buf, e);
 
     snprintf(buf, STRLEN, "MONIT_PROCESS_MEMORY=%ld", s->inf->priv.process.mem_kbyte);
