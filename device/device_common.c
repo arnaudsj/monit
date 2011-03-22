@@ -78,10 +78,10 @@
  * filesystem information structure for later use. Filesystem must be mounted.
  *
  * Valid objects are file or directory that are part of requested
- * filesystem, block special device or mountpoint.
+ * filesystem, device or mountpoint.
  *
  * In the case of file, directory or mountpoint the result is original
- * object, in the case of block special device mountpoint is returned.
+ * object, in the case of device the mountpoint is returned.
  *
  * @param inf     Information structure where resulting data will be stored
  * @param object  Identifies appropriate device object
@@ -105,20 +105,18 @@ char *device_path(Info_T inf, char *object) {
     return device_mountpoint_sysdep(inf, object);
   }
 
-  LogError("%s: Not file, directory or block special device: '%s'", prog, object);
+  LogError("%s: Not file, directory or device: '%s'", prog, object);
 
   return NULL;
 }
 
 
 /**
- * Filesystem usage statistics. In the case of success result is stored in
- * given information structure.
+ * Filesystem usage statistics. In the case of success the result is stored in the given information structure.
  *
  * @param inf Information structure where resulting data will be stored
- * @param object  Identifies requested filesystem - either file, directory,
- *                block special device or mountpoint
- * @return        TRUE if informations were succesfully read otherwise FALSE
+ * @param object Identifies requested filesystem - either file, directory, device or mountpoint
+ * @return TRUE if informations were succesfully read otherwise FALSE
  */
 int filesystem_usage(Info_T inf, char *object) {
   int rv;

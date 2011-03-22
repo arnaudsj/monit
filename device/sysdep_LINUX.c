@@ -76,8 +76,8 @@
  * @return         NULL in the case of failure otherwise mountpoint
  */
 char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
+  FILE *mntfd;
   struct mntent *mnt;
-  FILE          *mntfd;
 
   ASSERT(inf);
   ASSERT(blockdev);
@@ -87,7 +87,9 @@ char *device_mountpoint_sysdep(Info_T inf, char *blockdev) {
     return NULL;
   }
   while ((mnt = getmntent(mntfd)) != NULL) {
-    if (IS(blockdev, mnt->mnt_fsname)) {
+    char realpathbuf[PATH_MAX+1];
+    /* Try to compare the the filesystem as is, if failed, try to use the symbolic link target */
+    if (IS(blockdev, mnt->mnt_fsname) || (realpath(mnt->mnt_fsname, realpathbuf) && ! strcasecmp(blockdev, realpathbuf))) {
       endmntent(mntfd);
       inf->priv.filesystem.mntpath = xstrdup(mnt->mnt_dir);
       return inf->priv.filesystem.mntpath;

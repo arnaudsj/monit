@@ -237,25 +237,24 @@ int check_filesystem(Service_T s) {
 
   p = s->path;
 
-  /* We need to resolve symbolic link so if it points to device,
-   * we'll be able to find it in mnttab */
+  /* We need to resolve symbolic link so if it points to device, we'll be able to find it in mnttab */
   if (lstat(s->path, &stat_buf) != 0) {
     Event_post(s, Event_Nonexist, STATE_FAILED, s->action_NONEXIST, "filesystem doesn't exist");
     return FALSE;
   }
   if (S_ISLNK(stat_buf.st_mode)) {
     if (! realpath(s->path, path_buf)) {
-      Event_post(s, Event_Nonexist, STATE_FAILED, s->action_NONEXIST, "symbolic filesystem link error -- %s", STRERROR);
+      Event_post(s, Event_Nonexist, STATE_FAILED, s->action_NONEXIST, "filesystem symbolic link error -- %s", STRERROR);
       return FALSE;
     }
     p = path_buf;
-    Event_post(s, Event_Nonexist, STATE_SUCCEEDED, s->action_NONEXIST, "symbolic filesystem link %s -> %s", s->path, p);
+    Event_post(s, Event_Nonexist, STATE_SUCCEEDED, s->action_NONEXIST, "filesystem symbolic link %s -> %s", s->path, p);
     if (stat(p, &stat_buf) != 0) {
       Event_post(s, Event_Nonexist, STATE_FAILED, s->action_NONEXIST, "filesystem doesn't exist");
       return FALSE;
     }
   }
-  Event_post(s, Event_Nonexist, STATE_SUCCEEDED, s->action_NONEXIST, "filesystem exist");
+  Event_post(s, Event_Nonexist, STATE_SUCCEEDED, s->action_NONEXIST, "filesystem exists");
 
   s->inf->st_mode = stat_buf.st_mode;
   s->inf->st_uid  = stat_buf.st_uid;
