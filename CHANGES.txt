@@ -28,6 +28,8 @@ Version 5.2.5
 
 * AIX: Fix the M/Monit heartbeat. Thanks to Helen Chen for report.
 
+* Support symbolic link to monit configuration file.
+
 
 
 Version 5.2.4

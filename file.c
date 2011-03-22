@@ -305,8 +305,7 @@ int File_exist(char *file) {
 /**
  * Security check for files. The files must have the same uid as the
  * REAL uid of this process, it must have permissions no greater than
- * "maxpermission" and it must not be a symbolic link.  We check these
- * conditions here.
+ * "maxpermission".
  * @param filename The filename of the checked file
  * @param description The description of the checked file
  * @param permmask The permission mask for the file
@@ -319,24 +318,16 @@ int File_checkStat(char *filename, char *description, int permmask) {
   ASSERT(filename);
   ASSERT(description);
 
-  if(lstat(filename, &buf) < 0) {
-    LogError("%s: Cannot stat the %s '%s' -- %s\n",
-	prog, description, filename, STRERROR);
+  if(stat(filename, &buf) < 0) {
+    LogError("%s: Cannot stat the %s '%s' -- %s\n", prog, description, filename, STRERROR);
     return FALSE;
   }
-  if(S_ISLNK(buf.st_mode)) {
-    LogError("%s: The %s '%s' must not be a symbolic link.\n",
-	prog, description, filename);
-    return(FALSE);
-  }
   if(!S_ISREG(buf.st_mode)) {
-    LogError("%s: The %s '%s' is not a regular file.\n", 
-	prog, description,  filename);
+    LogError("%s: The %s '%s' is not a regular file.\n", prog, description,  filename);
     return FALSE;
   }
   if(buf.st_uid != geteuid())  {
-    LogError("%s: The %s '%s' must be owned by you.\n", 
-	prog, description, filename);
+    LogError("%s: The %s '%s' must be owned by you.\n", prog, description, filename);
     return FALSE;
   }
   if((buf.st_mode & 0777 ) & ~permmask) {
