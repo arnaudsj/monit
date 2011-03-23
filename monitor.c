@@ -735,7 +735,6 @@ static void version() {
  * M/Monit heartbeat thread
  */
 static void *heartbeat(void *args) {
-  int status;
   sigset_t ns;
   struct timespec wait;
 
@@ -744,7 +743,7 @@ static void *heartbeat(void *args) {
   LOCK(heartbeatMutex)
   {
     while (! Run.stopped && ! Run.doreload) {
-      if ((status = handle_mmonit(NULL)) == HANDLER_SUCCEEDED)
+      if (handle_mmonit(NULL) == HANDLER_SUCCEEDED)
         wait.tv_sec = time(NULL) + Run.polltime;
       else
         wait.tv_sec = time(NULL) + 1;
