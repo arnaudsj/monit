@@ -376,7 +376,7 @@ static void do_runtime(HttpRequest req, HttpResponse res) {
   }
 
   if(Run.mmonits) {
-    Mmonit_T c= Run.mmonits;
+    Mmonit_T c;
     out_print(res, "<tr><td>M/Monit server(s)</td><td>");
     for(c= Run.mmonits; c; c= c->next)
     {
@@ -394,7 +394,7 @@ static void do_runtime(HttpRequest req, HttpResponse res) {
   }
 
   if(Run.mailservers) {
-    MailServer_T mta= Run.mailservers;
+    MailServer_T mta;
     out_print(res, "<tr><td>Mail server(s)</td><td>");
     for(mta= Run.mailservers; mta; mta= mta->next)
         out_print(res, "%s:%d%s&nbsp;",
