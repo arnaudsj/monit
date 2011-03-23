@@ -407,11 +407,10 @@ const char *Event_get_description(Event_T E) {
  * @return An action id
  */
 short Event_get_action(Event_T E) {
-  Action_T A;
+  Action_T A = E->action->failed;
 
   ASSERT(E);
 
-  A = E->state ? E->action->failed : E->action->succeeded;
   switch (E->state) {
     case STATE_SUCCEEDED:
     case STATE_CHANGEDNOT:
