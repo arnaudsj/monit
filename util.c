@@ -574,7 +574,7 @@ void Util_printRunList() {
   }
 
   if(Run.mailservers) {
-    MailServer_T mta= Run.mailservers;
+    MailServer_T mta;
     printf(" %-18s = ", "Mail server(s)");
     for(mta= Run.mailservers; mta; mta= mta->next)
 	printf("%s:%d%s%s",
@@ -1050,12 +1050,11 @@ void Util_printServiceList() {
 void Util_printHash(char *filename) {
   unsigned char buf[STRLEN], buf2[STRLEN];
   FILE *fhandle = NULL;
-  int fresult;
   int i;
 
   if (! (fhandle = filename ? fopen(filename, "r") : stdin))
     goto fileerror;
-  if ((fresult = Util_getStreamDigests(fhandle, buf, buf2)))
+  if (Util_getStreamDigests(fhandle, buf, buf2))
     goto fileerror;
   if (filename && fclose(fhandle))
     goto fileerror;

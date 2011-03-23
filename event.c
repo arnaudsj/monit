@@ -407,7 +407,7 @@ const char *Event_get_description(Event_T E) {
  * @return An action id
  */
 short Event_get_action(Event_T E) {
-  Action_T A = E->action->failed;
+  Action_T A = NULL;
 
   ASSERT(E);
 
