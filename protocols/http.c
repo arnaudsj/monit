@@ -306,7 +306,6 @@ static int do_regex(Socket_T s, long content_length, Request_T R) {
   else if(content_length > HTTP_CONTENT_MAX)
     content_length= HTTP_CONTENT_MAX;
   
-  n= 0;
   size= 0;
   length= content_length;
   buf= xmalloc(content_length + 1);

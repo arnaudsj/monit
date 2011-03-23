@@ -110,7 +110,6 @@ int check_sip(Socket_T s) {
   const char *myip;
   char *rport= "";
   char *proto;
-  int seed;
 
   ASSERT(s);
 
@@ -126,13 +125,11 @@ int check_sip(Socket_T s) {
     {
       transport="UDP";
       rport=";rport";
-      seed=1;
       break;
     }
     case SOCK_STREAM:
     {
       transport="TCP";
-      seed=2;
       break;
     }
     default:

@@ -124,7 +124,7 @@ int sendmail(Mail_T mail) {
   ASSERT(mail);
   
   S.socket = NULL;
-  if((rv = sigsetjmp(S.error, TRUE))) {
+  if(sigsetjmp(S.error, TRUE)) {
     rv = FALSE;
     goto exit;
   } else {
