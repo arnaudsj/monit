@@ -89,7 +89,7 @@ int check_ntp3(Socket_T s)
     (NTP_MODE_CLIENT);
 
   /* Send request to NTP server */
-  if( (br= socket_write(s, ntpRequest, NTPLEN)) <= 0 ) {
+  if(socket_write(s, ntpRequest, NTPLEN) <= 0 ) {
     LogError("NTP: error sending NTP request -- %s\n", STRERROR);
     return FALSE;
   }
