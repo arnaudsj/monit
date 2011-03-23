@@ -2013,7 +2013,7 @@ void Util_stringbuffer(Buffer_T *b, const char *m, ...) {
 int Util_getfqdnhostname(char *buf, unsigned len) {
   int status;
   char hostname[STRLEN];
-  struct addrinfo hints, *info;
+  struct addrinfo hints, *info = NULL;
 
   if (gethostname(hostname, sizeof(hostname))) {
     LogError("%s: Error getting hostname -- %s\n", prog, STRERROR);
@@ -2029,7 +2029,8 @@ int Util_getfqdnhostname(char *buf, unsigned len) {
     snprintf(buf, len, "%s", hostname); // fallback to gethostname()
   } else
     snprintf(buf, len, "%s", info->ai_canonname);
-
+  if (info)
+    freeaddrinfo(info);
   return 0;
 }
 
