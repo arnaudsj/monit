@@ -88,6 +88,10 @@
 #include <sys/types.h>
 #endif
 
+#ifdef HAVE_NETDB_H
+#include <netdb.h>
+#endif
+
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
@@ -2003,6 +2007,30 @@ void Util_stringbuffer(Buffer_T *b, const char *m, ...) {
     (*b).buf[(*b).bufused]= 0;
     FREE(buf);
   }
+}
+
+
+int Util_getfqdnhostname(char *buf, unsigned len) {
+  int status;
+  char hostname[STRLEN];
+  struct addrinfo hints, *info;
+
+  if (gethostname(hostname, sizeof(hostname))) {
+    LogError("%s: Error getting hostname -- %s\n", prog, STRERROR);
+    return -1;
+  }
+
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_CANONNAME;
+  if ((status = getaddrinfo(hostname, NULL, &hints, &info))) {
+    LogError("%s: Cannot translate '%s' to FQDN name -- %s\n", prog, hostname, gai_strerror(status));
+    snprintf(buf, len, "%s", hostname); // fallback to gethostname()
+  } else
+    snprintf(buf, len, "%s", info->ai_canonname);
+
+  return 0;
 }
 
 

@@ -1866,7 +1866,7 @@ static void preparse() {
   /*
    * Get the localhost name
    */
-  if (gethostname(localhost, sizeof(localhost)) < 0)
+  if (Util_getfqdnhostname(localhost, sizeof(localhost)))
     snprintf(localhost, STRLEN, "%s", LOCALHOST);
 
   /* Set instance incarnation ID */

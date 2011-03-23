@@ -135,9 +135,7 @@ int sendmail(Mail_T mail) {
   
   Util_getRFC822Date(NULL, now, STRLEN);
   
-  if(Run.mail_hostname || gethostname(S.localhost, sizeof(S.localhost)) < 0) {
-    snprintf(S.localhost, sizeof(S.localhost), "%s", Run.mail_hostname?Run.mail_hostname:LOCALHOST);
-  }
+  snprintf(S.localhost, sizeof(S.localhost), "%s", Run.mail_hostname ? Run.mail_hostname : Run.localhostname);
   
   do_status(&S);
 
