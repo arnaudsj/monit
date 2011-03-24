@@ -67,7 +67,7 @@
 /* -------------------------------------------------------------- Prototypes */
 
 
-static void document_head(Buffer_T *, int);
+static void document_head(Buffer_T *, int, const char *);
 static void document_foot(Buffer_T *);
 static void status_service(Service_T, Buffer_T *, short, int);
 static void status_servicegroup(ServiceGroup_T, Buffer_T *, short);
@@ -83,17 +83,18 @@ static void status_event(Event_T, Buffer_T *);
  * @param E An event object or NULL for general status
  * @param L Status information level
  * @param V Format version
+ * @param myip The client-side IP address
  * @return XML document or NULL in the case of error. The caller must free
 *  the memory.
  */
-char *status_xml(Event_T E, short L, int V) {
+char *status_xml(Event_T E, short L, int V, const char *myip) {
   Buffer_T  B;
   Service_T S;
   ServiceGroup_T SG;
 
   memset(&B, 0, sizeof(Buffer_T));
 
-  document_head(&B, V);
+  document_head(&B, V, myip);
 
   if (V == 2)
     Util_stringbuffer(&B, "<services>");
@@ -123,8 +124,9 @@ char *status_xml(Event_T E, short L, int V) {
  * Prints a document header into the given buffer.
  * @param B Buffer object
  * @param V Format version
+ * @param myip The client-side IP address
  */
-static void document_head(Buffer_T *B, int V) {
+static void document_head(Buffer_T *B, int V, const char *myip) {
   Util_stringbuffer(B,
     "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
   if (V == 2) {
@@ -164,7 +166,7 @@ static void document_head(Buffer_T *B, int V) {
       "<port>%d</port>"
       "<ssl>%d</ssl>"
       "</httpd>",
-      Run.bind_addr?Run.bind_addr:"",
+      Run.bind_addr ? Run.bind_addr : myip,
       Run.httpdport,
       Run.httpdssl);
 

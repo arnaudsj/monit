@@ -2269,7 +2269,7 @@ static void print_status(HttpRequest req, HttpResponse res, int version)
 
   if(stringFormat && Util_startsWith(stringFormat, "xml"))
   {
-    char *D = status_xml(NULL, level, version);
+    char *D = status_xml(NULL, level, version, socket_get_local_host(req->S));
     out_print(res, "%s", D);
     FREE(D);
     set_content_type(res, "text/xml");

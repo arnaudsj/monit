@@ -969,7 +969,7 @@ int  sha_md5_stream (FILE *, void *, void *);
 void reset_procinfo(Service_T);
 int  check_service_status(Service_T);
 void printhash(char *);  
-char *status_xml(Event_T, short, int);
+char *status_xml(Event_T, short, int, const char *);
 int  handle_mmonit(Event_T);
 int  do_wakeupcall();
 

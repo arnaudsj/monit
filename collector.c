@@ -99,7 +99,7 @@ int handle_mmonit(Event_T E) {
     }
   }
 
-  D = status_xml(E, E ? LEVEL_SUMMARY : LEVEL_FULL, 2);
+  D = status_xml(E, E ? LEVEL_SUMMARY : LEVEL_FULL, 2, socket_get_local_host(socket));
 
   if(!data_send(socket, C, D)) {
     LogError("M/Monit: communication failed\n");
