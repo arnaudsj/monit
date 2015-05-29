@@ -101,7 +101,7 @@ Solaris Nevada:
   SUNWopenssl-libraries
   SUNWbison
   SUNWflexlex
-  SUNWflexruntime        NOTE: see bellow for Solaris Nevada x86 - AMD64
+  SUNWflexruntime        NOTE: see below for Solaris Nevada x86 - AMD64
   CSWgm4                (http://www.blastwave.org))
 
 Set path to the SFW utilities and libraries, for example:
