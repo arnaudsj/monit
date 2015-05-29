@@ -5,7 +5,7 @@
 ## Comments begin with a '#' and extend through the end of the line. Keywords
 ## are case insensitive. All path's MUST BE FULLY QUALIFIED, starting with '/'.
 ##
-## Bellow is the example of some frequently used statements. For information
+## Below is the example of some frequently used statements. For information
 ## about the control file, a complete list of statements and options please 
 ## have a look in the monit manual.
 ##
